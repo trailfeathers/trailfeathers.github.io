@@ -248,5 +248,87 @@ body {
 }
 
 /* Trip Planner */
+/* trip planner layout */
+.trip-planner {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* dashboard buttons */
+#dash-options {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* sections */
+.trip-setup,
+.trip-overview {
+  background: #f6f8f6;
+  padding: 1.5rem;
+  border-radius: 10px;
+}
+
+/* form */
+#trip-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+#trip-form input,
+#trip-form textarea {
+  padding: 0.6rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+#trip-form textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* trip card */
+.trip-card {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.trip-actions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* buttons */
+button {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background-color: #2f6b2f;
+  color: white;
+}
+
+button.small {
+  padding: 0.4rem 0.7rem;
+  font-size: 0.85rem;
+}
+
+button.danger {
+  background-color: #a33;
+}
+
+button:hover {
+  opacity: 0.9;
+}
 
 /* Friends */
