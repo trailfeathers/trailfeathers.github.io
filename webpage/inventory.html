@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TrailFeathers Gear Library</title>
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="banner">
+    <h1>Gear Library</h1>
+  </header>
+
+  <main class="content">
+    <section class="inventory-list">
+      <h2>Your Equipment</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Quantity</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody id="inventory-table">
+          <tr>
+            <td>Tent</td>
+            <td>2</td>
+            <td>
+              <button class="small">+</button>
+              <button class="small">−</button>
+              <button class="small"><span>🗑</span></button>
+            </td>
+          </tr>
+          <tr>
+            <td>Sleeping Bag</td>
+            <td>4</td>
+            <td>
+              <button class="small">+</button>
+              <button class="small">−</button>
+              <button class="small"><span>🗑</span></button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="inventory-add">
+        <h2>Add Equipment</h2>
+  
+        <form id="add-item-form">
+          <input
+            type="text"
+            id="item-name"
+            placeholder="Item Name"
+            required
+          />
+  
+          <input
+            type="number"
+            id="item-quantity"
+            placeholder="Qty"
+            min="1"
+            required
+          />
+  
+          <button type="submit">Add</button>
+        </form>
+      </section>
+
+    <div id="dash-options">
+      <button type="submit" id="home">Home</button>
+      <button type="submit" id="plan-trip">Plan a Trip</button>
+      <button type="submit" id="add-friend">Add a Friend</button>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
