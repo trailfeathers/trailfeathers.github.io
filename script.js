@@ -20,20 +20,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Login Form
   const loginForm = document.querySelector("#login-form");
   if (loginForm) {
-    loginForm.addEventListener("submit", async (event) => {
+    loginForm.addEventListener("submit", () => {
       event.preventDefault();
-      const username = document.querySelector("#username").value;
-      const password = document.querySelector("#password").value;
-
-      const res = await fetch(`${API_BASE}/api/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ username, password }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) return alert(data.error || "Login failed");
       window.location.href = "dashboard.html";
     });
   }
@@ -41,36 +29,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // Registration Form
   const registerForm = document.querySelector("#register-form");
   if (registerForm) {
-    registerForm.addEventListener("submit", async (event) => {
+    registerForm.addEventListener("submit", () => {
       event.preventDefault();
-      const username = document.querySelector("#username").value;
-      const password = document.querySelector("#password").value;
-      const confirm = document.querySelector("#confirm-password").value;
-
-      if (password !== confirm) return alert("Passwords do not match");
-
-      const res = await fetch(`${API_BASE}/api/signup`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ username, password }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) return alert(data.error || "Signup failed");
       window.location.href = "dashboard.html";
     });
-  }
-
-  // Dashboard welcome
-  const welcomeEl = document.querySelector("#welcome");
-  if (welcomeEl) {
-    (async () => {
-      const res = await fetch(`${API_BASE}/api/me`, { credentials: "include" });
-      if (!res.ok) return (window.location.href = "login.html");
-      const user = await res.json();
-      welcomeEl.textContent = `Welcome, ${user.username}`;
-    })();
   }
 
   // Dashboard buttons
