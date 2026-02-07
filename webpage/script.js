@@ -1,3 +1,5 @@
+const API_BASE = "http://localhost:5000";
+
 // First Page
 const loginButton = document.querySelector("#login");
 const registerButton = document.querySelector("#register");
@@ -14,27 +16,91 @@ if (registerButton) {
   });
 }
 
-// Login Page
+// Login
 const loginForm = document.querySelector("#login-form");
 
 if (loginForm) {
-  loginForm.addEventListener("submit", (event) => {
+  loginForm.addEventListener("submit", async (event) => {
     event.preventDefault();
+
+    const username = document.querySelector("#username").value;
+    const password = document.querySelector("#password").value;
+
+    const res = await fetch(`${API_BASE}/api/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      credentials: "include", // 🔑 session cookies
+      body: JSON.stringify({ username, password })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.error || "Login failed");
+      return;
+    }
+
     window.location.href = "dashboard.html";
   });
 }
+
 
 // Registration Page
 const registerForm = document.querySelector("#register-form");
 
 if (registerForm) {
-  registerForm.addEventListener("submit", (event) => {
+  registerForm.addEventListener("submit", async (event) => {
     event.preventDefault();
+
+    const username = document.querySelector("#username").value;
+    const password = document.querySelector("#password").value;
+    const confirm = document.querySelector("#confirm-password").value;
+
+    if (password !== confirm) {
+      alert("Passwords do not match");
+      return;
+    }
+
+    const res = await fetch(`${API_BASE}/api/signup`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      credentials: "include",
+      body: JSON.stringify({ username, password })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.error || "Signup failed");
+      return;
+    }
+
     window.location.href = "dashboard.html";
   });
 }
 
+
 // Dashboard
+(async () => {
+  const res = await fetch(`${API_BASE}/api/me`, {
+    credentials: "include"
+  });
+
+  if (!res.ok) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  const user = await res.json();
+  document.querySelector("#welcome").textContent =
+    `Welcome, ${user.username}`;
+})();
+
+
 const inventory = document.querySelector("#inventory");
 const planTrip = document.querySelector("#plan-trip");
 const addFriend = document.querySelector("#add-friend");
