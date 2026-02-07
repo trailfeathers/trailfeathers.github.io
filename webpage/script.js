@@ -85,20 +85,22 @@ if (registerForm) {
 
 
 // Dashboard
-(async () => {
-  const res = await fetch(`${API_BASE}/api/me`, {
-    credentials: "include"
-  });
+const welcomeEl = document.querySelector("#welcome");
+if (welcomeEl) {
+  (async () => {
+    const res = await fetch(`${API_BASE}/api/me`, {
+      credentials: "include"
+    });
 
-  if (!res.ok) {
-    window.location.href = "login.html";
-    return;
-  }
+    if (!res.ok) {
+      window.location.href = "login.html";
+      return;
+    }
 
-  const user = await res.json();
-  document.querySelector("#welcome").textContent =
-    `Welcome, ${user.username}`;
-})();
+    const user = await res.json();
+    welcomeEl.textContent = `Welcome, ${user.username}`;
+  })();
+}
 
 
 const inventory = document.querySelector("#inventory");
