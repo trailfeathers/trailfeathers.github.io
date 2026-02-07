@@ -1,4 +1,4 @@
-const API_BASE = "https://trailfeathers-github-io-2.onrender.com/";
+const API_BASE = "https://trailfeathers-github-io-real.onrender.com";
 
 // First Page
 const loginButton = document.querySelector("#login");
