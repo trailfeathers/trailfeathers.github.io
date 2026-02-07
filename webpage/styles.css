@@ -232,21 +232,6 @@ body {
   border-bottom: none;
 }
 
-/* acion buttons */
-.inventory-list button.small {
-  font-size: 1rem;
-  padding: 0.35rem 0.75rem;
-  border-radius: 999px;
-  border: none;
-  cursor: pointer;
-  background-color: #e0e0e0;
-  margin-right: 0.4rem;
-}
-
-.inventory-list button.small:hover {
-  background-color: #d5d5d5;
-}
-
 /* Trip Planner */
 /* trip planner layout */
 .trip-planner {
