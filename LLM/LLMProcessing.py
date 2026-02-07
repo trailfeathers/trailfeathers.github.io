@@ -1,7 +1,7 @@
 import openai
 import csv
 
-client = openai.OpenAI(api_key="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")
+#ADD api key here from discord
 
 # Fixed part of the message
 fixed_prompt = "You are a professional hiking guide writer. You are given all data for a specific hike: Hike Name, Trip Report 1 Title & Text, Trip Report 2 Title & Text, Description, Length_1, Highest Point_1, Elevation Gain_1, Calculated Difficulty_1, URL, and Coordinates. Produce a ready-to-publish website page in this format: include a Title & Critical Info section with Hike Name, Distance, Elevation Gain, Highest Point, Difficulty, Trailhead GPS as a clickable Google Maps link, and Permits with links; an Essential Gear section listing appropriate gear (include snow/shoeing gear if relevant, headlamp, trekking poles, rubber boots for huts, water filtration, food, warm layers); a Hike Overview section (~250 words) summarizing the trail using Description, mentioning junctions, scenic views, steep sections, hut amenities, and winter/snow tips; and a Trip Reports section listing each trip report with date and full text, preserving links. Use headings (#, ##), bold key info (distance, elevation, difficulty), make links clickable, and maintain a professional web-friendly style."
