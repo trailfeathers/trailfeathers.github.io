@@ -6,13 +6,13 @@ const registerButton = document.querySelector("#register");
 
 if (loginButton) {
   loginButton.addEventListener("click", () => {
-    window.location.href = "webpage/login.html";
+    window.location.href = "login.html";
   });
 }
 
 if (registerButton) {
   registerButton.addEventListener("click", () => {
-    window.location.href = "webpage/register.html";
+    window.location.href = "register.html";
   });
 }
 
