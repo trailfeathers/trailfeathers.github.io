@@ -7,13 +7,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (loginButton) {
     loginButton.addEventListener("click", () => {
-      window.location.href = "login.html";
+      window.location.href = "webpage/login.html";
     });
   }
 
   if (registerButton) {
     registerButton.addEventListener("click", () => {
-      window.location.href = "register.html";
+      window.location.href = "webpage/register.html";
     });
   }
 
