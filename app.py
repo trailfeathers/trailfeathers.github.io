@@ -32,14 +32,20 @@ def create_app():
     # ----------------------
     # CORS (sessions!)
     # ----------------------
+    origins = [
+        "http://localhost:5500",
+        "http://127.0.0.1:5500",
+    ]
+    frontend_url = os.getenv("FRONTEND_URL")
+    if frontend_url:
+        origins.append(frontend_url)
+    if "https://trailfeathers.github.io" not in origins:
+        origins.append("https://trailfeathers.github.io")
+
     CORS(
         app,
         supports_credentials=True,
-        origins=[
-            "http://localhost:5500",
-            "http://127.0.0.1:5500",
-            os.getenv("FRONTEND_URL"),
-        ],
+        origins=origins,
     )
 
     # ----------------------
