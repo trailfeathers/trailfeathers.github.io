@@ -3,6 +3,13 @@ from flask import Flask, request, jsonify, session
 from flask_bcrypt import Bcrypt
 from datetime import timedelta
 
+from database.database import (
+    get_user_by_id,
+    get_user_by_username,
+    create_user,
+    user_exists_by_username,
+)
+
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 
@@ -18,17 +25,13 @@ app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 app.config["SESSION_COOKIE_SECURE"] = bool(os.getenv("RENDER"))
 
-# --- Fake In-Memory "DB" ---
-users_by_username = {}  # username -> user dict
-users_by_id = {}        # id -> user dict
-next_id = 1
-
 
 def require_auth():
+    """Return current user dict (id, username) from DB or None."""
     uid = session.get("user_id")
-    if not uid or uid not in users_by_id:
+    if not uid:
         return None
-    return users_by_id[uid]
+    return get_user_by_id(uid)
 
 
 # ----------------------
@@ -36,7 +39,6 @@ def require_auth():
 # ----------------------
 @app.post("/api/signup")
 def signup():
-    global next_id
     data = request.get_json(silent=True) or {}
 
     username = (data.get("username") or "").strip()
@@ -45,22 +47,12 @@ def signup():
     if not username or not password:
         return jsonify(error="Missing username or password"), 400
 
-    if username in users_by_username:
+    if user_exists_by_username(username):
         return jsonify(error="Username already exists"), 409
 
     pw_hash = bcrypt.generate_password_hash(password).decode("utf-8")
+    user = create_user(username, pw_hash)
 
-    user = {
-        "id": next_id,
-        "username": username,
-        "pw_hash": pw_hash
-    }
-
-    next_id += 1
-    users_by_username[username] = user
-    users_by_id[user["id"]] = user
-
-    # Auto-login
     session["user_id"] = user["id"]
     session.permanent = True
 
@@ -83,11 +75,11 @@ def login_route():
     if not username or not password:
         return jsonify(error="Missing username or password"), 400
 
-    user = users_by_username.get(username)
+    user = get_user_by_username(username)
     if not user:
         return jsonify(error="Invalid credentials"), 401
 
-    if not bcrypt.check_password_hash(user["pw_hash"], password):
+    if not bcrypt.check_password_hash(user["password_hash"], password):
         return jsonify(error="Invalid credentials"), 401
 
     session["user_id"] = user["id"]

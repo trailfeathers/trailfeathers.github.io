@@ -5,10 +5,10 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 # Import auth routes (this file defines routes on an app instance)
-import login
+from auth import login
 
-# Import inventory DB helpers
-from database.database_inventory.database_inventory_pg import (
+# Import gear DB helpers (schema: gear.user_id -> users.id)
+from database.database import (
     add_gear_item,
     list_gear,
 )
@@ -62,7 +62,7 @@ def create_app():
         payload = request.get_json(silent=True) or {}
 
         try:
-            item_id = add_gear_item(user["username"], payload)
+            item_id = add_gear_item(user["id"], payload)
         except ValueError as e:
             return jsonify(error=str(e)), 400
 
@@ -74,7 +74,7 @@ def create_app():
         if not user:
             return jsonify(error="Not logged in"), 401
 
-        items = list_gear(user["username"])
+        items = list_gear(user["id"])
         return jsonify(items)
 
     # ----------------------
