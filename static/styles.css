@@ -85,6 +85,24 @@ body {
 
 
 /* Login Page*/
+/* back button */
+.authorization .secondary {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 999px;
+  border: 2px solid #2c5f2d;
+  background-color: white;
+  color: #2c5f2d;
+  font-size: 1.1rem;
+  cursor: pointer;
+  margin-top: 0.75rem;
+}
+
+.authorization .secondary:hover {
+  background-color: #f0f5eb;
+}
+
+
 /* authorization form */
 .authorization {
   background: white;

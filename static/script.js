@@ -17,6 +17,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Back button (Login Page)
+  const backButtonLogin = document.querySelector("#back-button-login");
+  if (backButtonLogin) {
+    backButtonLogin.addEventListener("click", () => {
+      window.history.back();
+    });
+  }
+
   // Login Form – call API, then redirect or show error
   const loginForm = document.querySelector("#login-form");
   if (loginForm) {
@@ -91,6 +99,14 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch (_) {
         if (errEl) errEl.textContent = "Could not reach the server. Try again later.";
       }
+    });
+  }
+
+  // Back button (Registration Page)
+  const backButtonRegister = document.querySelector("#back-button-register");
+  if (backButtonRegister) {
+    backButtonRegister.addEventListener("click", () => {
+      window.history.back();
     });
   }
 
