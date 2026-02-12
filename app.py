@@ -49,18 +49,21 @@ def create_app():
     )
 
     # Preflight OPTIONS must return 2xx for CORS; POST-only routes otherwise 404
-    @app.options("/api/signup")
-    @app.options("/api/login")
+    @app.route("/api/signup", methods=["OPTIONS"])
+    @app.route("/api/login", methods=["OPTIONS"])
     def options_auth():
         return "", 200
 
     # ----------------------
     # Register auth routes
     # ----------------------
-    # login.py already defines routes on its own Flask app,
-    # so we mount them onto this app via blueprint-style reassignment
+    # Point login at this app and register auth view functions here so they're on the same app we run
     login.app = app
     login.bcrypt.init_app(app)
+    app.add_url_rule("/api/signup", view_func=login.signup, methods=["POST"])
+    app.add_url_rule("/api/login", view_func=login.login_route, methods=["POST"])
+    app.add_url_rule("/api/logout", view_func=login.logout_route, methods=["POST"])
+    app.add_url_rule("/api/me", view_func=login.me, methods=["GET"])
 
     # ----------------------
     # Inventory API
