@@ -1,0 +1,160 @@
+
+TrailFeathers – Project Overview
+
+Project Summary
+
+TrailFeathers is a web-based outdoor trip planning application designed to help users organize personal gear and collaboratively plan outdoor trips. The system combines structured relational data (PostgreSQL) with AI-generated summaries to support safe, efficient, and well-coordinated adventures.
+
+The primary goal of TrailFeathers is to eliminate redundant gear packing, centralize trip planning, and provide relevant location intelligence (trip reports and conditions) within a single integrated platform.
+
+
+Core Problem
+
+Outdoor trip planning is currently fragmented across multiple tools:
+
+- Gear is tracked manually or in spreadsheets.
+- Trips are coordinated through text messages or shared documents.
+- Trip reports and weather data must be manually searched and interpreted.
+- Groups often duplicate shared gear (e.g., multiple tents or stoves).
+
+There is no unified system that:
+
+- Stores personal gear inventories.
+- Allows collaborative trip planning.
+- Prevents redundant packing.
+- Integrates summarized location intelligence.
+
+TrailFeathers addresses this gap.
+
+
+System Architecture Overview
+
+TrailFeathers consists of:
+
+Frontend (HTML/CSS/JS)
+- User login and registration
+- Inventory management interface
+- Trip management interface
+- Dashboard and collaborative views
+
+Backend (Flask + psycopg2)
+- Session-based authentication
+- REST API endpoints
+- Business logic for trips and gear
+- Database integration
+
+Database (Neon PostgreSQL)
+- Users table
+- Gear table (per user)
+- Trips table
+- Trip collaborators (many-to-many)
+- Optional trip gear assignment
+
+AI Integration (planned component)
+- Scrapes recent trip reports
+- Summarizes trail conditions
+- Generates trip-specific safety insights
+
+
+Core Features
+
+1. User Authentication
+- Users can create accounts and log in.
+- Passwords are securely hashed using bcrypt.
+- Sessions are maintained using Flask sessions.
+
+2. Gear Inventory Management
+
+Each user can:
+- Add gear items.
+- Store attributes (type, name, weight, brand, condition).
+- View their personal inventory.
+- Edit or remove gear (future enhancement).
+
+All gear items are tied to a specific user via foreign key relationships.
+
+3. Trip Creation and Management
+
+Users can:
+- Create trips with attributes:
+  - Trip name
+  - Trail/location
+  - Activity type
+  - Intended start date
+- View trips they created or collaborate on.
+- Add collaborators to trips.
+
+Trips support many-to-many relationships through a join table.
+
+4. Collaborative Planning
+- Multiple users can belong to the same trip.
+- The system can later support gear assignment to prevent duplication.
+- Designed to scale toward intelligent gear distribution logic.
+
+5. AI-Powered Location Intelligence (Planned)
+
+For each saved trip:
+- The system retrieves trail/location name.
+- Scrapes recent trip reports.
+- Uses AI to generate:
+  - Condition summaries
+  - Hazard warnings
+  - Recommended preparation notes
+
+This reduces manual research effort.
+
+
+Database Design Philosophy
+
+TrailFeathers uses a relational PostgreSQL database structured around:
+
+- Primary Keys (unique identifiers per table)
+- Foreign Keys (relationships between users, trips, and gear)
+- Many-to-many relationships for collaboration
+
+This ensures:
+- Data integrity
+- Efficient querying
+- Clean expansion for future features
+
+
+Technology Stack
+
+- Python (Flask)
+- PostgreSQL (Neon cloud database)
+- psycopg2 (database driver)
+- Flask-Bcrypt (password hashing)
+- HTML/CSS/JavaScript frontend
+- Planned AI API integration
+
+
+Design Principles
+
+TrailFeathers is designed to be:
+- Simple in architecture
+- Modular in structure
+- Relationally consistent
+- Expandable for AI and automation
+- Collaboration-first
+
+The system prioritizes clean data modeling before advanced features.
+
+
+Current Development Status
+
+- Database schema implemented in Neon.
+- Backend API for authentication completed.
+- Gear and trip endpoints implemented.
+- Local testing environment operational.
+- AI integration under development.
+
+
+Long-Term Vision
+
+Future enhancements may include:
+- Automated gear duplication detection.
+- Gear assignment optimization.
+- Weather API integration.
+- Map-based trip visualization.
+- Mobile responsiveness.
+- Production deployment via Render.

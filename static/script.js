@@ -7,31 +7,90 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (loginButton) {
     loginButton.addEventListener("click", () => {
-      window.location.href = "webpage/login.html";
+      window.location.href = "static/login.html";
     });
   }
 
   if (registerButton) {
     registerButton.addEventListener("click", () => {
-      window.location.href = "webpage/register.html";
+      window.location.href = "static/register.html";
     });
   }
 
-  // Login Form
+  // Login Form – call API, then redirect or show error
   const loginForm = document.querySelector("#login-form");
   if (loginForm) {
-    loginForm.addEventListener("submit", () => {
-      event.preventDefault();
-      window.location.href = "dashboard.html";
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const username = document.querySelector("#login-form #username").value.trim();
+      const password = document.querySelector("#login-form #password").value;
+      const errEl = document.querySelector("#login-error");
+      if (errEl) errEl.textContent = "";
+
+      if (!username || !password) {
+        if (errEl) errEl.textContent = "Please enter username and password.";
+        return;
+      }
+
+      try {
+        const res = await fetch(API_BASE + "/api/login", {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password }),
+        });
+        if (res.ok) {
+          window.location.href = "dashboard.html";
+          return;
+        }
+        const data = await res.json().catch(() => ({}));
+        if (errEl) errEl.textContent = data.error || "Invalid credentials.";
+      } catch (_) {
+        if (errEl) errEl.textContent = "Could not reach the server. Try again later.";
+      }
     });
   }
 
-  // Registration Form
+  // Registration Form – validate confirm password, call API, then redirect or show error
   const registerForm = document.querySelector("#register-form");
   if (registerForm) {
-    registerForm.addEventListener("submit", () => {
-      event.preventDefault();
-      window.location.href = "dashboard.html";
+    registerForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const username = document.querySelector("#register-form #username").value.trim();
+      const password = document.querySelector("#register-form #password").value;
+      const confirmPassword = document.querySelector("#register-form #confirm-password").value;
+      const errEl = document.querySelector("#register-error");
+      if (errEl) errEl.textContent = "";
+
+      if (!username || !password) {
+        if (errEl) errEl.textContent = "Please enter username and password.";
+        return;
+      }
+      if (password !== confirmPassword) {
+        if (errEl) errEl.textContent = "Passwords don't match.";
+        return;
+      }
+
+      try {
+        const res = await fetch(API_BASE + "/api/signup", {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password }),
+        });
+        if (res.status === 201) {
+          window.location.href = "dashboard.html";
+          return;
+        }
+        const data = await res.json().catch(() => ({}));
+        if (res.status === 409) {
+          if (errEl) errEl.textContent = "Username already exists.";
+        } else {
+          if (errEl) errEl.textContent = data.error || "Something went wrong. Try again.";
+        }
+      } catch (_) {
+        if (errEl) errEl.textContent = "Could not reach the server. Try again later.";
+      }
     });
   }
 
