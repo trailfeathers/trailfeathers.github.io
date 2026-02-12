@@ -26,7 +26,8 @@ def create_app():
     app.config["SESSION_PERMANENT"] = True
     app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=1)
     app.config["SESSION_COOKIE_HTTPONLY"] = True
-    app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+    # SameSite=None so cookie is sent on cross-origin requests (GitHub Pages → Render); requires Secure
+    app.config["SESSION_COOKIE_SAMESITE"] = "None" if os.getenv("RENDER") else "Lax"
     app.config["SESSION_COOKIE_SECURE"] = bool(os.getenv("RENDER"))
 
     # ----------------------
