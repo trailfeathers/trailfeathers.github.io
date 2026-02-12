@@ -119,16 +119,110 @@ document.addEventListener("DOMContentLoaded", () => {
   if (addFriend) addFriend.addEventListener("click", () => (window.location.href = "friends.html"));
   const home = document.querySelector("#home");
   if (home) home.addEventListener("click", () => (window.location.href = "dashboard.html"));
+
+  // ---------- Inventory: load gear and add form ----------
+  const inventoryTable = document.querySelector("#inventory-table");
+  const addItemForm = document.querySelector("#add-item-form");
+
+  async function loadGear() {
+    if (!inventoryTable) return;
+    try {
+      const res = await fetch(API_BASE + "/api/gear", { credentials: "include" });
+      if (res.status === 401) {
+        window.location.href = "login.html";
+        return;
+      }
+      if (!res.ok) {
+        inventoryTable.innerHTML = "<tr><td colspan=\"7\">Could not load gear.</td></tr>";
+        return;
+      }
+      const items = await res.json();
+      if (items.length === 0) {
+        inventoryTable.innerHTML = "<tr><td colspan=\"7\">No gear yet. Add some below.</td></tr>";
+        return;
+      }
+      inventoryTable.innerHTML = items
+        .map(
+          (item) =>
+            `<tr>
+              <td>${escapeHtml(item.type || "—")}</td>
+              <td>${escapeHtml(item.name || "—")}</td>
+              <td>${escapeHtml(item.capacity != null ? String(item.capacity) : "—")}</td>
+              <td>${item.weight_oz != null ? item.weight_oz : "—"}</td>
+              <td>${escapeHtml(item.brand || "—")}</td>
+              <td>${escapeHtml(item.condition || "—")}</td>
+              <td>${escapeHtml(item.notes || "—")}</td>
+            </tr>`
+        )
+        .join("");
+    } catch (_) {
+      inventoryTable.innerHTML = "<tr><td colspan=\"7\">Could not load gear.</td></tr>";
+    }
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  if (inventoryTable) loadGear();
+
+  if (addItemForm) {
+    addItemForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const errEl = document.querySelector("#add-gear-error");
+      if (errEl) errEl.textContent = "";
+
+      const name = document.querySelector("#gear-name").value.trim();
+      if (!name) {
+        if (errEl) errEl.textContent = "Name is required.";
+        return;
+      }
+
+      const payload = {
+        type: (document.querySelector("#gear-type").value || "other").trim() || "other",
+        name,
+        capacity: document.querySelector("#gear-capacity").value.trim() || undefined,
+        brand: document.querySelector("#gear-brand").value.trim() || undefined,
+        condition: document.querySelector("#gear-condition").value.trim() || undefined,
+        notes: document.querySelector("#gear-notes").value.trim() || undefined,
+      };
+      const weightVal = document.querySelector("#gear-weight").value;
+      if (weightVal !== "" && weightVal != null) {
+        const w = parseFloat(weightVal);
+        if (!Number.isNaN(w) && w >= 0) payload.weight_oz = w;
+      }
+
+      try {
+        const res = await fetch(API_BASE + "/api/gear", {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (res.ok) {
+          addItemForm.reset();
+          document.querySelector("#gear-type").value = "other";
+          loadGear();
+          if (errEl) errEl.textContent = "";
+          return;
+        }
+        const data = await res.json().catch(() => ({}));
+        if (errEl) errEl.textContent = data.error || "Could not add gear.";
+      } catch (_) {
+        if (errEl) errEl.textContent = "Could not reach the server. Try again later.";
+      }
+    });
+  }
 });
 
-
-// Inventory
+// Inventory nav (when already on page)
 const home = document.querySelector("#home");
-
 if (home) {
-    home.addEventListener("click", () => {
-      window.location.href = "dashboard.html";
-    });
+  home.addEventListener("click", () => {
+    window.location.href = "dashboard.html";
+  });
 }
 
 // Trip Planner
