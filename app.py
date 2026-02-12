@@ -48,6 +48,12 @@ def create_app():
         origins=origins,
     )
 
+    # Preflight OPTIONS must return 2xx for CORS; POST-only routes otherwise 404
+    @app.options("/api/signup")
+    @app.options("/api/login")
+    def options_auth():
+        return "", 200
+
     # ----------------------
     # Register auth routes
     # ----------------------
