@@ -78,7 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ username, password }),
         });
-        if (res.status === 201) {
+        if (res.ok) {
           window.location.href = "dashboard.html";
           return;
         }
