@@ -168,6 +168,133 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (inventoryTable) loadGear();
 
+  // ---------- Friends page: load requests and friends, add-friend form, accept/decline ----------
+  const addFriendForm = document.querySelector("#add-friend-form");
+  const friendRequestsList = document.querySelector("#friend-requests-list");
+  const myFriendsList = document.querySelector("#my-friends-list");
+
+  async function loadFriendRequests() {
+    if (!friendRequestsList) return;
+    try {
+      const res = await fetch(API_BASE + "/api/friends/requests", { credentials: "include" });
+      if (res.status === 401) {
+        window.location.href = "login.html";
+        return;
+      }
+      if (!res.ok) {
+        friendRequestsList.innerHTML = "<p>Could not load requests.</p>";
+        return;
+      }
+      const requests = await res.json();
+      if (requests.length === 0) {
+        friendRequestsList.innerHTML = "<p>No pending requests.</p>";
+        return;
+      }
+      friendRequestsList.innerHTML = requests
+        .map(
+          (r) =>
+            `<div class="friend-request-item" data-request-id="${r.id}">
+              <span>${escapeHtml(r.sender_username)}</span>
+              <button type="button" class="accept-request" data-request-id="${r.id}">Accept</button>
+              <button type="button" class="decline-request" data-request-id="${r.id}">Decline</button>
+            </div>`
+        )
+        .join("");
+      friendRequestsList.querySelectorAll(".accept-request").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-request-id");
+          try {
+            const r = await fetch(API_BASE + "/api/friends/requests/" + id + "/accept", {
+              method: "POST",
+              credentials: "include",
+              headers: { "Content-Type": "application/json" },
+            });
+            if (r.ok) {
+              loadFriendRequests();
+              if (myFriendsList) loadMyFriends();
+            }
+          } catch (_) {}
+        });
+      });
+      friendRequestsList.querySelectorAll(".decline-request").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-request-id");
+          try {
+            const r = await fetch(API_BASE + "/api/friends/requests/" + id + "/decline", {
+              method: "POST",
+              credentials: "include",
+              headers: { "Content-Type": "application/json" },
+            });
+            if (r.ok) loadFriendRequests();
+          } catch (_) {}
+        });
+      });
+    } catch (_) {
+      friendRequestsList.innerHTML = "<p>Could not load requests.</p>";
+    }
+  }
+
+  async function loadMyFriends() {
+    if (!myFriendsList) return;
+    try {
+      const res = await fetch(API_BASE + "/api/friends", { credentials: "include" });
+      if (res.status === 401) {
+        window.location.href = "login.html";
+        return;
+      }
+      if (!res.ok) {
+        myFriendsList.innerHTML = "<p>Could not load friends.</p>";
+        return;
+      }
+      const friends = await res.json();
+      if (friends.length === 0) {
+        myFriendsList.innerHTML = "<p>No friends yet.</p>";
+        return;
+      }
+      myFriendsList.innerHTML = friends
+        .map((f) => `<div class="friend-item">${escapeHtml(f.username)}</div>`)
+        .join("");
+    } catch (_) {
+      myFriendsList.innerHTML = "<p>Could not load friends.</p>";
+    }
+  }
+
+  if (friendRequestsList) loadFriendRequests();
+  if (myFriendsList) loadMyFriends();
+
+  if (addFriendForm) {
+    addFriendForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const errEl = document.querySelector("#add-friend-error");
+      const successEl = document.querySelector("#add-friend-success");
+      if (errEl) errEl.textContent = "";
+      if (successEl) successEl.textContent = "";
+      const username = document.querySelector("#friend-username").value.trim();
+      if (!username) {
+        if (errEl) errEl.textContent = "Enter a username.";
+        return;
+      }
+      try {
+        const res = await fetch(API_BASE + "/api/friends/request", {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username }),
+        });
+        if (res.ok) {
+          if (successEl) successEl.textContent = "Request sent.";
+          addFriendForm.reset();
+          if (friendRequestsList) loadFriendRequests();
+          return;
+        }
+        const data = await res.json().catch(() => ({}));
+        if (errEl) errEl.textContent = data.error || "Could not send request.";
+      } catch (_) {
+        if (errEl) errEl.textContent = "Could not reach the server. Try again later.";
+      }
+    });
+  }
+
   if (addItemForm) {
     addItemForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -226,5 +353,3 @@ if (home) {
 }
 
 // Trip Planner
-
-// Friends

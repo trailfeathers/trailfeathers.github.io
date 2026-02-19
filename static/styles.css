@@ -371,3 +371,30 @@ button:hover {
 }
 
 /* Friends */
+.friends-section {
+  margin-top: 1.5rem;
+}
+.friends-section h2 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+.friend-request-item,
+.friend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.friend-request-item button {
+  margin-left: 0.25rem;
+}
+.error {
+  color: #c00;
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+}
+.success {
+  color: #080;
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+}

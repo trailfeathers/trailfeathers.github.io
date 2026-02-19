@@ -1,0 +1,167 @@
+TrailFeathers
+Dash Kim, James Smith, Lachlan Domst, Kellen Snider
+Software Requirements Specification
+1. The Concept of Operations (ConOps)
+
+1.1 Current System or Situation - Dash Kim
+Outdoor trip planning is often sporadic and fragmented. Regardless of whether you are a beginner or an experienced outdoorsman, it can be difficult to coordinate a trip that is fun and safe for everyone. In the status quo, we must rely on informal communication and personal judgment to determine what we bring on trips, which can be daunting and dangerous for people who lack experience.
+Most hikers and backpackers do not keep an inventory of all of the gear they own. At best, some may keep a list that is not easily shareable or comparable. This leads to a multitude of problems regarding communication with other people. Necessary items like water filtration or cook systems can be completely overlooked.
+Furthermore, there are a variety of challenges that come with planning a trip. Oftentimes, people are traveling to extremely remote places, where it can be hard to garner information. Even if they have information resources for these types of trips, they become out-of -date very quickly. Particularly in the backcountry, a bridge being out could mean the difference between a casual stroll and a dangerous ford. Not knowing the trail conditions leads to people putting themselves into harm's way.
+Beyond trail conditions, weather conditions can make or break a trip. In high-traffic areas, the weather is especially volatile. When being so far from help, it’s important that people stay prepared.
+1.2 Justification for a New System - James Smith
+Outdoor recreation planning is currently supported by scattered lists of personal gear, group chats, ever-changing weather patterns, and trail webpages that can be long or inaccurate. This is absolutely a safety hazard. Search and rescue teams often report that inadequate equipment, poor planning, and lack of experience are the leading causes of wilderness incidents (Heggie & Amundson, 2009). Furthermore, national park service data shows that a significant portion of recreation-related fatalities come from hiking-related incidents. This includes dehydration, exposure, and navigation errors (National Park Service, 2023). Despite the data, studies continue to show that hikers do not maintain a comprehensive inventory of their gear (Ewert et al., 2021). Weather and trial conditions, along with accessibility, further compound these challenges. Environmental factors such as storms and infrastructure damage can rapidly alter routes more quickly than trail sources can be updated (U.S. Forest Service, n.d.).
+Some tools exist to address these issues, but fail to provide a unified solution for both collaborative planning and risk awareness.  Platforms that provide a “community” tend to be more current than trail condition sites. Unfortunately, this data can be dispersed and require manual synthesis or be locked behind a pay wall. Weather hazards remain a leading cause of outdoor fatalities, specifically in remote or mountainous areas. In places like these, sudden changes in weather are common (National Weather Service, 2023). Advances in AI have demonstrated effectiveness in aggregating and summarizing large amounts of information into short, actionable insights (Zhang et al., 2020; McKinsey & Company, 2023). 
+We plan to address a documented gap in current outdoor recreation planning tools. TrailFeathers is justified as a new system that integrates shared gear inventories, automated safety checklists based on said inventory, real-time trail condition summaries, and environmental context all into a single platform. 
+1.3 Operational Features of the Proposed System - Dash Kim
+TrailFeathers aims to create a seamless, web-based interface that allows users to coordinate trips with other users. On one end, we hope to create a system where it is easy for users to log what gear they have.  Then, users could easily compare and combine with each other for the trip planning process. This would let us create an automated checklist of all the gear needed, guaranteeing safety and efficiency.
+In terms of AI, there are many ways to incorporate it into this project. AI enables us to create succinct and accurate summaries and then present them in a convenient way. Using online resources and webscraping, we could completely automate the process of finding information about certain trails. Things such as blowdowns or crowds are frequently logged by the community, see example here [8]. Being able to automate the search process saves users time and introduces beginners to resources from the community. This can be further applied to weather reports and standard trail information. AI enables us to compile lots of relevant information into one place, capturing the static and dynamic.
+1.4 User Classes - Dash Kim
+
+Outdoor Recreationalists
+Hikers, Backpackers, Trail Runners, Bird Watchers,  Mountaineers, Skiers (Front and Back Country), Snowshoers, etc
+This will be the end users for the service. While mainly tailored to hikers and backpackers, as there are the most amount of resources for these groups, the service can be used by anyone who wishes to get outside and can support a broad range of activities.
+Responsibilities are maintaining personal gear inventories, participating in group trip plannings, managing group gear, reviewing AI generated summaries. There data entry as well, seeing that creating and maintaining accurate inventories is core to the project. 
+There are no technical skills required from the users. Besides proficiency with a computer and general knowledge of what activity they wish to participate in
+Data Providers
+As they are volunteer based, sources like the Washington Trails Association and Oregon Hikers provide free to use trip reports and overviews. Along the same lines, the weather service and local reports provide information on fluctuating weather patterns
+As these sources exist independently of the product, they do not have any responsibilities and are required skills.  They do not interact with the system in  any way other than providing data
+Systems Administration
+This mode will manage accounts from users and manage permissions. It will also manage the integration for external APIs, such as the one used to summarize or display data. It is the administrative and backend core for this project. 
+This requires strong technical skills, as it will be managing all of the moving parts for this project. There is also data entry and management. 
+1.5 Modes of Operation - Dash Kim
+
+Regular Users  Mode:
+This is the baseline for end users. It provides full functionality for End Users and System Admins. In this mode, users can manage their gear inventories, create and plan group trips, views generated trip information, etc. On the system admin side, we can monitor traffic and system health.
+Administrators Mode: 
+This has increased access to the database and user accounts. It allows us to address large scale issue, such as integration between the UI, database, and APIs. 
+Backup Mode: 
+There is a lot of overhead that we are trying to shed. We would prefer for the database’s size to come from storing user inventories, rather than keeping a list of unused data regarding actual trail information. That said, fully integrating the AI may have issues, so in case the final product doesn’t work, we can use a more traditional repository. 
+Degraded Mode:
+The minimum viable product for this service is to streamline the gear checklist process into something easier. While summaries are important, the site would still be useful with just the gear planning components. This maintains the account system as well.
+Maintenance Mode:
+Primarily for the integration aspect of AI and our data providers. Also used for fixing minor bugs in the code, such as items being dropped from inventories on accident. 
+1.6 Operational Scenarios (Use Cases) - Dash Kim
+
+Use Case 1:  Maintain a Personal Gear Inventory
+Description: User wants to keep track of all of their gear and be able to easily view what they have on hand (digitally)
+Actors: User (Outdoor Recreationist)
+Preconditions: 
+User has created an account with TrailFeathers
+Website is live and functioning
+Steps to Complete the Task: 
+User goes to website and opens dashboard
+Selects “My Gear” to view inventory
+User selects “Add Piece”, filling required information as to the type of gear, as long as optional information like the brand, weight, condition, and notes
+System validates the input
+System updates the database to associate the new item with user
+System displays “My Gear” page with update inventory
+Use Case 2: Planning Trip
+Description: A user has already created a gear inventory and is trying to plan a trip
+Actor: User (Outdoor Recreationist)
+Preconditions: 
+Case One
+Steps to Complete the Task: 
+User goes to website and opens dashboard
+Selects “Trips”
+Selects “Create New Trip” and fills in activity type  (Hike, Backpack, Ski, etc) and location
+System loads in required materials for activity type as well as users inventory
+Trip is saved into database
+User click “Invite Collaborators” if desired
+System loads in collaborators inventory
+User and collaborators clicks which items of theirs they are bringing on the trip, checking them off from the checklist
+The system then generates packing lists for each user on the trip, as well as information on what items are missing.
+Case 3: Reviewing trip conditions
+Description: User wishes to look at trip conditions for existing trip
+Actors: User
+Preconditions: 
+Case 1
+A trip has already been created
+Steps to Complete the Task: 
+User opens website and opens dashboard
+Selects “Trips” 
+Selects “AI report”
+System finds location name from trip information
+System fetches most recent  information regarding location from publicly available data (OregonHikers, WTA, Weather Services)
+System uses AI model API to summarize fetched data
+System displays to the user summary 
+2. Specific Requirements - Dash Kim
+
+The following sections will go over desired behaviors and properties for the TrailFeather project. With functional and non-functional requirements being addressed clearly and concisely. Furthermore, it is structured in a way to make everything flow seamlessly throughout. 
+2.1 External Interfaces (Inputs and Outputs) - Dash Kim
+
+Interface 1: Gear Inventory
+Name: Gear Inventory Input
+Purpose: Digitally organize someone's inventory to automate trip planning
+Source: TrailFeathers website
+Output: Internal Database
+Valid Ranges: 
+ Required tag for type (ex. Cookware, sleepsystem, bag) (Predetermined) 
+Required name and capacity (1-50 characters) 
+Optional tags for qualities ( weight, brand, condition, etc)
+EX) Sleep System, 2 person tent, weight N/A, Mountain Hardware, Condition like new
+Units: Gear types enumerations. Optional units for gear qualities
+Data Format: HTTP POST request with JSON body:
+ex) {"type": "Sleep System", "name": "2-person tent", "weight": "N/A", "brand": "Mountain Hardware", "condition": "like new"}
+Interface 2: Trip Creation
+Name: Trip Creation Input
+Purpose: To create and save potential trips
+Source: TrailFeathers Website
+Output: Internal Database
+Valid Ranges:
+Trip Name: String (1-100 Characters)
+Trail Name: String (1-100 Characters)
+Activity Type: Enum
+Date created: Datetime
+Intended Start date: Datetime
+Units: Datetime
+Data Format:   HTTP POST request with JSON body: ex) { "tripName": "Section K Through Hike",  "trailName": "Section K PCT",  "activityType": "Backpacking", "dateCreated": "2026-01-23T14:00:00Z", "intendedStartDate": "2026-03-10T08:00:00Z"}
+Modified data format for adding collaborators, but very similar. This is added onto the existing data
+Interface 3:  AI Summary
+Name: AI summary
+Purpose: To provide user with relevant data regarding location
+Source: PostgreSQL Database query
+Output: TrailFeathers Website
+Valid Ranges: 
+String: (1-100 Characters)
+Units: N/A
+Data Format: Query
+
+2.2 Functions
+Interface 1: Gear Inventory
+Validity Checks on Inputs: Must check for valid gear types (Predetermined Enumerations), string names, and handle input of different types for optional tags
+Sequence of Operations in processing inputs: First receive users JSON from TrailFeathers. Then validate types. Then store it into an internal database. Finally display these changes to the users via the web interface
+Responses to abnormal situations: For error handling, reject any mistyped JSON. Furthermore, display errors to users through the website. Lastly, log errors when for administration mode
+Relationship of outputs to inputs: Successful saves are displayed on the website,alongside with a successful notification. When successful, the user’s view of the TrailFeathers website is a direct representation of their inventory in the database.
+Interface 2: Trip Creation
+Validity Checks on Inputs: Checks for valid strings for Trail Names and Trip Names. Also check for valid datetime objects before sending JSON
+Sequence of Operations in processing inputs: Backend checks validity of data types from TrailFeather’s JSON. Checking valid strings for Trail and Trip names. Check for valid datetimes before entering into database
+Responses to abnormal situations: For error handling, reject any mistyped JSON. Furthermore, display errors to users through the website. Lastly, log errors when for administration mode
+Relationship of outputs to inputs: User should see a trip in the TrailFeathers trip dashboard, alongside a message notifying of a successful trip creation
+Interface 3: AI Summary
+Validity Checks on Inputs: Checks valid string name from database. 
+Sequence of Operations in processing inputs: From the valid string name, translate into URL for publicly available trip report or weather data (WTA, Oregon Hikers, Weather Service). Web scraping from these URL are then summarized using LLM.
+Responses to abnormal situations: When URL is not available, display an error on webpage and log for administrative mode. Keep cache of frequent URLs for improved latency 
+Relationship of outputs to inputs: Strings are converted into comprehensive summaries and displayed on the site.
+2.3 Usability Requirements - James Smith
+Our usability requirements define the extent to which the system should enable users to plan outdoor trips safely, efficiently, and effectively. These requirements apply to all users. From first-time hikers to experienced trip leaders. 
+The TrailFeathers application will be able to allow new users to create an account and profile. Once an account is created, users can fill out a checklist with what gear they have. Users will also be able to invite other users to groups. After group creation, both users will be able to see the combined group inventory. When planning a hike through TrailFeathers, users will be able to see what gear they will need for the trip, with varying importance. As well as accurate trail updates, and weather conditions. If any gear is missing from a group's inventory, TrailFeathers will alert them to the missing item.  Group members will also be able to communicate directly through the application as well.
+2.4 Performance Requirements - Kellen Snider
+At this stage TrailFeathers is being designed to work with a small user pool due to the scope of the project and cost of operation. Performance is reflective of this goal.
+The system can support up to 500 total user
+The system can accommodate 25 active users at peak
+95% of requests will complete in under 2 seconds
+Peak load Can process ~15 requests per second
+2.5 Software System Attributes - James Smith
+The software must protect the privacy of the users. Information such as names, emails, precise locations, and any private gear inventories will not be visible to other users unless explicitly shared as part of a group trip. Each user will have total control over what information is shared within a trip. This allows them to coordinate safely without exposing unnecessary personal details. All communication will occur through the platform, reducing the need for users to share phone numbers or emails outside the system.
+Since TrailFeathers will support safety-critical trip planning, the software must be reliable. Users must be able to trust that shared gear inventories, automated checklists, and summarized trail and weather information are consistent and accessible at all times. Any incomplete or unavailable data shall be clearly indicated to avoid misleading users. Reliability is essential so that users can plan their trips confidently.
+3. References
+[1] T. W. Heggie and M. E. Amundson, “Dead men walking: Search and rescue in U.S. national parks,” Wilderness & Environmental Medicine, vol. 20, no. 3, pp. 244–249, 2009.
+[2] A. Ewert et al., “Visitor preparedness and risk in backcountry recreation,” Journal of Outdoor Recreation and Tourism, 2021.
+[3] National Park Service, “Mortality data by park and cause of death,” 2023. [Online]. Available: https://www.nps.gov/aboutus/mortality-data.htm
+[4] U.S. Forest Service, “Trail fundamentals and conditions,” n.d. [Online]. Available: https://www.fs.usda.gov/managing-land/trails
+[5] National Weather Service, “Weather-related fatalities,” 2023. [Online]. Available: https://www.weather.gov/hazstat
+[6] J. Zhang, Y. Zhao, M. Saleh, and P. J. Liu, “PEGASUS: Pre-training with extracted gap-sentences for abstractive summarization,” arXiv:1912.08777, 2020.
+[7] McKinsey & Company, “The economic potential of generative AI,” 2023. [Online].
+[8]“Snow Lake - Winter, Snow Lake, Source Lake, Source Lake - Winter Route,” Washington Trails Association, 2025. https://www.wta.org/go-hiking/trip-reports/trip_report-2025-12-31.180130526071 (accessed Jan. 23, 2026).
+4. Acknowledgments
+We would like to thank the University of Oregon Outdoor Program for inspiration for the project. We would also like to thank public trail-reporting communities, especially the Washington Trails Association, for providing important information that makes this project possible.
