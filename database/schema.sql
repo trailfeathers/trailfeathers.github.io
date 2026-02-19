@@ -50,7 +50,19 @@ CREATE TABLE IF NOT EXISTS trip_gear (
   PRIMARY KEY (trip_id, gear_id)
 );
 
+-- FRIEND REQUESTS (sender_id requests receiver_id; status: pending → accepted or declined)
+CREATE TABLE IF NOT EXISTS friend_requests (
+  id BIGSERIAL PRIMARY KEY,
+  sender_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  receiver_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'declined')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE(sender_id, receiver_id)
+);
+
 -- Helpful indexes
 CREATE INDEX IF NOT EXISTS idx_gear_user_id ON gear(user_id);
 CREATE INDEX IF NOT EXISTS idx_trips_creator_id ON trips(creator_id);
 CREATE INDEX IF NOT EXISTS idx_trip_collab_user_id ON trip_collaborators(user_id);
+CREATE INDEX IF NOT EXISTS idx_friend_requests_receiver_id ON friend_requests(receiver_id);
+CREATE INDEX IF NOT EXISTS idx_friend_requests_sender_id ON friend_requests(sender_id);
