@@ -200,13 +200,25 @@ def list_friends(user_id):
 
 
 # ---------- Trips ----------
+ACTIVITY_TYPES = frozenset({
+    "Backpacking",
+    "Hiking",
+    "Car Camping",
+    "Bird Watching",
+    "Backcountry Skiing",
+    "Mountaineering",
+})
+
+
 def create_trip(creator_id, payload):
     """Create a trip and add creator as collaborator. Returns trip id."""
     trip_name = (payload.get("trip_name") or "").strip()
     if not trip_name:
         raise ValueError("Trip name is required")
     trail_name = (payload.get("trail_name") or "").strip() or None
-    activity_type = (payload.get("activity_type") or "").strip() or "hiking"
+    activity_type = (payload.get("activity_type") or "").strip()
+    if not activity_type or activity_type not in ACTIVITY_TYPES:
+        raise ValueError("Activity type must be one of: " + ", ".join(sorted(ACTIVITY_TYPES)))
     intended_start_date = payload.get("intended_start_date")
     if intended_start_date is not None and intended_start_date != "":
         intended_start_date = intended_start_date.strip() or None

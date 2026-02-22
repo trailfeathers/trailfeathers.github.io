@@ -27,7 +27,16 @@
       <form id="create-trip-form">
         <input type="text" id="trip-name" placeholder="Trip name" required />
         <input type="text" id="trip-trail" placeholder="Trail name" />
-        <input type="text" id="trip-activity" placeholder="Activity (e.g. hiking)" />
+        <label for="trip-activity">Activity</label>
+        <select id="trip-activity" required>
+          <option value="">Select activity…</option>
+          <option value="Backpacking">Backpacking</option>
+          <option value="Hiking">Hiking</option>
+          <option value="Car Camping">Car Camping</option>
+          <option value="Bird Watching">Bird Watching</option>
+          <option value="Backcountry Skiing">Backcountry Skiing</option>
+          <option value="Mountaineering">Mountaineering</option>
+        </select>
         <input type="date" id="trip-date" placeholder="Start date" />
         <button type="submit">Create trip</button>
       </form>
