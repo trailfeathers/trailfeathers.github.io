@@ -405,7 +405,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const payload = {
         trip_name,
         trail_name: document.querySelector("#trip-trail").value.trim() || undefined,
-        activity_type: document.querySelector("#trip-activity").value.trim() || undefined,
+        activity_type: document.querySelector("#trip-activity").value || undefined,
         intended_start_date: document.querySelector("#trip-date").value || undefined,
       };
       try {
