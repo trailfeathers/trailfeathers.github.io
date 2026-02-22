@@ -41,6 +41,17 @@ CREATE TABLE IF NOT EXISTS trip_collaborators (
   PRIMARY KEY (trip_id, user_id)
 );
 
+-- TRIP INVITES (pending acceptance; on accept, add to trip_collaborators)
+CREATE TABLE IF NOT EXISTS trip_invites (
+  id BIGSERIAL PRIMARY KEY,
+  trip_id BIGINT NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
+  inviter_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  invitee_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'declined')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE(trip_id, invitee_id)
+);
+
 -- OPTIONAL: Assign gear to trips (for “who brings what”)
 CREATE TABLE IF NOT EXISTS trip_gear (
   trip_id BIGINT NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
@@ -66,3 +77,5 @@ CREATE INDEX IF NOT EXISTS idx_trips_creator_id ON trips(creator_id);
 CREATE INDEX IF NOT EXISTS idx_trip_collab_user_id ON trip_collaborators(user_id);
 CREATE INDEX IF NOT EXISTS idx_friend_requests_receiver_id ON friend_requests(receiver_id);
 CREATE INDEX IF NOT EXISTS idx_friend_requests_sender_id ON friend_requests(sender_id);
+CREATE INDEX IF NOT EXISTS idx_trip_invites_trip_id ON trip_invites(trip_id);
+CREATE INDEX IF NOT EXISTS idx_trip_invites_invitee_id ON trip_invites(invitee_id);

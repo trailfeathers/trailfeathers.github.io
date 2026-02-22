@@ -341,6 +341,57 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (tripList) loadTrips();
 
+  async function loadTripInvites() {
+    const section = document.querySelector("#trip-invites-section");
+    const listEl = document.querySelector("#trip-invites-list");
+    if (!section || !listEl) return;
+    try {
+      const res = await fetch(API_BASE + "/api/trip-invites", { credentials: "include" });
+      if (res.status === 401) return;
+      if (!res.ok) return;
+      const invites = await res.json();
+      if (invites.length === 0) return;
+      section.style.display = "block";
+      listEl.innerHTML = invites
+        .map(
+          (inv) =>
+            `<div class="trip-invite-item" data-invite-id="${inv.id}">
+              <p><strong>${escapeHtml(inv.trip_name)}</strong> — ${escapeHtml(inv.inviter_username)} invited you.</p>
+              <a href="trip_dashboard.html?id=${encodeURIComponent(inv.trip_id)}">View trip</a>
+              <button type="button" class="trip-invite-accept" data-invite-id="${inv.id}">Accept</button>
+              <button type="button" class="trip-invite-decline" data-invite-id="${inv.id}">Decline</button>
+            </div>`
+        )
+        .join("");
+      listEl.querySelectorAll(".trip-invite-accept").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-invite-id");
+          const r = await fetch(API_BASE + "/api/trip-invites/" + id + "/accept", {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+          });
+          if (r.ok) {
+            loadTripInvites();
+            if (tripList) loadTrips();
+          }
+        });
+      });
+      listEl.querySelectorAll(".trip-invite-decline").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-invite-id");
+          const r = await fetch(API_BASE + "/api/trip-invites/" + id + "/decline", {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+          });
+          if (r.ok) loadTripInvites();
+        });
+      });
+    } catch (_) {}
+  }
+  loadTripInvites();
+
   if (createTripForm) {
     createTripForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -407,8 +458,106 @@ document.addEventListener("DOMContentLoaded", () => {
            <p><strong>Trail:</strong> ${escapeHtml(trip.trail_name || "—")}</p>
            <p><strong>Activity:</strong> ${escapeHtml(trip.activity_type || "—")}</p>
            <p><strong>Start date:</strong> ${trip.intended_start_date ? escapeHtml(String(trip.intended_start_date).slice(0, 10)) : "—"}</p>
-           <p><strong>Created by:</strong> ${escapeHtml(trip.creator_username || "—")}</p>
-           <p><em>More functionality can be added here.</em></p>`;
+           <p><strong>Created by:</strong> ${escapeHtml(trip.creator_username || "—")}</p>`;
+
+        const invitesRes = await fetch(API_BASE + "/api/trip-invites", { credentials: "include" });
+        const myInvites = invitesRes.ok ? await invitesRes.json() : [];
+        const pendingInvite = myInvites.find((inv) => String(inv.trip_id) === String(tripIdParam));
+
+        if (pendingInvite) {
+          const invitedSection = document.querySelector("#trip-dashboard-invited");
+          if (invitedSection) {
+            invitedSection.style.display = "block";
+            const msg = document.querySelector("#trip-invited-message");
+            if (msg) msg.textContent = "You've been invited to this trip. Accept to join.";
+            const acceptBtn = document.querySelector("#trip-invite-accept");
+            const declineBtn = document.querySelector("#trip-invite-decline");
+            if (acceptBtn) {
+              acceptBtn.onclick = async () => {
+                const r = await fetch(API_BASE + "/api/trip-invites/" + pendingInvite.id + "/accept", {
+                  method: "POST",
+                  credentials: "include",
+                  headers: { "Content-Type": "application/json" },
+                });
+                if (r.ok) window.location.reload();
+              };
+            }
+            if (declineBtn) {
+              declineBtn.onclick = async () => {
+                const r = await fetch(API_BASE + "/api/trip-invites/" + pendingInvite.id + "/decline", {
+                  method: "POST",
+                  credentials: "include",
+                  headers: { "Content-Type": "application/json" },
+                });
+                if (r.ok) window.location.href = "trip.html";
+              };
+            }
+          }
+        } else {
+          const collabRes = await fetch(API_BASE + "/api/trips/" + tripIdParam + "/collaborators", { credentials: "include" });
+          const invitesListRes = await fetch(API_BASE + "/api/trips/" + tripIdParam + "/invites", { credentials: "include" });
+          const friendsRes = await fetch(API_BASE + "/api/friends", { credentials: "include" });
+          const collaborators = collabRes.ok ? await collabRes.json() : [];
+          const pendingInvitesList = invitesListRes.ok ? await invitesListRes.json() : [];
+          const friends = friendsRes.ok ? await friendsRes.json() : [];
+
+          const collabIds = new Set(collaborators.map((c) => c.id));
+          const pendingInviteeIds = new Set(pendingInvitesList.map((p) => p.invitee_id));
+          const friendsToShow = friends.filter((f) => !collabIds.has(f.id) && !pendingInviteeIds.has(f.id));
+
+          const membersSection = document.querySelector("#trip-dashboard-members");
+          if (membersSection) {
+            membersSection.style.display = "block";
+            const listEl = document.querySelector("#trip-collaborators-list");
+            if (listEl) {
+              listEl.innerHTML = collaborators.length
+                ? collaborators.map((c) => `<p>${escapeHtml(c.username)} <span class="role-badge">${escapeHtml(c.role)}</span></p>`).join("")
+                : "<p>No members yet.</p>";
+            }
+          }
+
+          const pendingSection = document.querySelector("#trip-dashboard-pending-invites");
+          if (pendingSection && pendingInvitesList.length > 0) {
+            pendingSection.style.display = "block";
+            const listEl = document.querySelector("#trip-pending-invites-list");
+            if (listEl) listEl.innerHTML = pendingInvitesList.map((p) => `<p>${escapeHtml(p.invitee_username)} (pending)</p>`).join("");
+          }
+
+          const inviteSection = document.querySelector("#trip-dashboard-invite-friend");
+          if (inviteSection) {
+            inviteSection.style.display = "block";
+            const selectEl = document.querySelector("#trip-invite-friend-select");
+            const errEl = document.querySelector("#trip-invite-error");
+            if (selectEl) {
+              selectEl.innerHTML = "<option value=\"\">Choose a friend…</option>" +
+                friendsToShow.map((f) => `<option value="${f.id}">${escapeHtml(f.username)}</option>`).join("");
+            }
+            const inviteBtn = document.querySelector("#trip-invite-friend-btn");
+            if (inviteBtn && selectEl) {
+              inviteBtn.onclick = async () => {
+                const friendId = selectEl.value;
+                if (!friendId) return;
+                if (errEl) errEl.textContent = "";
+                try {
+                  const r = await fetch(API_BASE + "/api/trips/" + tripIdParam + "/invites", {
+                    method: "POST",
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ user_id: parseInt(friendId, 10) }),
+                  });
+                  if (r.ok) {
+                    window.location.reload();
+                    return;
+                  }
+                  const data = await r.json().catch(() => ({}));
+                  if (errEl) errEl.textContent = data.error || "Could not send invite.";
+                } catch (_) {
+                  if (errEl) errEl.textContent = "Could not reach the server.";
+                }
+              };
+            }
+          }
+        }
       } catch (_) {
         tripDashboardLoading.remove();
         tripDashboardContent.innerHTML = "<p>Could not load trip.</p>";

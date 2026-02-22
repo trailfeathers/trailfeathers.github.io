@@ -21,8 +21,14 @@ from database.database import (
     list_trips_for_user,
     get_trip,
     user_has_trip_access,
+    has_pending_invite_to_trip,
     list_trip_collaborators,
     add_trip_collaborator,
+    create_trip_invite,
+    list_trip_invites_pending,
+    list_incoming_trip_invites,
+    accept_trip_invite,
+    decline_trip_invite,
 )
 
 def create_app():
@@ -73,7 +79,11 @@ def create_app():
     @app.route("/api/trips", methods=["OPTIONS"])
     @app.route("/api/trips/<int:trip_id>", methods=["OPTIONS"])
     @app.route("/api/trips/<int:trip_id>/collaborators", methods=["OPTIONS"])
-    def options_auth(request_id=None, trip_id=None):
+    @app.route("/api/trips/<int:trip_id>/invites", methods=["OPTIONS"])
+    @app.route("/api/trip-invites", methods=["OPTIONS"])
+    @app.route("/api/trip-invites/<int:invite_id>/accept", methods=["OPTIONS"])
+    @app.route("/api/trip-invites/<int:invite_id>/decline", methods=["OPTIONS"])
+    def options_auth(request_id=None, trip_id=None, invite_id=None):
         return "", 200
 
     # ----------------------
@@ -214,7 +224,7 @@ def create_app():
         user = login.require_auth()
         if not user:
             return jsonify(error="Not logged in"), 401
-        if not user_has_trip_access(user["id"], trip_id):
+        if not user_has_trip_access(user["id"], trip_id) and not has_pending_invite_to_trip(user["id"], trip_id):
             return jsonify(error="Not found"), 404
         trip = get_trip(trip_id)
         if not trip:
@@ -226,10 +236,94 @@ def create_app():
         user = login.require_auth()
         if not user:
             return jsonify(error="Not logged in"), 401
-        if not user_has_trip_access(user["id"], trip_id):
+        if not user_has_trip_access(user["id"], trip_id) and not has_pending_invite_to_trip(user["id"], trip_id):
             return jsonify(error="Not found"), 404
         collab = list_trip_collaborators(trip_id)
         return jsonify([{"id": c["id"], "username": c["username"], "role": c["role"]} for c in collab])
+
+    @app.post("/api/trips/<int:trip_id>/invites")
+    def post_trip_invite(trip_id):
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        if not user_has_trip_access(user["id"], trip_id):
+            return jsonify(error="Not found"), 404
+        payload = request.get_json(silent=True) or {}
+        invitee_id = payload.get("user_id")
+        username = (payload.get("username") or "").strip()
+        if invitee_id is None and username:
+            u = get_user_by_username(username)
+            invitee_id = u["id"] if u else None
+        if invitee_id is None:
+            return jsonify(error="user_id or username required"), 400
+        try:
+            invitee_id = int(invitee_id)
+        except (TypeError, ValueError):
+            return jsonify(error="Invalid user_id"), 400
+        friend_ids = [f["id"] for f in list_friends(user["id"])]
+        if invitee_id not in friend_ids:
+            return jsonify(error="Can only invite friends"), 400
+        try:
+            invite_id = create_trip_invite(trip_id, user["id"], invitee_id)
+            return jsonify(ok=True, id=invite_id), 201
+        except ValueError as e:
+            return jsonify(error=str(e)), 400
+
+    @app.get("/api/trips/<int:trip_id>/invites")
+    def get_trip_invites(trip_id):
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        if not user_has_trip_access(user["id"], trip_id):
+            return jsonify(error="Not found"), 404
+        rows = list_trip_invites_pending(trip_id)
+        out = []
+        for r in rows:
+            ca = r.get("created_at")
+            out.append({
+                "id": r["id"],
+                "invitee_id": r["invitee_id"],
+                "invitee_username": r["invitee_username"],
+                "inviter_username": r["inviter_username"],
+                "created_at": ca.isoformat() if hasattr(ca, "isoformat") else ca,
+            })
+        return jsonify(out)
+
+    @app.get("/api/trip-invites")
+    def get_my_trip_invites():
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        rows = list_incoming_trip_invites(user["id"])
+        out = []
+        for r in rows:
+            ca = r.get("created_at")
+            out.append({
+                "id": r["id"],
+                "trip_id": r["trip_id"],
+                "trip_name": r["trip_name"],
+                "inviter_username": r["inviter_username"],
+                "created_at": ca.isoformat() if hasattr(ca, "isoformat") else ca,
+            })
+        return jsonify(out)
+
+    @app.post("/api/trip-invites/<int:invite_id>/accept")
+    def accept_trip_invite_route(invite_id):
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        if accept_trip_invite(invite_id, user["id"]):
+            return jsonify(ok=True), 200
+        return jsonify(error="Invite not found or already responded to"), 404
+
+    @app.post("/api/trip-invites/<int:invite_id>/decline")
+    def decline_trip_invite_route(invite_id):
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        if decline_trip_invite(invite_id, user["id"]):
+            return jsonify(ok=True), 200
+        return jsonify(error="Invite not found or already responded to"), 404
 
     # ----------------------
     # Health check
