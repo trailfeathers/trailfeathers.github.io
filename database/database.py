@@ -197,3 +197,98 @@ def list_friends(user_id):
             (user_id, user_id, user_id, user_id),
         )
         return cur.fetchall()
+
+
+# ---------- Trips ----------
+def create_trip(creator_id, payload):
+    """Create a trip and add creator as collaborator. Returns trip id."""
+    trip_name = (payload.get("trip_name") or "").strip()
+    if not trip_name:
+        raise ValueError("Trip name is required")
+    trail_name = (payload.get("trail_name") or "").strip() or None
+    activity_type = (payload.get("activity_type") or "").strip() or "hiking"
+    intended_start_date = payload.get("intended_start_date")
+    if intended_start_date is not None and intended_start_date != "":
+        intended_start_date = intended_start_date.strip() or None
+    with get_cursor() as cur:
+        cur.execute(
+            """INSERT INTO trips (creator_id, trip_name, trail_name, activity_type, intended_start_date)
+               VALUES (%s, %s, %s, %s, %s) RETURNING id""",
+            (creator_id, trip_name, trail_name, activity_type, intended_start_date),
+        )
+        row = cur.fetchone()
+        trip_id = row["id"]
+        cur.execute(
+            """INSERT INTO trip_collaborators (trip_id, user_id, role) VALUES (%s, %s, 'creator')""",
+            (trip_id, creator_id),
+        )
+        return trip_id
+
+
+def list_trips_for_user(user_id):
+    """Return trips where user is creator or in trip_collaborators. Includes creator username."""
+    with get_cursor() as cur:
+        cur.execute(
+            """SELECT t.id, t.trip_name, t.trail_name, t.activity_type, t.intended_start_date,
+                      t.creator_id, u.username AS creator_username, t.created_at
+               FROM trips t
+               JOIN users u ON u.id = t.creator_id
+               WHERE t.creator_id = %s
+                  OR EXISTS (SELECT 1 FROM trip_collaborators tc WHERE tc.trip_id = t.id AND tc.user_id = %s)
+               ORDER BY t.created_at DESC""",
+            (user_id, user_id),
+        )
+        return cur.fetchall()
+
+
+def get_trip(trip_id):
+    """Return one trip with creator username, or None."""
+    with get_cursor() as cur:
+        cur.execute(
+            """SELECT t.id, t.trip_name, t.trail_name, t.activity_type, t.intended_start_date,
+                      t.creator_id, u.username AS creator_username, t.created_at
+               FROM trips t
+               JOIN users u ON u.id = t.creator_id
+               WHERE t.id = %s""",
+            (trip_id,),
+        )
+        return cur.fetchone()
+
+
+def user_has_trip_access(user_id, trip_id):
+    """True if user is creator or in trip_collaborators."""
+    with get_cursor() as cur:
+        cur.execute(
+            """SELECT 1 FROM trips t
+               WHERE t.id = %s AND t.creator_id = %s
+               UNION
+               SELECT 1 FROM trip_collaborators tc WHERE tc.trip_id = %s AND tc.user_id = %s""",
+            (trip_id, user_id, trip_id, user_id),
+        )
+        return cur.fetchone() is not None
+
+
+def list_trip_collaborators(trip_id):
+    """Return list of collaborators: id, username, role (includes creator from trip_collaborators)."""
+    with get_cursor() as cur:
+        cur.execute(
+            """SELECT u.id, u.username, tc.role
+               FROM trip_collaborators tc
+               JOIN users u ON u.id = tc.user_id
+               WHERE tc.trip_id = %s
+               ORDER BY tc.role = 'creator' DESC, tc.added_at ASC""",
+            (trip_id,),
+        )
+        return cur.fetchall()
+
+
+def add_trip_collaborator(trip_id, user_id, role="member"):
+    """Add a user to trip. Raises ValueError if already a collaborator."""
+    with get_cursor() as cur:
+        cur.execute("SELECT 1 FROM trip_collaborators WHERE trip_id = %s AND user_id = %s", (trip_id, user_id))
+        if cur.fetchone():
+            raise ValueError("Already a collaborator")
+        cur.execute(
+            """INSERT INTO trip_collaborators (trip_id, user_id, role) VALUES (%s, %s, %s)""",
+            (trip_id, user_id, role),
+        )

@@ -7,7 +7,7 @@ from flask_cors import CORS
 # Import auth routes (this file defines routes on an app instance)
 from auth import login
 
-# Import gear and friend DB helpers
+# Import gear, friend, and trip DB helpers
 from database.database import (
     add_gear_item,
     list_gear,
@@ -17,6 +17,12 @@ from database.database import (
     accept_friend_request,
     decline_friend_request,
     list_friends,
+    create_trip,
+    list_trips_for_user,
+    get_trip,
+    user_has_trip_access,
+    list_trip_collaborators,
+    add_trip_collaborator,
 )
 
 def create_app():
@@ -64,7 +70,10 @@ def create_app():
     @app.route("/api/friends", methods=["OPTIONS"])
     @app.route("/api/friends/requests/<int:request_id>/accept", methods=["OPTIONS"])
     @app.route("/api/friends/requests/<int:request_id>/decline", methods=["OPTIONS"])
-    def options_auth(request_id=None):
+    @app.route("/api/trips", methods=["OPTIONS"])
+    @app.route("/api/trips/<int:trip_id>", methods=["OPTIONS"])
+    @app.route("/api/trips/<int:trip_id>/collaborators", methods=["OPTIONS"])
+    def options_auth(request_id=None, trip_id=None):
         return "", 200
 
     # ----------------------
@@ -167,6 +176,60 @@ def create_app():
             return jsonify(error="Not logged in"), 401
         friends = list_friends(user["id"])
         return jsonify([{"id": f["id"], "username": f["username"]} for f in friends])
+
+    # ----------------------
+    # Trips API
+    # ----------------------
+    def _trip_to_json(t):
+        out = {"id": t["id"], "trip_name": t["trip_name"], "trail_name": t.get("trail_name"), "activity_type": t.get("activity_type"), "creator_username": t.get("creator_username")}
+        ca = t.get("created_at")
+        out["created_at"] = ca.isoformat() if hasattr(ca, "isoformat") else ca
+        idate = t.get("intended_start_date")
+        out["intended_start_date"] = idate.isoformat() if hasattr(idate, "isoformat") else idate if idate else None
+        return out
+
+    @app.post("/api/trips")
+    def post_trip():
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        payload = request.get_json(silent=True) or {}
+        try:
+            trip_id = create_trip(user["id"], payload)
+            trip = get_trip(trip_id)
+            return jsonify(_trip_to_json(trip)), 201
+        except ValueError as e:
+            return jsonify(error=str(e)), 400
+
+    @app.get("/api/trips")
+    def get_trips():
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        trips = list_trips_for_user(user["id"])
+        return jsonify([_trip_to_json(t) for t in trips])
+
+    @app.get("/api/trips/<int:trip_id>")
+    def get_trip_route(trip_id):
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        if not user_has_trip_access(user["id"], trip_id):
+            return jsonify(error="Not found"), 404
+        trip = get_trip(trip_id)
+        if not trip:
+            return jsonify(error="Not found"), 404
+        return jsonify(_trip_to_json(trip))
+
+    @app.get("/api/trips/<int:trip_id>/collaborators")
+    def get_trip_collaborators(trip_id):
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        if not user_has_trip_access(user["id"], trip_id):
+            return jsonify(error="Not found"), 404
+        collab = list_trip_collaborators(trip_id)
+        return jsonify([{"id": c["id"], "username": c["username"], "role": c["role"]} for c in collab])
 
     # ----------------------
     # Health check

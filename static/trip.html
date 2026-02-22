@@ -14,27 +14,20 @@
 
   <main class="content trip-planner">
     <section class="trip-overview">
-      <h2>Current Trips</h2>
-
-      <div class="trip-card">
-        <h3>Mt. Hood Backpacking</h3>
-        <p><strong>Dates:</strong> June 12 – June 16</p>
-        <p><strong>Additional Needed Gear:</strong> None</p>
-
-        <div class="trip-actions">
-          <button class="small">Edit</button>
-          <button class="small danger">Delete</button>
-        </div>
-      </div>
+      <h2>Active Trips</h2>
+      <div id="trip-list"></div>
     </section>
 
     <section class="trip-setup">
-      <h2>Search for Trip</h2>
-
-      <form id="trip-form">
-        <input type="text" id="trip-name" placeholder="Trip Name" required />
-        <button type="submit">Search</button>
+      <h2>Create a trip</h2>
+      <form id="create-trip-form">
+        <input type="text" id="trip-name" placeholder="Trip name" required />
+        <input type="text" id="trip-trail" placeholder="Trail name" />
+        <input type="text" id="trip-activity" placeholder="Activity (e.g. hiking)" />
+        <input type="date" id="trip-date" placeholder="Start date" />
+        <button type="submit">Create trip</button>
       </form>
+      <p id="create-trip-error" class="error"></p>
     </section>
 
     <div id="dash-options">

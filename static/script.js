@@ -295,6 +295,130 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // ---------- Trip list and create trip ----------
+  const tripList = document.querySelector("#trip-list");
+  const createTripForm = document.querySelector("#create-trip-form");
+
+  async function loadTrips() {
+    if (!tripList) return;
+    try {
+      const res = await fetch(API_BASE + "/api/trips", { credentials: "include" });
+      if (res.status === 401) {
+        window.location.href = "login.html";
+        return;
+      }
+      if (!res.ok) {
+        tripList.innerHTML = "<p>Could not load trips.</p>";
+        return;
+      }
+      const trips = await res.json();
+      if (trips.length === 0) {
+        tripList.innerHTML = "<p>No trips yet. Create one below.</p>";
+        return;
+      }
+      tripList.innerHTML = trips
+        .map(
+          (t) =>
+            `<div class="trip-card trip-card-clickable" data-trip-id="${t.id}">
+              <h3>${escapeHtml(t.trip_name || "Unnamed")}</h3>
+              <p><strong>Trail:</strong> ${escapeHtml(t.trail_name || "—")}</p>
+              <p><strong>Activity:</strong> ${escapeHtml(t.activity_type || "—")}</p>
+              <p><strong>Start:</strong> ${t.intended_start_date ? escapeHtml(String(t.intended_start_date).slice(0, 10)) : "—"}</p>
+              <p><strong>Created by:</strong> ${escapeHtml(t.creator_username || "—")}</p>
+            </div>`
+        )
+        .join("");
+      tripList.querySelectorAll(".trip-card-clickable").forEach((el) => {
+        el.addEventListener("click", () => {
+          const id = el.getAttribute("data-trip-id");
+          window.location.href = "trip_dashboard.html?id=" + encodeURIComponent(id);
+        });
+      });
+    } catch (_) {
+      tripList.innerHTML = "<p>Could not load trips.</p>";
+    }
+  }
+
+  if (tripList) loadTrips();
+
+  if (createTripForm) {
+    createTripForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const errEl = document.querySelector("#create-trip-error");
+      if (errEl) errEl.textContent = "";
+      const trip_name = document.querySelector("#trip-name").value.trim();
+      if (!trip_name) {
+        if (errEl) errEl.textContent = "Trip name is required.";
+        return;
+      }
+      const payload = {
+        trip_name,
+        trail_name: document.querySelector("#trip-trail").value.trim() || undefined,
+        activity_type: document.querySelector("#trip-activity").value.trim() || undefined,
+        intended_start_date: document.querySelector("#trip-date").value || undefined,
+      };
+      try {
+        const res = await fetch(API_BASE + "/api/trips", {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (res.ok) {
+          const data = await res.json().catch(() => ({}));
+          createTripForm.reset();
+          loadTrips();
+          if (errEl) errEl.textContent = "";
+          if (data.id) window.location.href = "trip_dashboard.html?id=" + encodeURIComponent(data.id);
+          return;
+        }
+        const data = await res.json().catch(() => ({}));
+        if (errEl) errEl.textContent = data.error || "Could not create trip.";
+      } catch (_) {
+        if (errEl) errEl.textContent = "Could not reach the server. Try again later.";
+      }
+    });
+  }
+
+  // ---------- Trip dashboard (trip_dashboard.html?id=...) ----------
+  const tripDashboardContent = document.querySelector("#trip-dashboard-content");
+  const tripDashboardLoading = document.querySelector("#trip-dashboard-loading");
+  const params = new URLSearchParams(window.location.search);
+  const tripIdParam = params.get("id");
+
+  if (tripDashboardContent && tripIdParam) {
+    (async () => {
+      try {
+        const res = await fetch(API_BASE + "/api/trips/" + tripIdParam, { credentials: "include" });
+        if (res.status === 401) {
+          window.location.href = "login.html";
+          return;
+        }
+        if (res.status === 404 || !res.ok) {
+          tripDashboardLoading.remove();
+          tripDashboardContent.innerHTML = "<p>Trip not found.</p>";
+          return;
+        }
+        const trip = await res.json();
+        document.querySelector(".banner h1").textContent = trip.trip_name || "Trip";
+        tripDashboardLoading.remove();
+        tripDashboardContent.innerHTML =
+          `<h2>${escapeHtml(trip.trip_name || "Trip")}</h2>
+           <p><strong>Trail:</strong> ${escapeHtml(trip.trail_name || "—")}</p>
+           <p><strong>Activity:</strong> ${escapeHtml(trip.activity_type || "—")}</p>
+           <p><strong>Start date:</strong> ${trip.intended_start_date ? escapeHtml(String(trip.intended_start_date).slice(0, 10)) : "—"}</p>
+           <p><strong>Created by:</strong> ${escapeHtml(trip.creator_username || "—")}</p>
+           <p><em>More functionality can be added here.</em></p>`;
+      } catch (_) {
+        tripDashboardLoading.remove();
+        tripDashboardContent.innerHTML = "<p>Could not load trip.</p>";
+      }
+    })();
+  } else if (tripDashboardContent && !tripIdParam) {
+    tripDashboardLoading.remove();
+    tripDashboardContent.innerHTML = "<p>No trip selected. <a href=\"trip.html\">Back to trips</a></p>";
+  }
+
   if (addItemForm) {
     addItemForm.addEventListener("submit", async (e) => {
       e.preventDefault();
