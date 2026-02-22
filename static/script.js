@@ -495,15 +495,18 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         } else {
           const collabRes = await fetch(API_BASE + "/api/trips/" + tripIdParam + "/collaborators", { credentials: "include" });
-          const invitesListRes = await fetch(API_BASE + "/api/trips/" + tripIdParam + "/invites", { credentials: "include" });
-          const friendsRes = await fetch(API_BASE + "/api/friends", { credentials: "include" });
           const collaborators = collabRes.ok ? await collabRes.json() : [];
-          const pendingInvitesList = invitesListRes.ok ? await invitesListRes.json() : [];
-          const friends = friendsRes.ok ? await friendsRes.json() : [];
-
-          const collabIds = new Set(collaborators.map((c) => c.id));
-          const pendingInviteeIds = new Set(pendingInvitesList.map((p) => p.invitee_id));
-          const friendsToShow = friends.filter((f) => !collabIds.has(f.id) && !pendingInviteeIds.has(f.id));
+          let pendingInvitesList = [];
+          let friendsToShow = [];
+          if (trip.is_creator) {
+            const invitesListRes = await fetch(API_BASE + "/api/trips/" + tripIdParam + "/invites", { credentials: "include" });
+            const friendsRes = await fetch(API_BASE + "/api/friends", { credentials: "include" });
+            pendingInvitesList = invitesListRes.ok ? await invitesListRes.json() : [];
+            const friends = friendsRes.ok ? await friendsRes.json() : [];
+            const collabIds = new Set(collaborators.map((c) => c.id));
+            const pendingInviteeIds = new Set(pendingInvitesList.map((p) => p.invitee_id));
+            friendsToShow = friends.filter((f) => !collabIds.has(f.id) && !pendingInviteeIds.has(f.id));
+          }
 
           const membersSection = document.querySelector("#trip-dashboard-members");
           if (membersSection) {
@@ -516,45 +519,47 @@ document.addEventListener("DOMContentLoaded", () => {
             }
           }
 
-          const pendingSection = document.querySelector("#trip-dashboard-pending-invites");
-          if (pendingSection && pendingInvitesList.length > 0) {
-            pendingSection.style.display = "block";
-            const listEl = document.querySelector("#trip-pending-invites-list");
-            if (listEl) listEl.innerHTML = pendingInvitesList.map((p) => `<p>${escapeHtml(p.invitee_username)} (pending)</p>`).join("");
-          }
-
-          const inviteSection = document.querySelector("#trip-dashboard-invite-friend");
-          if (inviteSection) {
-            inviteSection.style.display = "block";
-            const selectEl = document.querySelector("#trip-invite-friend-select");
-            const errEl = document.querySelector("#trip-invite-error");
-            if (selectEl) {
-              selectEl.innerHTML = "<option value=\"\">Choose a friend…</option>" +
-                friendsToShow.map((f) => `<option value="${f.id}">${escapeHtml(f.username)}</option>`).join("");
+          if (trip.is_creator) {
+            const pendingSection = document.querySelector("#trip-dashboard-pending-invites");
+            if (pendingSection && pendingInvitesList.length > 0) {
+              pendingSection.style.display = "block";
+              const listEl = document.querySelector("#trip-pending-invites-list");
+              if (listEl) listEl.innerHTML = pendingInvitesList.map((p) => `<p>${escapeHtml(p.invitee_username)} (pending)</p>`).join("");
             }
-            const inviteBtn = document.querySelector("#trip-invite-friend-btn");
-            if (inviteBtn && selectEl) {
-              inviteBtn.onclick = async () => {
-                const friendId = selectEl.value;
-                if (!friendId) return;
-                if (errEl) errEl.textContent = "";
-                try {
-                  const r = await fetch(API_BASE + "/api/trips/" + tripIdParam + "/invites", {
-                    method: "POST",
-                    credentials: "include",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ user_id: parseInt(friendId, 10) }),
-                  });
-                  if (r.ok) {
-                    window.location.reload();
-                    return;
+
+            const inviteSection = document.querySelector("#trip-dashboard-invite-friend");
+            if (inviteSection) {
+              inviteSection.style.display = "block";
+              const selectEl = document.querySelector("#trip-invite-friend-select");
+              const errEl = document.querySelector("#trip-invite-error");
+              if (selectEl) {
+                selectEl.innerHTML = "<option value=\"\">Choose a friend…</option>" +
+                  friendsToShow.map((f) => `<option value="${f.id}">${escapeHtml(f.username)}</option>`).join("");
+              }
+              const inviteBtn = document.querySelector("#trip-invite-friend-btn");
+              if (inviteBtn && selectEl) {
+                inviteBtn.onclick = async () => {
+                  const friendId = selectEl.value;
+                  if (!friendId) return;
+                  if (errEl) errEl.textContent = "";
+                  try {
+                    const r = await fetch(API_BASE + "/api/trips/" + tripIdParam + "/invites", {
+                      method: "POST",
+                      credentials: "include",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ user_id: parseInt(friendId, 10) }),
+                    });
+                    if (r.ok) {
+                      window.location.reload();
+                      return;
+                    }
+                    const data = await r.json().catch(() => ({}));
+                    if (errEl) errEl.textContent = data.error || "Could not send invite.";
+                  } catch (_) {
+                    if (errEl) errEl.textContent = "Could not reach the server.";
                   }
-                  const data = await r.json().catch(() => ({}));
-                  if (errEl) errEl.textContent = data.error || "Could not send invite.";
-                } catch (_) {
-                  if (errEl) errEl.textContent = "Could not reach the server.";
-                }
-              };
+                };
+              }
             }
           }
         }

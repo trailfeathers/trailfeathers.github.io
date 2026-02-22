@@ -229,7 +229,9 @@ def create_app():
         trip = get_trip(trip_id)
         if not trip:
             return jsonify(error="Not found"), 404
-        return jsonify(_trip_to_json(trip))
+        out = _trip_to_json(trip)
+        out["is_creator"] = trip["creator_id"] == user["id"]
+        return jsonify(out)
 
     @app.get("/api/trips/<int:trip_id>/collaborators")
     def get_trip_collaborators(trip_id):
@@ -246,8 +248,9 @@ def create_app():
         user = login.require_auth()
         if not user:
             return jsonify(error="Not logged in"), 401
-        if not user_has_trip_access(user["id"], trip_id):
-            return jsonify(error="Not found"), 404
+        trip = get_trip(trip_id)
+        if not trip or trip["creator_id"] != user["id"]:
+            return jsonify(error="Only the trip creator can invite people"), 403
         payload = request.get_json(silent=True) or {}
         invitee_id = payload.get("user_id")
         username = (payload.get("username") or "").strip()
@@ -274,8 +277,9 @@ def create_app():
         user = login.require_auth()
         if not user:
             return jsonify(error="Not logged in"), 401
-        if not user_has_trip_access(user["id"], trip_id):
-            return jsonify(error="Not found"), 404
+        trip = get_trip(trip_id)
+        if not trip or trip["creator_id"] != user["id"]:
+            return jsonify(error="Only the trip creator can view pending invites"), 403
         rows = list_trip_invites_pending(trip_id)
         out = []
         for r in rows:
