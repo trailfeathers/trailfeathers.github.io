@@ -406,3 +406,32 @@ button:hover {
   font-size: 0.9rem;
   margin-top: 0.25rem;
 }
+
+/* Trip dashboard */
+.trip-dashboard-section {
+  margin-top: 1.5rem;
+}
+.trip-dashboard-section h2 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+.role-badge {
+  font-size: 0.85rem;
+  color: #555;
+  margin-left: 0.25rem;
+}
+
+/* Trip invites (list page) */
+.trip-invite-item {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: #f8f8f8;
+  border-radius: 6px;
+}
+.trip-invite-item button {
+  margin-right: 0.5rem;
+  margin-top: 0.25rem;
+}
+.trip-invite-item a {
+  margin-right: 0.75rem;
+}

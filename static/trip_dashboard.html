@@ -17,6 +17,28 @@
     <section id="trip-dashboard-content">
       <p id="trip-dashboard-loading">Loading…</p>
     </section>
+    <section id="trip-dashboard-invited" class="trip-dashboard-section" style="display: none;">
+      <h2>You're invited</h2>
+      <p id="trip-invited-message"></p>
+      <button type="button" id="trip-invite-accept">Accept</button>
+      <button type="button" id="trip-invite-decline">Decline</button>
+    </section>
+    <section id="trip-dashboard-members" class="trip-dashboard-section" style="display: none;">
+      <h2>Trip members</h2>
+      <div id="trip-collaborators-list"></div>
+    </section>
+    <section id="trip-dashboard-pending-invites" class="trip-dashboard-section" style="display: none;">
+      <h2>Pending invites</h2>
+      <div id="trip-pending-invites-list"></div>
+    </section>
+    <section id="trip-dashboard-invite-friend" class="trip-dashboard-section" style="display: none;">
+      <h2>Invite a friend</h2>
+      <select id="trip-invite-friend-select">
+        <option value="">Choose a friend…</option>
+      </select>
+      <button type="button" id="trip-invite-friend-btn">Send invite</button>
+      <p id="trip-invite-error" class="error"></p>
+    </section>
     <div id="dash-options">
       <button id="home">Home</button>
       <button id="inventory">My Gear Library</button>
