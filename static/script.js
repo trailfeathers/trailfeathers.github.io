@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const backButtonLogin = document.querySelector("#back-button-login");
   if (backButtonLogin) {
     backButtonLogin.addEventListener("click", () => {
-      window.history.back();
+      window.location.href = "register.html";
     });
   }
 
@@ -106,7 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const backButtonRegister = document.querySelector("#back-button-register");
   if (backButtonRegister) {
     backButtonRegister.addEventListener("click", () => {
-      window.history.back();
+      window.location.href = "login.html";
     });
   }
 
@@ -622,7 +622,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// Inventory nav (when already on page)
+// Inventory Nav (when already on page)
 const home = document.querySelector("#home");
 if (home) {
   home.addEventListener("click", () => {
@@ -630,4 +630,10 @@ if (home) {
   });
 }
 
-// Trip Planner
+// Back button (Trip Dashboard)
+const backToTrips = document.querySelector("#back-to-trips");
+if (backToTrips) {
+  backToTrips.addEventListener("click", () => {
+    window.location.href = "trip.html";
+  });
+}
