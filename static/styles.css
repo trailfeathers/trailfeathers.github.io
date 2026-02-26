@@ -451,3 +451,89 @@ button:hover {
 .trip-invite-item a {
   margin-right: 0.75rem;
 }
+
+/* Gear pool sections */
+.gear-owner-section {
+  margin-bottom: 1.5rem;
+  padding: 0.75rem;
+  background: #f9f9f9;
+  border-radius: 6px;
+}
+
+.gear-owner-section h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+.gear-pool-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.gear-pool-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  margin-bottom: 0.25rem;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+}
+
+.gear-pool-item.assigned {
+  background: #e8f5e9;
+  border-color: #4caf50;
+}
+
+.gear-info {
+  flex: 1;
+  font-size: 0.9rem;
+}
+
+.btn-small {
+  padding: 0.3rem 0.75rem;
+  font-size: 0.85rem;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-add-gear {
+  background: #2c5f2d;
+  color: white;
+}
+
+.btn-add-gear:hover {
+  background: #1f4420;
+}
+
+.btn-remove-gear {
+  background: #d32f2f;
+  color: white;
+}
+
+.btn-remove-gear:hover {
+  background: #b71c1c;
+}
+
+.assigned-gear-list {
+  list-style: none;
+  padding: 0;
+}
+
+.assigned-gear-list li {
+  padding: 0.5rem;
+  margin-bottom: 0.25rem;
+  background: #f0f5eb;
+  border-left: 3px solid #2c5f2d;
+  border-radius: 4px;
+}
+
+.assigned-gear-list em {
+  color: #555;
+  font-size: 0.9rem;
+}
