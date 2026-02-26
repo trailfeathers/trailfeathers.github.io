@@ -421,6 +421,22 @@ button:hover {
   margin-left: 0.25rem;
 }
 
+#back-to-trips {
+  width: 17%;
+  padding: 0.6rem;
+  border-radius: 999px;
+  border: 2px solid #2c5f2d;
+  background-color: white;
+  color: #2c5f2d;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 0.75rem;
+}
+
+#back-to-trips:hover {
+  background-color: #f0f5eb;
+}
+
 /* Trip invites (list page) */
 .trip-invite-item {
   margin-bottom: 1rem;
