@@ -460,6 +460,21 @@ document.addEventListener("DOMContentLoaded", () => {
            <p><strong>Start date:</strong> ${trip.intended_start_date ? escapeHtml(String(trip.intended_start_date).slice(0, 10)) : "—"}</p>
            <p><strong>Created by:</strong> ${escapeHtml(trip.creator_username || "—")}</p>`;
 
+        const checklistSection = document.querySelector("#trip-dashboard-checklist");
+        const checklistList = document.querySelector("#trip-checklist-list");
+        if (checklistSection && checklistList) {
+          try {
+            const checklistRes = await fetch(API_BASE + "/api/trips/" + tripIdParam + "/checklist", { credentials: "include" });
+            if (checklistRes.ok) {
+              const items = await checklistRes.json();
+              if (items && items.length > 0) {
+                checklistList.innerHTML = items.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
+                checklistSection.style.display = "block";
+              }
+            }
+          } catch (_) {}
+        }
+
         const invitesRes = await fetch(API_BASE + "/api/trip-invites", { credentials: "include" });
         const myInvites = invitesRes.ok ? await invitesRes.json() : [];
         const pendingInvite = myInvites.find((inv) => String(inv.trip_id) === String(tripIdParam));

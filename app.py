@@ -78,6 +78,7 @@ def create_app():
     @app.route("/api/friends/requests/<int:request_id>/decline", methods=["OPTIONS"])
     @app.route("/api/trips", methods=["OPTIONS"])
     @app.route("/api/trips/<int:trip_id>", methods=["OPTIONS"])
+    @app.route("/api/trips/<int:trip_id>/checklist", methods=["OPTIONS"])
     @app.route("/api/trips/<int:trip_id>/collaborators", methods=["OPTIONS"])
     @app.route("/api/trips/<int:trip_id>/invites", methods=["OPTIONS"])
     @app.route("/api/trip-invites", methods=["OPTIONS"])
@@ -237,6 +238,21 @@ def create_app():
         out = _trip_to_json(trip)
         out["is_creator"] = trip["creator_id"] == user["id"]
         return jsonify(out)
+
+    @app.get("/api/trips/<int:trip_id>/checklist")
+    def get_trip_checklist(trip_id):
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        if not user_has_trip_access(user["id"], trip_id) and not has_pending_invite_to_trip(user["id"], trip_id):
+            return jsonify(error="Not found"), 404
+        trip = get_trip(trip_id)
+        if not trip:
+            return jsonify(error="Not found"), 404
+        from checklists.requirements import CHECKLISTS
+        activity_type = (trip.get("activity_type") or "").strip()
+        items = CHECKLISTS.get(activity_type, [])
+        return jsonify(items)
 
     @app.get("/api/trips/<int:trip_id>/collaborators")
     def get_trip_collaborators(trip_id):
