@@ -578,6 +578,104 @@ document.addEventListener("DOMContentLoaded", () => {
             }
           }
         }
+
+        // Load gear pool and assigned gear (if user is collaborator)
+        const gearPoolSection = document.querySelector("#trip-dashboard-gear-pool");
+        const assignedGearSection = document.querySelector("#trip-dashboard-assigned-gear");
+        if (!pendingInvite && gearPoolSection && assignedGearSection) {
+          try {
+            // Load gear pool
+            const poolRes = await fetch(API_BASE + "/api/trips/" + tripIdParam + "/gear/pool", { credentials: "include" });
+            if (poolRes.ok) {
+              const gearPool = await poolRes.json();
+              
+              // Load assigned gear
+              const assignedRes = await fetch(API_BASE + "/api/trips/" + tripIdParam + "/gear", { credentials: "include" });
+              const assignedGear = assignedRes.ok ? await assignedRes.json() : [];
+              const assignedIds = new Set(assignedGear.map(g => g.id));
+              
+              if (gearPool.length > 0) {
+                gearPoolSection.style.display = "block";
+                const poolList = document.querySelector("#trip-gear-pool-list");
+                
+                // Group by owner
+                const byOwner = {};
+                gearPool.forEach(item => {
+                  if (!byOwner[item.owner_username]) {
+                    byOwner[item.owner_username] = [];
+                  }
+                  byOwner[item.owner_username].push(item);
+                });
+                
+                poolList.innerHTML = Object.keys(byOwner).sort().map(owner => {
+                  const items = byOwner[owner];
+                  return `<div class="gear-owner-section">
+                    <h4>${escapeHtml(owner)}'s Gear</h4>
+                    <ul class="gear-pool-items">
+                      ${items.map(item => {
+                        const isAssigned = item.is_assigned;
+                        return `<li class="gear-pool-item ${isAssigned ? 'assigned' : ''}">
+                          <span class="gear-info">
+                            <strong>${escapeHtml(item.type)}</strong>: ${escapeHtml(item.name)}
+                            ${item.capacity ? ` (${escapeHtml(item.capacity)})` : ''}
+                            ${item.brand ? ` - ${escapeHtml(item.brand)}` : ''}
+                          </span>
+                          ${isAssigned ? 
+                            `<button type="button" class="btn-small btn-remove-gear" data-gear-id="${item.id}">Remove</button>` :
+                            `<button type="button" class="btn-small btn-add-gear" data-gear-id="${item.id}">Add to Trip</button>`
+                          }
+                        </li>`;
+                      }).join('')}
+                    </ul>
+                  </div>`;
+                }).join('');
+                
+                // Add event listeners for add/remove buttons
+                poolList.querySelectorAll('.btn-add-gear').forEach(btn => {
+                  btn.addEventListener('click', async () => {
+                    const gearId = btn.getAttribute('data-gear-id');
+                    try {
+                      const r = await fetch(API_BASE + "/api/trips/" + tripIdParam + "/gear/" + gearId, {
+                        method: "POST",
+                        credentials: "include",
+                        headers: { "Content-Type": "application/json" }
+                      });
+                      if (r.ok) window.location.reload();
+                    } catch (_) {}
+                  });
+                });
+                
+                poolList.querySelectorAll('.btn-remove-gear').forEach(btn => {
+                  btn.addEventListener('click', async () => {
+                    const gearId = btn.getAttribute('data-gear-id');
+                    try {
+                      const r = await fetch(API_BASE + "/api/trips/" + tripIdParam + "/gear/" + gearId, {
+                        method: "DELETE",
+                        credentials: "include"
+                      });
+                      if (r.ok) window.location.reload();
+                    } catch (_) {}
+                  });
+                });
+              }
+              
+              // Show assigned gear
+              if (assignedGear.length > 0) {
+                assignedGearSection.style.display = "block";
+                const assignedList = document.querySelector("#trip-assigned-gear-list");
+                assignedList.innerHTML = `<ul class="assigned-gear-list">
+                  ${assignedGear.map(item => 
+                    `<li>
+                      <strong>${escapeHtml(item.type)}</strong>: ${escapeHtml(item.name)}
+                      ${item.capacity ? ` (${escapeHtml(item.capacity)})` : ''}
+                      - <em>Owned by ${escapeHtml(item.owner_username)}</em>
+                    </li>`
+                  ).join('')}
+                </ul>`;
+              }
+            }
+          } catch (_) {}
+        }
       } catch (_) {
         tripDashboardLoading.remove();
         tripDashboardContent.innerHTML = "<p>Could not load trip.</p>";
