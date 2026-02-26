@@ -1,7 +1,7 @@
 import os
 from datetime import timedelta
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, session
 from flask_cors import CORS
 
 # Import auth routes (this file defines routes on an app instance)
@@ -113,6 +113,7 @@ def create_app():
         except ValueError as e:
             return jsonify(error=str(e)), 400
 
+        login.refresh_session_cache(user["id"])
         return jsonify(ok=True, id=item_id), 201
 
     @app.get("/api/gear")
@@ -120,9 +121,9 @@ def create_app():
         user = login.require_auth()
         if not user:
             return jsonify(error="Not logged in"), 401
-
-        items = list_gear(user["id"])
-        return jsonify(items)
+        if session.get("gear") is None:
+            login.refresh_session_cache(user["id"])
+        return jsonify(session["gear"])
 
     # ----------------------
     # Friends API
@@ -167,6 +168,7 @@ def create_app():
         if not user:
             return jsonify(error="Not logged in"), 401
         if accept_friend_request(request_id, user["id"]):
+            login.refresh_session_cache(user["id"])
             return jsonify(ok=True), 200
         return jsonify(error="Request not found or already handled"), 404
 
@@ -184,8 +186,9 @@ def create_app():
         user = login.require_auth()
         if not user:
             return jsonify(error="Not logged in"), 401
-        friends = list_friends(user["id"])
-        return jsonify([{"id": f["id"], "username": f["username"]} for f in friends])
+        if session.get("friends") is None:
+            login.refresh_session_cache(user["id"])
+        return jsonify(session["friends"])
 
     # ----------------------
     # Trips API
@@ -207,6 +210,7 @@ def create_app():
         try:
             trip_id = create_trip(user["id"], payload)
             trip = get_trip(trip_id)
+            login.refresh_session_cache(user["id"])
             return jsonify(_trip_to_json(trip)), 201
         except ValueError as e:
             return jsonify(error=str(e)), 400
@@ -216,8 +220,9 @@ def create_app():
         user = login.require_auth()
         if not user:
             return jsonify(error="Not logged in"), 401
-        trips = list_trips_for_user(user["id"])
-        return jsonify([_trip_to_json(t) for t in trips])
+        if session.get("trips") is None:
+            login.refresh_session_cache(user["id"])
+        return jsonify(session["trips"])
 
     @app.get("/api/trips/<int:trip_id>")
     def get_trip_route(trip_id):
@@ -317,6 +322,7 @@ def create_app():
         if not user:
             return jsonify(error="Not logged in"), 401
         if accept_trip_invite(invite_id, user["id"]):
+            login.refresh_session_cache(user["id"])
             return jsonify(ok=True), 200
         return jsonify(error="Invite not found or already responded to"), 404
 
