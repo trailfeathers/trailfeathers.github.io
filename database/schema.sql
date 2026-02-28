@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS trip_report_info (
   difficulty TEXT,
   trip_report_1 TEXT,
   trip_report_2 TEXT,
-  lat/long TEXT
+  lat/long TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
