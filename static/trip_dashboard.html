@@ -10,49 +10,64 @@
 <body>
   <header class="banner">
     <h1>Trip</h1>
+    <p class="banner-subtitle">Planning dashboard</p>
   </header>
 
   <main class="content trip-dashboard">
-    <section id="trip-dashboard-content">
-      <p id="trip-dashboard-loading">Loading…</p>
-    </section>
-    <section id="trip-dashboard-gear-pool" class="trip-dashboard-section" style="display: none;">
-      <h2>Equipment Pool</h2>
-      <p>Select equipment from trip members to assign to this trip:</p>
-      <div id="trip-gear-pool-list"></div>
-    </section>
-    <section id="trip-dashboard-assigned-gear" class="trip-dashboard-section" style="display: none;">
-      <h2>Assigned Equipment</h2>
-      <p>Equipment committed for this trip:</p>
-      <div id="trip-assigned-gear-list"></div>
-    </section>
-    <section id="trip-dashboard-checklist" class="trip-dashboard-section" style="display: none;">
-      <h2>What to bring</h2>
-      <ul id="trip-checklist-list"></ul>
-    </section>
-    <section id="trip-dashboard-invited" class="trip-dashboard-section" style="display: none;">
-      <h2>You're invited</h2>
-      <p id="trip-invited-message"></p>
-      <button type="button" id="trip-invite-accept">Accept</button>
-      <button type="button" id="trip-invite-decline">Decline</button>
-    </section>
-    <section id="trip-dashboard-members" class="trip-dashboard-section" style="display: none;">
-      <h2>Trip members</h2>
-      <div id="trip-collaborators-list"></div>
-    </section>
-    <section id="trip-dashboard-pending-invites" class="trip-dashboard-section" style="display: none;">
-      <h2>Pending invites</h2>
-      <div id="trip-pending-invites-list"></div>
-    </section>
-    <section id="trip-dashboard-invite-friend" class="trip-dashboard-section" style="display: none;">
-      <h2>Invite a friend</h2>
-      <select id="trip-invite-friend-select">
-        <option value="">Choose a friend…</option>
-      </select>
-      <button type="button" id="trip-invite-friend-btn">Send invite</button>
-      <p id="trip-invite-error" class="error"></p>
-    </section>
-    <button type="button" id="back-to-trips" class="secondary">Back to Trip Dashboard</button>
+    <div class="trip-dashboard-layout">
+      <nav class="trip-dashboard-nav">
+        <button type="button" id="back-to-trips" class="secondary">← Back to trips</button>
+      </nav>
+
+      <section class="trip-dashboard-summary">
+        <div id="trip-dashboard-content">
+          <p id="trip-dashboard-loading">Loading…</p>
+        </div>
+      </section>
+
+      <div class="trip-dashboard-block trip-dashboard-gear">
+        <section id="trip-dashboard-gear-pool" class="trip-dashboard-section" style="display: none;">
+          <h2>Equipment Pool</h2>
+          <p>Select equipment from trip members to assign to this trip:</p>
+          <div id="trip-gear-pool-list"></div>
+        </section>
+        <section id="trip-dashboard-assigned-gear" class="trip-dashboard-section" style="display: none;">
+          <h2>Assigned Equipment</h2>
+          <p>Equipment committed for this trip:</p>
+          <div id="trip-assigned-gear-list"></div>
+        </section>
+        <section id="trip-dashboard-checklist" class="trip-dashboard-section" style="display: none;">
+          <h2>What to bring</h2>
+          <ul id="trip-checklist-list"></ul>
+        </section>
+      </div>
+
+      <section id="trip-dashboard-invited" class="trip-dashboard-section" style="display: none;">
+        <h2>You're invited</h2>
+        <p id="trip-invited-message"></p>
+        <button type="button" id="trip-invite-accept">Accept</button>
+        <button type="button" id="trip-invite-decline">Decline</button>
+      </section>
+
+      <div class="trip-dashboard-block trip-dashboard-team">
+        <section id="trip-dashboard-members" class="trip-dashboard-section" style="display: none;">
+          <h2>Trip members</h2>
+          <div id="trip-collaborators-list"></div>
+        </section>
+        <section id="trip-dashboard-pending-invites" class="trip-dashboard-section" style="display: none;">
+          <h2>Pending invites</h2>
+          <div id="trip-pending-invites-list"></div>
+        </section>
+        <section id="trip-dashboard-invite-friend" class="trip-dashboard-section" style="display: none;">
+          <h2>Invite a friend</h2>
+          <select id="trip-invite-friend-select">
+            <option value="">Choose a friend…</option>
+          </select>
+          <button type="button" id="trip-invite-friend-btn">Send invite</button>
+          <p id="trip-invite-error" class="error"></p>
+        </section>
+      </div>
+    </div>
   </main>
 
   <script src="script.js"></script>
