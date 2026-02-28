@@ -82,6 +82,8 @@ CREATE TABLE IF NOT EXISTS trip_report_info (
   elevation_gain TEXT,
   highpoint TEXT,
   difficulty TEXT,
+  trip_report_1 TEXT,
+  trip_report_2 TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
