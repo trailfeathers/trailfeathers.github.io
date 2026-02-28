@@ -13,19 +13,18 @@
   </header>
 
   <main class="content">
-    <h2 id="welcome">Welcome!</h2> 
+    <h2 id="welcome">Welcome! Thank you for using TrailFeathers!</h2> 
+    <p id="welcome-message">Here you can manage your gear library, plan a trip, and add friends.</p>
 
+    <!-- Set a specific image per button: change the path inside url('...') in each style. Path is relative to the static folder (e.g. images_for_site/your-photo.jpg). -->
     <div id="dash-options">
-      <button type="button" id="inventory" class="dash-btn">
-        <img class="dash-btn-img" src="" alt="" />
+      <button type="button" id="inventory" class="dash-btn" style="--dash-btn-bg: url('images_for_site/IMG_6591.JPG')">
         <span class="dash-btn-label">My Gear Library</span>
       </button>
-      <button type="button" id="plan-trip" class="dash-btn">
-        <img class="dash-btn-img" src="" alt="" />
+      <button type="button" id="plan-trip" class="dash-btn" style="--dash-btn-bg: url('images_for_site/cape_perpetua.jpg')">
         <span class="dash-btn-label">Plan a Trip</span>
       </button>
-      <button type="button" id="add-friend" class="dash-btn">
-        <img class="dash-btn-img" src="" alt="" />
+      <button type="button" id="add-friend" class="dash-btn" style="--dash-btn-bg: url('images_for_site/IMG_5673.jpeg')">
         <span class="dash-btn-label">Add a Friend</span>
       </button>
     </div>
