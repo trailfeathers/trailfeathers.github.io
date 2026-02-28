@@ -35,6 +35,47 @@ body {
   margin-top: 0.25rem;
 }
 
+/* page-specific banner photos */
+.banner--login {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
+    url('images_for_site/mount_adams.jpg');
+  background-size: cover;
+  background-position: center 82%;
+  min-height: 200px;
+}
+
+.banner--friends {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
+    url('images_for_site/mount_adams.jpg');
+  background-size: cover;
+  background-position: center 62%;
+  min-height: 200px;
+}
+
+.banner--inventory {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
+    url('images_for_site/mount_daniel.jpeg');
+  background-size: cover;
+  background-position: center 67%;
+  min-height: 200px;
+}
+
+.banner--dashboard {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
+    url('images_for_site/IMG_5673.jpeg');
+  background-size: cover;
+  background-position: center 67%;
+  min-height: 200px;
+}
+
+.banner--trip {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
+    url('images_for_site/IMG_5899.jpeg');
+  background-size: cover;
+  background-position: center 67%;
+  min-height: 200px;
+}
+
 /* shared page content */
 .content {
   display: flex;
@@ -193,25 +234,57 @@ body {
 #dash-options {
   display: flex;
   justify-content: center;
-  gap: 1.5rem;
+  gap: 2rem;
   margin: 3rem auto;
+  padding: 0 2rem;
+  max-width: 900px;
+  width: 100%;
+  flex-wrap: wrap;
 }
 
-#dash-options button {
+#dash-options .dash-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex: 1;
+  min-width: 200px;
+  min-height: 180px;
+  padding: 2rem 2.5rem;
   background-color: #2c5f2d;
   color: white;
-  font-size: 1rem;
-  padding: 0.75rem 1.75rem;
-  border-radius: 10px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  border-radius: 16px;
   border: none;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
 }
 
-#dash-options button:hover {
+#dash-options .dash-btn:hover {
   background-color: #244d24;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Hide image area when no src so button still looks clean */
+#dash-options .dash-btn-img:not([src]),
+#dash-options .dash-btn-img[src=""] {
+  display: none;
+}
+
+#dash-options .dash-btn-img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+#dash-options .dash-btn-label {
+  text-align: center;
+  line-height: 1.3;
 }
 
 
