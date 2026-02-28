@@ -71,6 +71,20 @@ CREATE TABLE IF NOT EXISTS friend_requests (
   UNIQUE(sender_id, receiver_id)
 );
 
+-- TRIP REPORT INFO (summarized trail/report data per trip; summarized_description instead of full description)
+CREATE TABLE IF NOT EXISTS trip_report_info (
+  id BIGSERIAL PRIMARY KEY,
+  trip_id BIGINT NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
+  summarized_description TEXT NOT NULL,
+  hike_name TEXT,
+  source_url TEXT,
+  distance TEXT,
+  elevation_gain TEXT,
+  highpoint TEXT,
+  difficulty TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 -- Helpful indexes
 CREATE INDEX IF NOT EXISTS idx_gear_user_id ON gear(user_id);
 CREATE INDEX IF NOT EXISTS idx_trips_creator_id ON trips(creator_id);
@@ -79,3 +93,4 @@ CREATE INDEX IF NOT EXISTS idx_friend_requests_receiver_id ON friend_requests(re
 CREATE INDEX IF NOT EXISTS idx_friend_requests_sender_id ON friend_requests(sender_id);
 CREATE INDEX IF NOT EXISTS idx_trip_invites_trip_id ON trip_invites(trip_id);
 CREATE INDEX IF NOT EXISTS idx_trip_invites_invitee_id ON trip_invites(invitee_id);
+CREATE INDEX IF NOT EXISTS idx_trip_report_info_trip_id ON trip_report_info(trip_id);
