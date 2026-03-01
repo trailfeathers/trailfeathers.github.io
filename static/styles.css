@@ -197,6 +197,25 @@ body {
   min-height: 1.25rem;
 }
 
+.form-hint {
+  display: block;
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 0.2rem;
+}
+
+.checklist-item.checklist-met {
+  color: #2c5f2d;
+}
+
+.checklist-item.checklist-short {
+  color: #c00;
+}
+
+.checklist-status {
+  font-style: italic;
+}
+
 /* Gear add form (inventory page) */
 .gear-form {
   background: white;

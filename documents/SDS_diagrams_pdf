@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TrailFeathers SDS Diagrams</title>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: system-ui, sans-serif; padding: 1rem; }
+    .diagram { margin-bottom: 2rem; break-inside: avoid; }
+    .mermaid { display: flex; justify-content: center; }
+    @media print {
+      body { padding: 0; }
+      .diagram { page-break-after: always; }
+      .diagram:last-child { page-break-after: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="diagram">
+    <pre class="mermaid">
+erDiagram
+    users ||--o{ gear : "owns"
+    users ||--o{ trips : "creates"
+    users ||--o{ trip_collaborators : "member of"
+    trips ||--o{ trip_collaborators : "has"
+    users ||--o{ trip_invites_inviter : "invites"
+    users ||--o{ trip_invites_invitee : "invited"
+    trips ||--o{ trip_invites : "has"
+    trips ||--o{ trip_gear : "uses"
+    gear ||--o{ trip_gear : "assigned to"
+    users ||--o{ trip_gear : "assigned_to"
+    users ||--o{ friend_requests_sender : "sends"
+    users ||--o{ friend_requests_receiver : "receives"
+
+    users {
+        bigint id PK
+        text username UK
+        text password_hash
+        timestamptz created_at
+    }
+
+    gear {
+        bigint id PK
+        bigint user_id FK
+        text type
+        text name
+        text capacity
+        numeric weight_oz
+        text brand
+        text condition
+        text notes
+        timestamptz created_at
+    }
+
+    trips {
+        bigint id PK
+        bigint creator_id FK
+        text trip_name
+        text trail_name
+        text activity_type
+        timestamptz intended_start_date
+        timestamptz created_at
+    }
+
+    trip_collaborators {
+        bigint trip_id PK,FK
+        bigint user_id PK,FK
+        text role
+        timestamptz added_at
+    }
+
+    trip_invites {
+        bigint id PK
+        bigint trip_id FK
+        bigint inviter_id FK
+        bigint invitee_id FK
+        text status
+        timestamptz created_at
+    }
+
+    trip_gear {
+        bigint trip_id PK,FK
+        bigint gear_id PK,FK
+        bigint assigned_to_user_id FK
+        int quantity
+    }
+
+    friend_requests {
+        bigint id PK
+        bigint sender_id FK
+        bigint receiver_id FK
+        text status
+        timestamptz created_at
+    }
+    </pre>
+  </div>
+
+  <div class="diagram">
+    <pre class="mermaid">
+flowchart TB
+    subgraph client [Client]
+        Browser[Browser]
+        Static[Static pages]
+        TripDash[Trip dashboard]
+        Browser --> Static
+        Static --> TripDash
+    end
+
+    subgraph api [Backend API]
+        Flask[Flask app]
+        Auth[Auth / Session]
+        Routes[API routes]
+        Flask --> Auth
+        Flask --> Routes
+    end
+
+    subgraph data [Data]
+        DB[(PostgreSQL)]
+        Checklist[Checklists module]
+    end
+
+    subgraph llm_pipeline [LLM pipeline - planned]
+        Scrape[Web scrape WTA]
+        CSV[CSV]
+        LLM[LLM processing]
+        Scrape --> CSV
+        CSV --> LLM
+        LLM -.->|"store enriched trail data"| DB
+    end
+
+    Static -->|"HTTPS + cookies"| Flask
+    Routes --> DB
+    Auth --> DB
+    Routes --> Checklist
+    TripDash -->|"fetch trip/trail info"| Flask
+    DB -.->|"trail data for dashboard"| Routes
+    </pre>
+  </div>
+</body>
+</html>
