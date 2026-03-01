@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TrailFeathers SDS Diagrams</title>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: system-ui, sans-serif; padding: 1rem; }
+    .diagram { margin-bottom: 2rem; break-inside: avoid; }
+    .mermaid { display: flex; justify-content: center; }
+    @media print {
+      body { padding: 0; }
+      .diagram { page-break-after: always; }
+      .diagram:last-child { page-break-after: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="diagram">
+    <pre class="mermaid">
+flowchart TB
+    users["users\nid PK, username UK, password_hash, created_at"]
+    gear["gear\nid PK, user_id FK, type, name, capacity, weight_oz, brand, condition, notes"]
+    trips["trips\nid PK, creator_id FK, trip_name, trail_name, activity_type, intended_start_date"]
+    tc["trip_collaborators\ntrip_id PK,FK, user_id PK,FK, role, added_at"]
+    ti["trip_invites\nid PK, trip_id FK, inviter_id FK, invitee_id FK, status"]
+    tg["trip_gear\ntrip_id PK,FK, gear_id PK,FK, assigned_to_user_id FK, quantity"]
+    fr["friend_requests\nid PK, sender_id FK, receiver_id FK, status"]
+
+    users -->|owns| gear
+    users -->|creates| trips
+    users -->|sends / receives| fr
+    trips -->|has| tc
+    users -->|member of| tc
+    trips -->|has| ti
+    users -->|inviter / invitee| ti
+    trips -->|uses| tg
+    gear -->|assigned to| tg
+    users -->|assigned_to| tg
+    </pre>
+  </div>
+
+  <div class="diagram">
+    <pre class="mermaid">
+flowchart TB
+    subgraph client [Client]
+        Browser[Browser]
+        Static[Static pages]
+        TripDash[Trip dashboard]
+        Browser --> Static
+        Static --> TripDash
+    end
+
+    subgraph api [Backend API]
+        Flask[Flask app]
+        Auth[Auth / Session]
+        Routes[API routes]
+        Flask --> Auth
+        Flask --> Routes
+    end
+
+    subgraph data [Data]
+        DB[(PostgreSQL)]
+        Checklist[Checklists module]
+    end
+
+    subgraph llm_pipeline [LLM pipeline - planned]
+        Scrape[Web scrape WTA]
+        CSV[CSV]
+        LLM[LLM processing]
+        Scrape --> CSV
+        CSV --> LLM
+        LLM -.->|"store enriched trail data"| DB
+    end
+
+    Static -->|"HTTPS + cookies"| Flask
+    Routes --> DB
+    Auth --> DB
+    Routes --> Checklist
+    TripDash -->|"fetch trip/trail info"| Flask
+    DB -.->|"trail data for dashboard"| Routes
+    </pre>
+  </div>
+</body>
+</html>

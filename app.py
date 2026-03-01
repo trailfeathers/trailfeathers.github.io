@@ -29,6 +29,12 @@ from database.database import (
     list_incoming_trip_invites,
     accept_trip_invite,
     decline_trip_invite,
+    list_requirement_types,
+    get_trip_requirement_summary,
+    get_trip_gear_pool,
+    get_trip_assigned_gear,
+    assign_gear_to_trip,
+    unassign_gear_from_trip,
 )
 
 def create_app():
@@ -79,6 +85,7 @@ def create_app():
     @app.route("/api/trips", methods=["OPTIONS"])
     @app.route("/api/trips/<int:trip_id>", methods=["OPTIONS"])
     @app.route("/api/trips/<int:trip_id>/checklist", methods=["OPTIONS"])
+    @app.route("/api/requirement-types", methods=["OPTIONS"])
     @app.route("/api/trips/<int:trip_id>/collaborators", methods=["OPTIONS"])
     @app.route("/api/trips/<int:trip_id>/invites", methods=["OPTIONS"])
     @app.route("/api/trip-invites", methods=["OPTIONS"])
@@ -252,10 +259,33 @@ def create_app():
         trip = get_trip(trip_id)
         if not trip:
             return jsonify(error="Not found"), 404
-        from checklists.requirements import CHECKLISTS
-        activity_type = (trip.get("activity_type") or "").strip()
-        items = CHECKLISTS.get(activity_type, [])
-        return jsonify(items)
+        summary = get_trip_requirement_summary(trip_id)
+        if summary is None:
+            return jsonify([])
+        out = []
+        for s in summary:
+            item = {
+                "requirement_type_id": s["requirement_type_id"],
+                "requirement_key": s["requirement_key"],
+                "requirement_display_name": s["requirement_display_name"],
+                "rule": s["rule"],
+                "quantity": s["quantity"],
+                "n_persons": s["n_persons"],
+                "required_count": s["required_count"],
+                "covered_count": s["covered_count"],
+                "status": s["status"],
+            }
+            out.append(item)
+        return jsonify(out)
+
+    @app.get("/api/requirement-types")
+    def get_requirement_types():
+        """Return all requirement types for gear type dropdown and forms."""
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        types = list_requirement_types()
+        return jsonify([{"id": t["id"], "key": t["key"], "display_name": t["display_name"]} for t in types])
 
     @app.get("/api/trips/<int:trip_id>/collaborators")
     def get_trip_collaborators(trip_id):
@@ -358,57 +388,49 @@ def create_app():
     # Trip Gear API
     # ----------------------
     @app.get("/api/trips/<int:trip_id>/gear/pool")
-    def get_trip_gear_pool(trip_id):
+    def get_trip_gear_pool_route(trip_id):
         """Get all available gear from trip collaborators"""
         user = login.require_auth()
         if not user:
             return jsonify(error="Not logged in"), 401
         if not user_has_trip_access(user["id"], trip_id):
             return jsonify(error="Not found"), 404
-        
-        from database.database import get_trip_gear_pool
         gear_pool = get_trip_gear_pool(trip_id)
         return jsonify(gear_pool)
-    
+
     @app.get("/api/trips/<int:trip_id>/gear")
-    def get_trip_assigned_gear(trip_id):
+    def get_trip_assigned_gear_route(trip_id):
         """Get gear already assigned to this trip"""
         user = login.require_auth()
         if not user:
             return jsonify(error="Not logged in"), 401
         if not user_has_trip_access(user["id"], trip_id):
             return jsonify(error="Not found"), 404
-        
-        from database.database import get_trip_assigned_gear
         assigned_gear = get_trip_assigned_gear(trip_id)
         return jsonify(assigned_gear)
-    
+
     @app.post("/api/trips/<int:trip_id>/gear/<int:gear_id>")
-    def assign_gear_to_trip(trip_id, gear_id):
+    def assign_gear_to_trip_route(trip_id, gear_id):
         """Assign a piece of gear to a trip"""
         user = login.require_auth()
         if not user:
             return jsonify(error="Not logged in"), 401
         if not user_has_trip_access(user["id"], trip_id):
             return jsonify(error="Not found"), 404
-        
-        from database.database import assign_gear_to_trip as db_assign
         try:
-            db_assign(trip_id, gear_id)
+            assign_gear_to_trip(trip_id, gear_id)
             return jsonify(ok=True), 201
         except ValueError as e:
             return jsonify(error=str(e)), 400
-    
+
     @app.delete("/api/trips/<int:trip_id>/gear/<int:gear_id>")
-    def unassign_gear_from_trip(trip_id, gear_id):
+    def unassign_gear_from_trip_route(trip_id, gear_id):
         """Remove gear assignment from a trip"""
         user = login.require_auth()
         if not user:
             return jsonify(error="Not logged in"), 401
         if not user_has_trip_access(user["id"], trip_id):
             return jsonify(error="Not found"), 404
-        
-        from database.database import unassign_gear_from_trip
         unassign_gear_from_trip(trip_id, gear_id)
         return jsonify(ok=True), 200
 

@@ -1,46 +1,6 @@
 """
-Barebones checklist items per activity type (matches trip activity_type dropdown).
+Checklists are now stored in the database (requirement_types + activity_requirements).
+Use GET /api/trips/<id>/checklist for trip requirements and GET /api/requirement-types for gear types.
+Legacy: empty dict for any code that still imports CHECKLISTS.
 """
-CHECKLISTS = {
-    "Backpacking": [
-        "Backpack",
-        "Tent",
-        "Sleeping bag",
-        "Stove",
-        "Water filter",
-        "First aid",
-    ],
-    "Hiking": [
-        "Daypack",
-        "Water",
-        "Snacks",
-        "First aid",
-        "Map",
-    ],
-    "Car Camping": [
-        "Tent",
-        "Sleeping bag",
-        "Cooler",
-        "Lantern",
-        "First aid",
-    ],
-    "Bird Watching": [
-        "Binoculars",
-        "Field guide",
-        "Notebook",
-        "Water",
-    ],
-    "Backcountry Skiing": [
-        "Skis",
-        "Avalanche gear",
-        "Beacon",
-        "First aid",
-    ],
-    "Mountaineering": [
-        "Helmet",
-        "Harness",
-        "Rope",
-        "First aid",
-        "Layers",
-    ],
-}
+CHECKLISTS = {}

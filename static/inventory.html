@@ -22,6 +22,7 @@
             <th>Type</th>
             <th>Name</th>
             <th>Capacity</th>
+            <th>Covers</th>
             <th>Weight (oz)</th>
             <th>Brand</th>
             <th>Condition</th>
@@ -40,21 +41,18 @@
         <label>
           Type
           <select id="gear-type" required>
-            <option value="other">Other</option>
-            <option value="Sleep System">Sleep System</option>
-            <option value="Cookware">Cookware</option>
-            <option value="Bag">Bag</option>
-            <option value="Shelter">Shelter</option>
-            <option value="Clothing">Clothing</option>
-            <option value="Navigation">Navigation</option>
-            <option value="Safety">Safety</option>
+            <option value="">Loading…</option>
           </select>
         </label>
         <label>
           Name <input type="text" id="gear-name" placeholder="e.g. 2-person tent" required />
         </label>
         <label>
-          Capacity <input type="text" id="gear-capacity" placeholder="e.g. 2P" maxlength="50" />
+          Capacity (text) <input type="text" id="gear-capacity" placeholder="e.g. 2P" maxlength="50" />
+        </label>
+        <label>
+          Capacity (people) <input type="number" id="gear-capacity-persons" placeholder="e.g. 2 for tent; leave blank for group-shareable" min="1" step="1" />
+          <span class="form-hint">Leave blank for group-shareable (e.g. water filter, stove).</span>
         </label>
         <label>
           Weight (oz) <input type="number" id="gear-weight" placeholder="optional" min="0" step="0.1" />
