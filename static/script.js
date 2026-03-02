@@ -1,5 +1,46 @@
 const API_BASE = "https://trailfeathers-github-io-real.onrender.com";
 
+// Gear library: map requirement_type key → category for dashboard grouping (client-side only)
+const REQUIREMENT_KEY_TO_CATEGORY = {
+  shelter: "Sleep Systems",
+  sleeping_bag: "Sleep Systems",
+  sleeping_pad: "Sleep Systems",
+  emergency_shelter: "Sleep Systems",
+  water_filter: "Food & Water",
+  stove: "Food & Water",
+  cookware: "Food & Water",
+  water_capacity: "Food & Water",
+  snacks_food: "Food & Water",
+  cooler: "Food & Water",
+  lantern: "Food & Water",
+  backpack: "Packs",
+  daypack: "Packs",
+  first_aid: "Safety & First Aid",
+  headlamp: "Safety & First Aid",
+  navigation: "Safety & First Aid",
+  rain_gear: "Safety & First Aid",
+  sun_protection: "Safety & First Aid",
+  beacon: "Safety & First Aid",
+  avalanche_gear: "Safety & First Aid",
+  insulation_layer: "Clothing & Layers",
+  helmet: "Climbing & Technical",
+  harness: "Climbing & Technical",
+  rope: "Climbing & Technical",
+  binoculars: "Other",
+  field_guide: "Other",
+  skis: "Other",
+  other: "Other"
+};
+const GEAR_CATEGORY_ORDER = [
+  "Sleep Systems",
+  "Food & Water",
+  "Packs",
+  "Safety & First Aid",
+  "Clothing & Layers",
+  "Climbing & Technical",
+  "Other"
+];
+
 document.addEventListener("DOMContentLoaded", () => {
   // First Page buttons
   const loginButton = document.querySelector("#login");
@@ -120,47 +161,61 @@ document.addEventListener("DOMContentLoaded", () => {
   const home = document.querySelector("#home");
   if (home) home.addEventListener("click", () => (window.location.href = "dashboard.html"));
 
-  // ---------- Inventory: load gear and add form ----------
-  const inventoryTable = document.querySelector("#inventory-table");
+  // ---------- Inventory (Gear Library dashboard): load gear by category and add form ----------
+  const gearCategoriesEl = document.querySelector("#gear-categories");
+  const gearLoadingEl = document.querySelector("#gear-loading");
   const addItemForm = document.querySelector("#add-item-form");
 
+  function getCategoryForKey(key) {
+    if (!key) return "Other";
+    return REQUIREMENT_KEY_TO_CATEGORY[key] || "Other";
+  }
+
   async function loadGear() {
-    if (!inventoryTable) return;
+    if (!gearCategoriesEl) return;
     try {
+      if (gearLoadingEl) gearLoadingEl.textContent = "Loading…";
       const res = await fetch(API_BASE + "/api/gear", { credentials: "include" });
       if (res.status === 401) {
         window.location.href = "login.html";
         return;
       }
       if (!res.ok) {
-        inventoryTable.innerHTML = "<tr><td colspan=\"8\">Could not load gear.</td></tr>";
+        if (gearLoadingEl) gearLoadingEl.remove();
+        gearCategoriesEl.innerHTML = "<p class=\"gear-loading\">Could not load gear.</p>";
         return;
       }
       const items = await res.json();
+      if (gearLoadingEl) gearLoadingEl.remove();
       if (items.length === 0) {
-        inventoryTable.innerHTML = "<tr><td colspan=\"8\">No gear yet. Add some below.</td></tr>";
+        gearCategoriesEl.innerHTML = "<p class=\"gear-loading\">No gear yet. Add some in the form on the right.</p>";
         return;
       }
-      inventoryTable.innerHTML = items
-        .map(
-          (item) => {
-            const typeLabel = item.requirement_display_name || item.type || "—";
-            const coversLabel = item.capacity_persons != null ? `${item.capacity_persons} people` : "Group";
-            return `<tr>
-              <td>${escapeHtml(typeLabel)}</td>
-              <td>${escapeHtml(item.name || "—")}</td>
-              <td>${escapeHtml(item.capacity != null ? String(item.capacity) : "—")}</td>
-              <td>${escapeHtml(coversLabel)}</td>
-              <td>${item.weight_oz != null ? item.weight_oz : "—"}</td>
-              <td>${escapeHtml(item.brand || "—")}</td>
-              <td>${escapeHtml(item.condition || "—")}</td>
-              <td>${escapeHtml(item.notes || "—")}</td>
-            </tr>`;
-          }
-        )
+      const byCategory = {};
+      for (const item of items) {
+        const key = item.requirement_key || null;
+        const cat = getCategoryForKey(key);
+        if (!byCategory[cat]) byCategory[cat] = [];
+        byCategory[cat].push(item);
+      }
+      const order = GEAR_CATEGORY_ORDER.filter((c) => byCategory[c] && byCategory[c].length > 0);
+      const html = order
+        .map((category) => {
+          const listItems = byCategory[category]
+            .map((item) => {
+              const typeLabel = item.requirement_display_name || item.type || "—";
+              const coversLabel = item.capacity_persons != null ? `${item.capacity_persons} people` : "Group";
+              const meta = [item.capacity ? `Capacity: ${escapeHtml(String(item.capacity))}` : null, coversLabel, item.weight_oz != null ? `${item.weight_oz} oz` : null, item.brand ? escapeHtml(item.brand) : null].filter(Boolean).join(" · ");
+              return `<li class="gear-category-item"><strong>${escapeHtml(typeLabel)}</strong>: ${escapeHtml(item.name || "—")}${item.condition || item.notes ? ` <span class="gear-meta">${[item.condition, item.notes].filter(Boolean).map(escapeHtml).join(" — ")}</span>` : ""}${meta ? ` <span class="gear-meta">${meta}</span>` : ""}</li>`;
+            })
+            .join("");
+          return `<div class="gear-category-section"><h3>${escapeHtml(category)}</h3><ul>${listItems}</ul></div>`;
+        })
         .join("");
+      gearCategoriesEl.innerHTML = html;
     } catch (_) {
-      inventoryTable.innerHTML = "<tr><td colspan=\"8\">Could not load gear.</td></tr>";
+      if (gearLoadingEl) gearLoadingEl.remove();
+      gearCategoriesEl.innerHTML = "<p class=\"gear-loading\">Could not load gear.</p>";
     }
   }
 
@@ -193,7 +248,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return div.innerHTML;
   }
 
-  if (inventoryTable) loadGear();
+  if (gearCategoriesEl) loadGear();
   if (document.querySelector("#gear-type")) loadRequirementTypes();
 
   // ---------- Friends page: load requests and friends, add-friend form, accept/decline ----------
