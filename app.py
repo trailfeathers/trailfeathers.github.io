@@ -29,6 +29,7 @@ from database.database import (
     list_incoming_trip_invites,
     accept_trip_invite,
     decline_trip_invite,
+    get_trip_id_for_invite,
     list_requirement_types,
     get_trip_requirement_summary,
     get_trip_gear_pool,
@@ -94,6 +95,7 @@ def create_app():
     @app.route("/api/trips/<int:trip_id>/gear", methods=["OPTIONS"])
     @app.route("/api/trips/<int:trip_id>/gear/pool", methods=["OPTIONS"])
     @app.route("/api/trips/<int:trip_id>/gear/<int:gear_id>", methods=["OPTIONS"])
+    @app.route("/api/trips/<int:trip_id>/dashboard", methods=["OPTIONS"])
     def options_auth(request_id=None, trip_id=None, invite_id=None, gear_id=None):
         return "", 200
 
@@ -249,6 +251,112 @@ def create_app():
         out["is_creator"] = trip["creator_id"] == user["id"]
         return jsonify(out)
 
+    def _build_trip_dashboard(trip_id, user):
+        """Build full dashboard payload for a trip (trip, collaborators, gear, checklist, etc.)."""
+        trip = get_trip(trip_id)
+        if not trip:
+            return None
+        trip_json = _trip_to_json(trip)
+        trip_json["is_creator"] = trip["creator_id"] == user["id"]
+
+        my_invites = list_incoming_trip_invites(user["id"])
+        pending_invite = next((i for i in my_invites if i["trip_id"] == trip_id), None)
+        if pending_invite:
+            ca = pending_invite.get("created_at")
+            pending_invite = {
+                "id": pending_invite["id"],
+                "trip_id": pending_invite["trip_id"],
+                "trip_name": pending_invite.get("trip_name"),
+                "inviter_username": pending_invite.get("inviter_username"),
+                "created_at": ca.isoformat() if hasattr(ca, "isoformat") else ca,
+            }
+        else:
+            pending_invite = None
+
+        collaborators = [
+            {"id": c["id"], "username": c["username"], "role": c["role"]}
+            for c in list_trip_collaborators(trip_id)
+        ]
+
+        pending_invites = []
+        friends = []
+        if trip_json.get("is_creator"):
+            rows = list_trip_invites_pending(trip_id)
+            for r in rows:
+                ca = r.get("created_at")
+                pending_invites.append({
+                    "id": r["id"],
+                    "invitee_id": r["invitee_id"],
+                    "invitee_username": r["invitee_username"],
+                    "inviter_username": r["inviter_username"],
+                    "created_at": ca.isoformat() if hasattr(ca, "isoformat") else ca,
+                })
+            all_friends = list_friends(user["id"])
+            collab_ids = {c["id"] for c in collaborators}
+            pending_invitee_ids = {p["invitee_id"] for p in pending_invites}
+            friends = [
+                {"id": f["id"], "username": f["username"]}
+                for f in all_friends
+                if f["id"] not in collab_ids and f["id"] not in pending_invitee_ids
+            ]
+
+        gear_pool = get_trip_gear_pool(trip_id)
+        gear_pool = [dict(row) for row in gear_pool]
+        for row in gear_pool:
+            if row.get("weight_oz") is not None:
+                row["weight_oz"] = float(row["weight_oz"])
+
+        assigned_gear = get_trip_assigned_gear(trip_id)
+        assigned_gear = [dict(row) for row in assigned_gear]
+        for row in assigned_gear:
+            if row.get("weight_oz") is not None:
+                row["weight_oz"] = float(row["weight_oz"])
+
+        summary = get_trip_requirement_summary(trip_id)
+        checklist = []
+        if summary:
+            for s in summary:
+                checklist.append({
+                    "requirement_type_id": s["requirement_type_id"],
+                    "requirement_key": s["requirement_key"],
+                    "requirement_display_name": s["requirement_display_name"],
+                    "rule": s["rule"],
+                    "quantity": s["quantity"],
+                    "n_persons": s["n_persons"],
+                    "required_count": s["required_count"],
+                    "covered_count": s["covered_count"],
+                    "status": s["status"],
+                })
+
+        return {
+            "trip": trip_json,
+            "pending_invite": pending_invite,
+            "collaborators": collaborators,
+            "pending_invites": pending_invites,
+            "friends": friends,
+            "gear_pool": gear_pool,
+            "assigned_gear": assigned_gear,
+            "checklist": checklist,
+        }
+
+    @app.get("/api/trips/<int:trip_id>/dashboard")
+    def get_trip_dashboard(trip_id):
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        if not user_has_trip_access(user["id"], trip_id) and not has_pending_invite_to_trip(user["id"], trip_id):
+            return jsonify(error="Not found"), 404
+        cached = (session.get("trip_dashboard") or {}).get(trip_id)
+        if cached is not None:
+            return jsonify(cached)
+        payload = _build_trip_dashboard(trip_id, user)
+        if payload is None:
+            return jsonify(error="Not found"), 404
+        if "trip_dashboard" not in session:
+            session["trip_dashboard"] = {}
+        session["trip_dashboard"][trip_id] = payload
+        return jsonify(payload)
+
     @app.get("/api/trips/<int:trip_id>/checklist")
     def get_trip_checklist(trip_id):
         user = login.require_auth()
@@ -322,6 +430,7 @@ def create_app():
             return jsonify(error="Can only invite friends"), 400
         try:
             invite_id = create_trip_invite(trip_id, user["id"], invitee_id)
+            login.invalidate_trip_dashboard_cache(trip_id)
             return jsonify(ok=True, id=invite_id), 201
         except ValueError as e:
             return jsonify(error=str(e)), 400
@@ -372,6 +481,9 @@ def create_app():
             return jsonify(error="Not logged in"), 401
         if accept_trip_invite(invite_id, user["id"]):
             login.refresh_session_cache(user["id"])
+            tid = get_trip_id_for_invite(invite_id)
+            if tid is not None:
+                login.invalidate_trip_dashboard_cache(tid)
             return jsonify(ok=True), 200
         return jsonify(error="Invite not found or already responded to"), 404
 
@@ -381,6 +493,9 @@ def create_app():
         if not user:
             return jsonify(error="Not logged in"), 401
         if decline_trip_invite(invite_id, user["id"]):
+            tid = get_trip_id_for_invite(invite_id)
+            if tid is not None:
+                login.invalidate_trip_dashboard_cache(tid)
             return jsonify(ok=True), 200
         return jsonify(error="Invite not found or already responded to"), 404
 
@@ -419,6 +534,7 @@ def create_app():
             return jsonify(error="Not found"), 404
         try:
             assign_gear_to_trip(trip_id, gear_id)
+            login.invalidate_trip_dashboard_cache(trip_id)
             return jsonify(ok=True), 201
         except ValueError as e:
             return jsonify(error=str(e)), 400
@@ -432,6 +548,7 @@ def create_app():
         if not user_has_trip_access(user["id"], trip_id):
             return jsonify(error="Not found"), 404
         unassign_gear_from_trip(trip_id, gear_id)
+        login.invalidate_trip_dashboard_cache(trip_id)
         return jsonify(ok=True), 200
 
     # ----------------------

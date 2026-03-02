@@ -77,6 +77,16 @@ def refresh_session_cache(user_id):
     session["trips"] = [_serialize_trip(t) for t in list_trips_for_user(user_id)]
 
 
+def invalidate_trip_dashboard_cache(trip_id=None):
+    """Invalidate cached dashboard for one trip or all trips. Call after trip mutations."""
+    if trip_id is not None:
+        dash = session.get("trip_dashboard") or {}
+        dash.pop(trip_id, None)
+        session["trip_dashboard"] = dash
+    else:
+        session["trip_dashboard"] = {}
+
+
 def require_auth():
     """Return current user dict (id, username) from session cache or DB, or None."""
     cached = session.get("user")

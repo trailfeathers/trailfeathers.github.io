@@ -541,6 +541,14 @@ def decline_trip_invite(invite_id, user_id):
         return cur.rowcount > 0
 
 
+def get_trip_id_for_invite(invite_id):
+    """Return trip_id for an invite, or None if not found."""
+    with get_cursor() as cur:
+        cur.execute("SELECT trip_id FROM trip_invites WHERE id = %s", (invite_id,))
+        row = cur.fetchone()
+        return row["trip_id"] if row else None
+
+
 # ---------- Trip Gear (Equipment Assignment) ----------
 def get_trip_gear_pool(trip_id):
     """Get all gear from trip collaborators that could be assigned to this trip. Includes requirement_type and capacity_persons."""
