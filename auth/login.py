@@ -81,7 +81,7 @@ def invalidate_trip_dashboard_cache(trip_id=None):
     """Invalidate cached dashboard for one trip or all trips. Call after trip mutations."""
     if trip_id is not None:
         dash = session.get("trip_dashboard") or {}
-        dash.pop(trip_id, None)
+        dash.pop(str(trip_id), None)
         session["trip_dashboard"] = dash
     else:
         session["trip_dashboard"] = {}

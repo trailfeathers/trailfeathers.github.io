@@ -346,7 +346,7 @@ def create_app():
             return jsonify(error="Not logged in"), 401
         if not user_has_trip_access(user["id"], trip_id) and not has_pending_invite_to_trip(user["id"], trip_id):
             return jsonify(error="Not found"), 404
-        cached = (session.get("trip_dashboard") or {}).get(trip_id)
+        cached = (session.get("trip_dashboard") or {}).get(str(trip_id))
         if cached is not None:
             return jsonify(cached)
         payload = _build_trip_dashboard(trip_id, user)
@@ -354,7 +354,7 @@ def create_app():
             return jsonify(error="Not found"), 404
         if "trip_dashboard" not in session:
             session["trip_dashboard"] = {}
-        session["trip_dashboard"][trip_id] = payload
+        session["trip_dashboard"][str(trip_id)] = payload
         return jsonify(payload)
 
     @app.get("/api/trips/<int:trip_id>/checklist")
