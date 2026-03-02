@@ -78,11 +78,125 @@ def user_exists_by_username(username):
         return cur.fetchone() is not None
 
 
+<<<<<<< HEAD
 def get_first_user():
     """Return first user (id, username) or None if no users exist."""
     with get_cursor() as cur:
         cur.execute("SELECT id, username FROM users ORDER BY id ASC LIMIT 1")
         return cur.fetchone()
+=======
+# ---------- Requirement types and activity requirements ----------
+def list_requirement_types():
+    """Return all requirement types: id, key, display_name. Ordered by display_name."""
+    with get_cursor() as cur:
+        cur.execute(
+            """SELECT id, key, display_name FROM requirement_types
+               ORDER BY display_name""",
+        )
+        return cur.fetchall()
+
+
+def list_activity_requirements(activity_type):
+    """Return requirements for an activity: id, requirement_type_id, rule, quantity, n_persons,
+       plus requirement type key and display_name from requirement_types."""
+    with get_cursor() as cur:
+        cur.execute(
+            """SELECT ar.id, ar.requirement_type_id, ar.rule, ar.quantity, ar.n_persons,
+                      rt.key AS requirement_key, rt.display_name AS requirement_display_name
+               FROM activity_requirements ar
+               JOIN requirement_types rt ON rt.id = ar.requirement_type_id
+               WHERE ar.activity_type = %s
+               ORDER BY rt.display_name""",
+            (activity_type,),
+        )
+        return cur.fetchall()
+
+
+def _required_count_for_rule(rule, quantity, n_persons, num_people):
+    """Compute required count given rule and head count."""
+    import math
+    if rule == "per_group":
+        return quantity
+    if rule == "per_person":
+        return quantity * num_people
+    if rule == "per_N_persons" and n_persons and n_persons > 0:
+        return quantity * math.ceil(num_people / n_persons)
+    return 0
+
+
+def _covered_count_for_type(assigned_gear_rows):
+    """From list of gear rows (with capacity_persons), sum coverage. Group-shareable (NULL) counts as 1 per type."""
+    if not assigned_gear_rows:
+        return 0
+    total = 0
+    for row in assigned_gear_rows:
+        cap = row.get("capacity_persons")
+        if cap is not None:
+            total += cap
+        else:
+            total += 1
+    return total
+
+
+def get_trip_requirement_summary(trip_id):
+    """For the trip's activity, return list of requirement rows with required_count, covered_count, status.
+    Each row: requirement_type_id, requirement_key, requirement_display_name, rule, quantity, n_persons,
+    required_count, covered_count, status ('met' | 'short').
+    """
+    trip = get_trip(trip_id)
+    if not trip:
+        return None
+    activity_type = (trip.get("activity_type") or "").strip()
+    if not activity_type:
+        return []
+    reqs = list_activity_requirements(activity_type)
+    if not reqs:
+        return []
+
+    # Head count
+    collabs = list_trip_collaborators(trip_id)
+    num_people = len(collabs)
+
+    # Assigned gear for this trip, with requirement_type_id and capacity_persons
+    with get_cursor() as cur:
+        cur.execute(
+            """SELECT g.id, g.requirement_type_id, g.capacity_persons
+               FROM trip_gear tg
+               JOIN gear g ON g.id = tg.gear_id
+               WHERE tg.trip_id = %s""",
+            (trip_id,),
+        )
+        assigned = cur.fetchall()
+
+    # Group assigned gear by requirement_type_id
+    by_type = {}
+    for row in assigned:
+        rt_id = row.get("requirement_type_id")
+        if rt_id is not None:
+            by_type.setdefault(rt_id, []).append(row)
+
+    out = []
+    for ar in reqs:
+        rt_id = ar["requirement_type_id"]
+        rule = ar["rule"]
+        quantity = ar["quantity"]
+        n_persons = ar.get("n_persons")
+        required = _required_count_for_rule(rule, quantity, n_persons, num_people)
+        covered = _covered_count_for_type(by_type.get(rt_id, []))
+        status = "met" if covered >= required else "short"
+        out.append({
+            "requirement_type_id": rt_id,
+            "requirement_key": ar["requirement_key"],
+            "requirement_display_name": ar["requirement_display_name"],
+            "rule": rule,
+            "quantity": quantity,
+            "n_persons": n_persons,
+            "required_count": required,
+            "covered_count": covered,
+            "status": status,
+        })
+    return out
+>>>>>>> 5e5066ab380fd072720409a0974b02416df5c095
 
 
 # ---------- Gear ----------
@@ -104,23 +218,45 @@ def add_gear_item(user_id, payload):
     brand = (payload.get("brand") or "").strip() or None
     condition = (payload.get("condition") or "").strip() or None
     notes = (payload.get("notes") or "").strip() or None
+    requirement_type_id = payload.get("requirement_type_id")
+    if requirement_type_id is not None and requirement_type_id != "":
+        try:
+            requirement_type_id = int(requirement_type_id)
+        except (TypeError, ValueError):
+            requirement_type_id = None
+    else:
+        requirement_type_id = None
+    capacity_persons = payload.get("capacity_persons")
+    if capacity_persons is not None and capacity_persons != "":
+        try:
+            capacity_persons = int(capacity_persons)
+            if capacity_persons < 1:
+                capacity_persons = None
+        except (TypeError, ValueError):
+            capacity_persons = None
+    else:
+        capacity_persons = None
 
     with get_cursor() as cur:
         cur.execute(
-            """INSERT INTO gear (user_id, type, name, capacity, weight_oz, brand, condition, notes)
-               VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING id""",
-            (user_id, gear_type, name, capacity, weight_oz, brand, condition, notes),
+            """INSERT INTO gear (user_id, type, name, capacity, weight_oz, brand, condition, notes, requirement_type_id, capacity_persons)
+               VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id""",
+            (user_id, gear_type, name, capacity, weight_oz, brand, condition, notes, requirement_type_id, capacity_persons),
         )
         row = cur.fetchone()
         return row["id"]
 
 
 def list_gear(user_id):
-    """Return all gear for the given user (by user_id)."""
+    """Return all gear for the given user (by user_id). Includes requirement_type key/display_name and capacity_persons."""
     with get_cursor() as cur:
         cur.execute(
-            """SELECT id, type, name, capacity, weight_oz, brand, condition, notes, created_at
-               FROM gear WHERE user_id = %s ORDER BY created_at DESC""",
+            """SELECT g.id, g.type, g.name, g.capacity, g.weight_oz, g.brand, g.condition, g.notes,
+                      g.requirement_type_id, g.capacity_persons, g.created_at,
+                      rt.key AS requirement_key, rt.display_name AS requirement_display_name
+               FROM gear g
+               LEFT JOIN requirement_types rt ON rt.id = g.requirement_type_id
+               WHERE g.user_id = %s ORDER BY g.created_at DESC""",
             (user_id,),
         )
         return cur.fetchall()
@@ -415,15 +551,18 @@ def decline_trip_invite(invite_id, user_id):
 
 # ---------- Trip Gear (Equipment Assignment) ----------
 def get_trip_gear_pool(trip_id):
-    """Get all gear from trip collaborators that could be assigned to this trip."""
+    """Get all gear from trip collaborators that could be assigned to this trip. Includes requirement_type and capacity_persons."""
     with get_cursor() as cur:
         cur.execute(
             """SELECT g.id, g.user_id, g.type, g.name, g.capacity, g.weight_oz, 
-                      g.brand, g.condition, g.notes, u.username AS owner_username,
+                      g.brand, g.condition, g.notes, g.requirement_type_id, g.capacity_persons,
+                      rt.key AS requirement_key, rt.display_name AS requirement_display_name,
+                      u.username AS owner_username,
                       CASE WHEN tg.gear_id IS NOT NULL THEN TRUE ELSE FALSE END AS is_assigned
                FROM trip_collaborators tc
                JOIN users u ON u.id = tc.user_id
                JOIN gear g ON g.user_id = tc.user_id
+               LEFT JOIN requirement_types rt ON rt.id = g.requirement_type_id
                LEFT JOIN trip_gear tg ON tg.trip_id = %s AND tg.gear_id = g.id
                WHERE tc.trip_id = %s
                ORDER BY u.username, g.type, g.name""",
@@ -433,14 +572,16 @@ def get_trip_gear_pool(trip_id):
 
 
 def get_trip_assigned_gear(trip_id):
-    """Get gear already assigned to this trip with owner info."""
+    """Get gear already assigned to this trip with owner info. Includes requirement_type and capacity_persons."""
     with get_cursor() as cur:
         cur.execute(
             """SELECT g.id, g.type, g.name, g.capacity, g.weight_oz, 
-                      g.brand, g.condition, tg.quantity, 
-                      u.username AS owner_username, tg.assigned_to_user_id
+                      g.brand, g.condition, g.requirement_type_id, g.capacity_persons,
+                      rt.key AS requirement_key, rt.display_name AS requirement_display_name,
+                      tg.quantity, u.username AS owner_username, tg.assigned_to_user_id
                FROM trip_gear tg
                JOIN gear g ON g.id = tg.gear_id
+               LEFT JOIN requirement_types rt ON rt.id = g.requirement_type_id
                JOIN users u ON u.id = g.user_id
                WHERE tg.trip_id = %s
                ORDER BY g.type, g.name""",

@@ -1,4 +1,26 @@
 
+-- REQUIREMENT TYPES (canonical gear/requirement taxonomy; drives checklist and gear type dropdown)
+CREATE TABLE IF NOT EXISTS requirement_types (
+  id BIGSERIAL PRIMARY KEY,
+  key TEXT UNIQUE NOT NULL,
+  display_name TEXT NOT NULL
+);
+
+-- ACTIVITY REQUIREMENTS (what is required per activity, with amounts and sharing rules)
+CREATE TABLE IF NOT EXISTS activity_requirements (
+  id BIGSERIAL PRIMARY KEY,
+  activity_type TEXT NOT NULL,
+  requirement_type_id BIGINT NOT NULL REFERENCES requirement_types(id) ON DELETE CASCADE,
+  rule TEXT NOT NULL CHECK (rule IN ('per_group', 'per_person', 'per_N_persons')),
+  quantity INT NOT NULL DEFAULT 1,
+  n_persons INT,
+  CONSTRAINT activity_requirements_n_persons CHECK (
+    (rule = 'per_N_persons' AND n_persons IS NOT NULL AND n_persons > 0) OR
+    (rule != 'per_N_persons' AND n_persons IS NULL)
+  ),
+  UNIQUE(activity_type, requirement_type_id)
+);
+
 -- USERS (username for login, per project description)
 CREATE TABLE IF NOT EXISTS users (
   id BIGSERIAL PRIMARY KEY,
@@ -18,7 +40,10 @@ CREATE TABLE IF NOT EXISTS gear (
   brand TEXT,
   condition TEXT,
   notes TEXT,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  requirement_type_id BIGINT REFERENCES requirement_types(id) ON DELETE SET NULL,
+  capacity_persons INT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  CONSTRAINT gear_capacity_persons_positive CHECK (capacity_persons IS NULL OR capacity_persons > 0)
 );
 
 -- TRIPS (created by one user)
@@ -84,11 +109,15 @@ CREATE TABLE IF NOT EXISTS trip_report_info (
   difficulty TEXT,
   trip_report_1 TEXT,
   trip_report_2 TEXT,
-  lat_long TEXT,
+  lat TEXT,
+  long TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- Helpful indexes
+CREATE INDEX IF NOT EXISTS idx_requirement_types_key ON requirement_types(key);
+CREATE INDEX IF NOT EXISTS idx_activity_requirements_activity_type ON activity_requirements(activity_type);
+CREATE INDEX IF NOT EXISTS idx_gear_requirement_type_id ON gear(requirement_type_id);
 CREATE INDEX IF NOT EXISTS idx_gear_user_id ON gear(user_id);
 CREATE INDEX IF NOT EXISTS idx_trips_creator_id ON trips(creator_id);
 CREATE INDEX IF NOT EXISTS idx_trip_collab_user_id ON trip_collaborators(user_id);

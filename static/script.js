@@ -1,5 +1,46 @@
 const API_BASE = "https://trailfeathers-github-io-real.onrender.com";
 
+// Gear library: map requirement_type key → category for dashboard grouping (client-side only)
+const REQUIREMENT_KEY_TO_CATEGORY = {
+  shelter: "Sleep Systems",
+  sleeping_bag: "Sleep Systems",
+  sleeping_pad: "Sleep Systems",
+  emergency_shelter: "Sleep Systems",
+  water_filter: "Food & Water",
+  stove: "Food & Water",
+  cookware: "Food & Water",
+  water_capacity: "Food & Water",
+  snacks_food: "Food & Water",
+  cooler: "Food & Water",
+  lantern: "Food & Water",
+  backpack: "Packs",
+  daypack: "Packs",
+  first_aid: "Safety & First Aid",
+  headlamp: "Safety & First Aid",
+  navigation: "Safety & First Aid",
+  rain_gear: "Safety & First Aid",
+  sun_protection: "Safety & First Aid",
+  beacon: "Safety & First Aid",
+  avalanche_gear: "Safety & First Aid",
+  insulation_layer: "Clothing & Layers",
+  helmet: "Climbing & Technical",
+  harness: "Climbing & Technical",
+  rope: "Climbing & Technical",
+  binoculars: "Other",
+  field_guide: "Other",
+  skis: "Other",
+  other: "Other"
+};
+const GEAR_CATEGORY_ORDER = [
+  "Sleep Systems",
+  "Food & Water",
+  "Packs",
+  "Safety & First Aid",
+  "Clothing & Layers",
+  "Climbing & Technical",
+  "Other"
+];
+
 document.addEventListener("DOMContentLoaded", () => {
   // First Page buttons
   const loginButton = document.querySelector("#login");
@@ -120,43 +161,84 @@ document.addEventListener("DOMContentLoaded", () => {
   const home = document.querySelector("#home");
   if (home) home.addEventListener("click", () => (window.location.href = "dashboard.html"));
 
-  // ---------- Inventory: load gear and add form ----------
-  const inventoryTable = document.querySelector("#inventory-table");
+  // ---------- Inventory (Gear Library dashboard): load gear by category and add form ----------
+  const gearCategoriesEl = document.querySelector("#gear-categories");
+  const gearLoadingEl = document.querySelector("#gear-loading");
   const addItemForm = document.querySelector("#add-item-form");
 
+  function getCategoryForKey(key) {
+    if (!key) return "Other";
+    return REQUIREMENT_KEY_TO_CATEGORY[key] || "Other";
+  }
+
   async function loadGear() {
-    if (!inventoryTable) return;
+    if (!gearCategoriesEl) return;
     try {
+      if (gearLoadingEl) gearLoadingEl.textContent = "Loading…";
       const res = await fetch(API_BASE + "/api/gear", { credentials: "include" });
       if (res.status === 401) {
         window.location.href = "login.html";
         return;
       }
       if (!res.ok) {
-        inventoryTable.innerHTML = "<tr><td colspan=\"7\">Could not load gear.</td></tr>";
+        if (gearLoadingEl) gearLoadingEl.remove();
+        gearCategoriesEl.innerHTML = "<p class=\"gear-loading\">Could not load gear.</p>";
         return;
       }
       const items = await res.json();
+      if (gearLoadingEl) gearLoadingEl.remove();
       if (items.length === 0) {
-        inventoryTable.innerHTML = "<tr><td colspan=\"7\">No gear yet. Add some below.</td></tr>";
+        gearCategoriesEl.innerHTML = "<p class=\"gear-loading\">No gear yet. Add some in the form on the right.</p>";
         return;
       }
-      inventoryTable.innerHTML = items
-        .map(
-          (item) =>
-            `<tr>
-              <td>${escapeHtml(item.type || "—")}</td>
-              <td>${escapeHtml(item.name || "—")}</td>
-              <td>${escapeHtml(item.capacity != null ? String(item.capacity) : "—")}</td>
-              <td>${item.weight_oz != null ? item.weight_oz : "—"}</td>
-              <td>${escapeHtml(item.brand || "—")}</td>
-              <td>${escapeHtml(item.condition || "—")}</td>
-              <td>${escapeHtml(item.notes || "—")}</td>
-            </tr>`
-        )
+      const byCategory = {};
+      for (const item of items) {
+        const key = item.requirement_key || null;
+        const cat = getCategoryForKey(key);
+        if (!byCategory[cat]) byCategory[cat] = [];
+        byCategory[cat].push(item);
+      }
+      const order = GEAR_CATEGORY_ORDER.filter((c) => byCategory[c] && byCategory[c].length > 0);
+      const html = order
+        .map((category) => {
+          const listItems = byCategory[category]
+            .map((item) => {
+              const typeLabel = item.requirement_display_name || item.type || "—";
+              const coversLabel = item.capacity_persons != null ? `${item.capacity_persons} people` : "Group";
+              const meta = [item.capacity ? `Capacity: ${escapeHtml(String(item.capacity))}` : null, coversLabel, item.weight_oz != null ? `${item.weight_oz} oz` : null, item.brand ? escapeHtml(item.brand) : null].filter(Boolean).join(" · ");
+              return `<li class="gear-category-item"><strong>${escapeHtml(typeLabel)}</strong>: ${escapeHtml(item.name || "—")}${item.condition || item.notes ? ` <span class="gear-meta">${[item.condition, item.notes].filter(Boolean).map(escapeHtml).join(" — ")}</span>` : ""}${meta ? ` <span class="gear-meta">${meta}</span>` : ""}</li>`;
+            })
+            .join("");
+          return `<div class="gear-category-section"><h3>${escapeHtml(category)}</h3><ul>${listItems}</ul></div>`;
+        })
+        .join("");
+      gearCategoriesEl.innerHTML = html;
+    } catch (_) {
+      if (gearLoadingEl) gearLoadingEl.remove();
+      gearCategoriesEl.innerHTML = "<p class=\"gear-loading\">Could not load gear.</p>";
+    }
+  }
+
+  async function loadRequirementTypes() {
+    const selectEl = document.querySelector("#gear-type");
+    if (!selectEl) return;
+    try {
+      const res = await fetch(API_BASE + "/api/requirement-types", { credentials: "include" });
+      if (res.status === 401) return;
+      if (!res.ok) {
+        selectEl.innerHTML = "<option value=\"\">Could not load types</option>";
+        return;
+      }
+      const types = await res.json();
+      if (types.length === 0) {
+        selectEl.innerHTML = "<option value=\"\">Other (no types in DB yet)</option>";
+        return;
+      }
+      selectEl.innerHTML = types
+        .map((t) => `<option value="${t.id}">${escapeHtml(t.display_name)}</option>`)
         .join("");
     } catch (_) {
-      inventoryTable.innerHTML = "<tr><td colspan=\"7\">Could not load gear.</td></tr>";
+      selectEl.innerHTML = "<option value=\"\">Could not load types</option>";
     }
   }
 
@@ -166,7 +248,8 @@ document.addEventListener("DOMContentLoaded", () => {
     return div.innerHTML;
   }
 
-  if (inventoryTable) loadGear();
+  if (gearCategoriesEl) loadGear();
+  if (document.querySelector("#gear-type")) loadRequirementTypes();
 
   // ---------- Friends page: load requests and friends, add-friend form, accept/decline ----------
   const addFriendForm = document.querySelector("#add-friend-form");
@@ -599,11 +682,14 @@ document.addEventListener("DOMContentLoaded", () => {
                     <ul class="gear-pool-items">
                       ${items.map(item => {
                         const isAssigned = item.is_assigned;
+                        const typeLabel = item.requirement_display_name || item.type;
+                        const coversLabel = item.capacity_persons != null ? `covers ${item.capacity_persons} people` : "group";
                         return `<li class="gear-pool-item ${isAssigned ? 'assigned' : ''}">
                           <span class="gear-info">
-                            <strong>${escapeHtml(item.type)}</strong>: ${escapeHtml(item.name)}
+                            <strong>${escapeHtml(typeLabel)}</strong>: ${escapeHtml(item.name)}
                             ${item.capacity ? ` (${escapeHtml(item.capacity)})` : ''}
-                            ${item.brand ? ` - ${escapeHtml(item.brand)}` : ''}
+                            — <em>${coversLabel}</em>
+                            ${item.brand ? ` — ${escapeHtml(item.brand)}` : ''}
                           </span>
                           ${isAssigned ? 
                             `<button type="button" class="btn-small btn-remove-gear" data-gear-id="${item.id}">Remove</button>` :
@@ -649,20 +735,23 @@ document.addEventListener("DOMContentLoaded", () => {
                 assignedGearSection.style.display = "block";
                 const assignedList = document.querySelector("#trip-assigned-gear-list");
                 assignedList.innerHTML = `<ul class="assigned-gear-list">
-                  ${assignedGear.map(item => 
-                    `<li>
-                      <strong>${escapeHtml(item.type)}</strong>: ${escapeHtml(item.name)}
+                  ${assignedGear.map(item => {
+                    const typeLabel = item.requirement_display_name || item.type;
+                    const coversLabel = item.capacity_persons != null ? `covers ${item.capacity_persons} people` : "group";
+                    return `<li>
+                      <strong>${escapeHtml(typeLabel)}</strong>: ${escapeHtml(item.name)}
                       ${item.capacity ? ` (${escapeHtml(item.capacity)})` : ''}
-                      - <em>Owned by ${escapeHtml(item.owner_username)}</em>
-                    </li>`
-                  ).join('')}
+                      — <em>${coversLabel}</em>
+                      — <em>Owned by ${escapeHtml(item.owner_username)}</em>
+                    </li>`;
+                  }).join('')}
                 </ul>`;
               }
             }
           } catch (_) {}
         }
 
-        // Load checklist (shows for all collaborators, positioned after gear sections)
+        // Load checklist (structured: required_count, covered_count, status per requirement)
         const checklistSection = document.querySelector("#trip-dashboard-checklist");
         const checklistList = document.querySelector("#trip-checklist-list");
         if (!pendingInvite && checklistSection && checklistList) {
@@ -671,7 +760,19 @@ document.addEventListener("DOMContentLoaded", () => {
             if (checklistRes.ok) {
               const items = await checklistRes.json();
               if (items && items.length > 0) {
-                checklistList.innerHTML = items.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
+                checklistList.innerHTML = items.map((item) => {
+                  const name = escapeHtml(item.requirement_display_name || item.requirement_key || "Item");
+                  let ruleText = "";
+                  if (item.rule === "per_group") ruleText = "1 per group";
+                  else if (item.rule === "per_person") ruleText = "1 per person";
+                  else if (item.rule === "per_N_persons" && item.n_persons) ruleText = `1 per ${item.n_persons} people`;
+                  const required = item.required_count;
+                  const covered = item.covered_count;
+                  const statusClass = item.status === "met" ? "checklist-met" : "checklist-short";
+                  return `<li class="checklist-item ${statusClass}">
+                    <strong>${name}</strong>: ${required} needed${ruleText ? ` (${ruleText})` : ""} — ${covered} covered <span class="checklist-status">(${item.status})</span>
+                  </li>`;
+                }).join("");
                 checklistSection.style.display = "block";
               }
             }
@@ -699,14 +800,28 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
+      const typeSelect = document.querySelector("#gear-type");
+      const typeOption = typeSelect && typeSelect.options[typeSelect.selectedIndex];
+      const requirement_type_id = typeOption && typeOption.value ? parseInt(typeOption.value, 10) : undefined;
+      const typeDisplay = typeOption && typeOption.textContent ? typeOption.textContent.trim() : "Other";
+
       const payload = {
-        type: (document.querySelector("#gear-type").value || "other").trim() || "other",
+        type: typeDisplay,
         name,
         capacity: document.querySelector("#gear-capacity").value.trim() || undefined,
         brand: document.querySelector("#gear-brand").value.trim() || undefined,
         condition: document.querySelector("#gear-condition").value.trim() || undefined,
         notes: document.querySelector("#gear-notes").value.trim() || undefined,
       };
+      if (requirement_type_id && !Number.isNaN(requirement_type_id)) {
+        payload.requirement_type_id = requirement_type_id;
+      }
+      const capPersonsEl = document.querySelector("#gear-capacity-persons");
+      if (capPersonsEl && capPersonsEl.value !== "" && capPersonsEl.value != null) {
+        const cp = parseInt(capPersonsEl.value, 10);
+        if (!Number.isNaN(cp) && cp >= 1) payload.capacity_persons = cp;
+      }
+
       const weightVal = document.querySelector("#gear-weight").value;
       if (weightVal !== "" && weightVal != null) {
         const w = parseFloat(weightVal);
@@ -722,7 +837,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         if (res.ok) {
           addItemForm.reset();
-          document.querySelector("#gear-type").value = "other";
+          if (typeSelect) typeSelect.selectedIndex = 0;
           loadGear();
           if (errEl) errEl.textContent = "";
           return;
