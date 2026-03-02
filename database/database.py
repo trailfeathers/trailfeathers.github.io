@@ -78,6 +78,13 @@ def user_exists_by_username(username):
         return cur.fetchone() is not None
 
 
+def get_first_user():
+    """Return first user (id, username) or None if no users exist."""
+    with get_cursor() as cur:
+        cur.execute("SELECT id, username FROM users ORDER BY id ASC LIMIT 1")
+        return cur.fetchone()
+
+
 # ---------- Gear ----------
 def add_gear_item(user_id, payload):
     """Add a gear item for user. Returns new gear id."""
@@ -472,4 +479,30 @@ def unassign_gear_from_trip(trip_id, gear_id):
             "DELETE FROM trip_gear WHERE trip_id = %s AND gear_id = %s",
             (trip_id, gear_id),
         )
+
+
+# ---------- Trip Report Info ----------
+def insert_trip_report_info(trip_id, data):
+    """Insert trip_report_info for a trip. Returns new id."""
+    with get_cursor() as cur:
+        cur.execute(
+            """INSERT INTO trip_report_info (
+                trip_id, summarized_description, hike_name, source_url,
+                distance, elevation_gain, highpoint, difficulty,
+                trip_report_1, trip_report_2
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id""",
+            (
+                trip_id,
+                data.get("summarized_description") or "",
+                data.get("hike_name"),
+                data.get("source_url"),
+                data.get("distance"),
+                data.get("elevation_gain"),
+                data.get("highpoint"),
+                data.get("difficulty"),
+                data.get("trip_report_1") or "",
+                data.get("trip_report_2") or "",
+            ),
+        )
+        return cur.fetchone()["id"]
 
