@@ -78,13 +78,6 @@ def user_exists_by_username(username):
         return cur.fetchone() is not None
 
 
-<<<<<<< HEAD
-def get_first_user():
-    """Return first user (id, username) or None if no users exist."""
-    with get_cursor() as cur:
-        cur.execute("SELECT id, username FROM users ORDER BY id ASC LIMIT 1")
-        return cur.fetchone()
-=======
 # ---------- Requirement types and activity requirements ----------
 def list_requirement_types():
     """Return all requirement types: id, key, display_name. Ordered by display_name."""
@@ -196,7 +189,6 @@ def get_trip_requirement_summary(trip_id):
             "status": status,
         })
     return out
->>>>>>> 5e5066ab380fd072720409a0974b02416df5c095
 
 
 # ---------- Gear ----------
