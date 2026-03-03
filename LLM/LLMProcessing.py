@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 from dotenv import load_dotenv
 load_dotenv()  # ← THIS MUST COME FIRST
 
@@ -15,11 +14,10 @@ DATABASE_URL = os.environ.get("DATABASE_URL")
 # Allow importing from project root (database module)
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from database.database import get_first_user, create_trip, insert_trip_report_info
+from database.database import get_cursor, insert_trip_report_info
 
 # Use environment variable for API key (set OPENAI_API_KEY)
-client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY", "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"))
-
+client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY", "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"))
 # Prompt: LLM produces summarized_description + cleaned trip_report_1 and trip_report_2
 fixed_prompt = """
 You are a professional hiking guide writer. You are given trail data including: Hike Name, Trip Report 1 Title & Text, Trip Report 2 Title & Text, Description, and other stats.
@@ -74,6 +72,71 @@ def get_row_value(row: list, headers: list[str], *candidates: str) -> str | None
         return None
 
 
+def extract_lat_long(row: list, headers: list[str]) -> tuple[str | None, str | None]:
+    """Extract latitude/longitude from malformed CSV where coordinates live in headers."""
+    coord_pair_re = re.compile(r"^\s*([-+]?\d{1,2}(?:\.\d+)?)\s*,\s*([-+]?\d{1,3}(?:\.\d+)?)\s*$")
+
+    raw_lat = get_row_value(row, headers, "latitude", "lat")
+    raw_lon = get_row_value(row, headers, "longitude", "long", "lon")
+    if raw_lat and raw_lon:
+        try:
+            lat_val = float(raw_lat)
+            lon_val = float(raw_lon)
+            if -90 <= lat_val <= 90 and -180 <= lon_val <= 180:
+                return (str(lat_val), str(lon_val))
+        except ValueError:
+            pass
+
+    # Primary path for this dataset:
+    # Coordinates are stored as header names, and each row marks the matching
+    # coordinate by containing data in that coordinate column.
+    coord_header_hits: list[tuple[str, str]] = []
+    for idx, header_value in enumerate(headers):
+        if idx >= len(row) or not row[idx].strip():
+            continue
+
+        match = coord_pair_re.match(header_value.strip())
+        if not match:
+            continue
+
+        try:
+            lat_val = float(match.group(1))
+            lon_val = float(match.group(2))
+        except ValueError:
+            continue
+        if not (-90 <= lat_val <= 90 and -180 <= lon_val <= 180):
+            continue
+
+        pair = (str(lat_val), str(lon_val))
+        if "map & directions" in row[idx].lower():
+            return pair
+        coord_header_hits.append(pair)
+
+    if coord_header_hits:
+        return coord_header_hits[0]
+
+    coord_text = get_row_value(row, headers, "coordinate", "map & directions", "trailhead gps")
+
+    # Final fallback for any future CSV variants.
+    cells_to_scan = [coord_text] if coord_text else []
+    cells_to_scan.extend(row)
+    for cell in cells_to_scan:
+        if not cell:
+            continue
+        match = re.search(r"([-+]?\d{1,2}(?:\.\d+)?)\s*,\s*([-+]?\d{1,3}(?:\.\d+)?)", cell)
+        if not match:
+            continue
+        try:
+            lat_val = float(match.group(1))
+            lon_val = float(match.group(2))
+        except ValueError:
+            continue
+        if -90 <= lat_val <= 90 and -180 <= lon_val <= 180:
+            return (str(lat_val), str(lon_val))
+
+    return (None, None)
+
+
 def parse_llm_response(response_text: str) -> dict:
     """Extract summarized_description, trip_report_1, trip_report_2 from LLM JSON response."""
     text = response_text.strip()
@@ -111,6 +174,8 @@ def build_trip_report_info(
     Build a trip_report_info object per schema.sql.
     trip_id is required for DB insert; pass None to output without it.
     """
+    lat, lon = extract_lat_long(row, headers)
+
     info = {
         "summarized_description": summarized_description,
         "hike_name": get_row_value(row, headers, "hike name"),
@@ -123,15 +188,40 @@ def build_trip_report_info(
         ),
         "trip_report_1": trip_report_1,
         "trip_report_2": trip_report_2,
+        "lat": lat,
+        "long": lon,
     }
     if trip_id is not None:
         info["trip_id"] = trip_id
     return info
 
 
+def get_starting_trip_id() -> int:
+    """
+    Starting trip_id for trip_report_info-only inserts.
+    If TRIP_REPORT_START_TRIP_ID is set, use it; otherwise continue from
+    MAX(trip_id)+1 in trip_report_info.
+    """
+    raw_start = os.environ.get("TRIP_REPORT_START_TRIP_ID")
+    if raw_start:
+        try:
+            start = int(raw_start)
+            if start > 0:
+                return start
+        except ValueError:
+            pass
+
+    with get_cursor() as cur:
+        cur.execute("SELECT COALESCE(MAX(trip_id), 0) AS max_trip_id FROM trip_report_info")
+        row = cur.fetchone()
+        max_trip_id = int(row["max_trip_id"]) if row and row.get("max_trip_id") is not None else 0
+        return max_trip_id + 1
+
+
 # Path to CSV (relative to script directory)
 script_dir = Path(__file__).parent
 csv_file_path = script_dir / "trailData.csv"
+next_trip_id = get_starting_trip_id()
 
 with open(csv_file_path, newline="", encoding="utf-8") as csvfile:
     reader = csv.reader(csvfile)
@@ -166,26 +256,12 @@ with open(csv_file_path, newline="", encoding="utf-8") as csvfile:
             trip_id=None,
         )
 
-        # Insert into database (first hike only)
+        # Insert into database with a unique trip_id per input row.
         try:
-            creator_id = os.environ.get("TRIP_CREATOR_USER_ID")
-            if creator_id:
-                creator_id = int(creator_id)
-            else:
-                user = get_first_user()
-                if not user:
-                    print("Error: No users in database. Create a user first or set TRIP_CREATOR_USER_ID.")
-                    break
-                creator_id = user["id"]
-
             hike_name = trip_report_info.get("hike_name") or "Unknown Trail"
-            trip_payload = {
-                "trip_name": hike_name,
-                "trail_name": hike_name,
-                "activity_type": "Hiking",
-            }
-            trip_id = creator_id
+            trip_id = next_trip_id
             info_id = insert_trip_report_info(trip_id, trip_report_info)
+            next_trip_id += 1
 
             print(f"Inserted trip_report_info id={info_id} for trip id={trip_id} ({hike_name})")
         except RuntimeError as e:
@@ -195,52 +271,3 @@ with open(csv_file_path, newline="", encoding="utf-8") as csvfile:
                 raise
         except Exception as e:
             print(f"Database error: {e}")
-          # Process first hike only
-        break
-=======
-import openai
-import csv
-
-#ADD api key here from discord
-
-# Fixed part of the message
-fixed_prompt = "You are a professional hiking guide writer. You are given all data for a specific hike: Hike Name, Trip Report 1 Title & Text, Trip Report 2 Title & Text, Description, Length_1, Highest Point_1, Elevation Gain_1, Calculated Difficulty_1, URL, and Coordinates. Produce a ready-to-publish website page in this format: include a Title & Critical Info section with Hike Name, Distance, Elevation Gain, Highest Point, Difficulty, Trailhead GPS as a clickable Google Maps link, and Permits with links; an Essential Gear section listing appropriate gear (include snow/shoeing gear if relevant, headlamp, trekking poles, rubber boots for huts, water filtration, food, warm layers); a Hike Overview section (~250 words) summarizing the trail using Description, mentioning junctions, scenic views, steep sections, hut amenities, and winter/snow tips; and a Trip Reports section listing each trip report with date and full text, preserving links. Use headings (#, ##), bold key info (distance, elevation, difficulty), make links clickable, and maintain a professional web-friendly style."
-
-# Path to your CSV file
-csv_file_path = "trailData.csv"
-
-# Open the CSV file
-with open(csv_file_path, newline='', encoding='utf-8') as csvfile:
-    reader = csv.reader(csvfile)
-    
-    # Get headers from the first row
-    headers = next(reader)
-    
-    # Loop through each row
-    for row in reader:
-        # Combine headers with row values
-        row_with_headers = [f"{header}: {value}" for header, value in zip(headers, row)]
-        variable_text = " | ".join(row_with_headers)
-        
-        # Full prompt
-        full_prompt = f"{fixed_prompt} {variable_text}"
-        
-        # Send to OpenAI using the new Chat Completions API
-        response = client.responses.create(
-            model="gpt-5-mini",  # or "gpt-4" if you have access
-            #messages=[
-            #    {"role": "system", "content": "You are a helpful assistant."},
-            #    {"role": "user", "content": full_prompt}
-            #],
-            input = full_prompt
-            #max_completion_tokens=500
-        )
-        
-        # Extract AI's response
-        #ai_text = response.choices[0].message.content.strip()
-        
-        # Print input and output
-        print(f"Input: {variable_text}")
-        print(f"Output: {response.output_text}")
-        print("-" * 50)
->>>>>>> 0ce3389ba9c07621e415d982c3db12e81a7df70d
