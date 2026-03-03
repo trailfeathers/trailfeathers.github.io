@@ -541,6 +541,14 @@ def decline_trip_invite(invite_id, user_id):
         return cur.rowcount > 0
 
 
+def get_trip_id_for_invite(invite_id):
+    """Return trip_id for an invite, or None if not found."""
+    with get_cursor() as cur:
+        cur.execute("SELECT trip_id FROM trip_invites WHERE id = %s", (invite_id,))
+        row = cur.fetchone()
+        return row["trip_id"] if row else None
+
+
 # ---------- Trip Gear (Equipment Assignment) ----------
 def get_trip_gear_pool(trip_id):
     """Get all gear from trip collaborators that could be assigned to this trip. Includes requirement_type and capacity_persons."""
@@ -612,30 +620,4 @@ def unassign_gear_from_trip(trip_id, gear_id):
             "DELETE FROM trip_gear WHERE trip_id = %s AND gear_id = %s",
             (trip_id, gear_id),
         )
-
-
-# ---------- Trip Report Info ----------
-def insert_trip_report_info(trip_id, data):
-    """Insert trip_report_info for a trip. Returns new id."""
-    with get_cursor() as cur:
-        cur.execute(
-            """INSERT INTO trip_report_info (
-                trip_id, summarized_description, hike_name, source_url,
-                distance, elevation_gain, highpoint, difficulty,
-                trip_report_1, trip_report_2
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id""",
-            (
-                trip_id,
-                data.get("summarized_description") or "",
-                data.get("hike_name"),
-                data.get("source_url"),
-                data.get("distance"),
-                data.get("elevation_gain"),
-                data.get("highpoint"),
-                data.get("difficulty"),
-                data.get("trip_report_1") or "",
-                data.get("trip_report_2") or "",
-            ),
-        )
-        return cur.fetchone()["id"]
 

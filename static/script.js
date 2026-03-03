@@ -520,269 +520,232 @@ document.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
   const tripIdParam = params.get("id");
 
-  if (tripDashboardContent && tripIdParam) {
-    (async () => {
-      try {
-        const res = await fetch(API_BASE + "/api/trips/" + tripIdParam, { credentials: "include" });
-        if (res.status === 401) {
-          window.location.href = "login.html";
-          return;
+  function renderTripDashboard(data) {
+    const trip = data.trip;
+    const pendingInvite = data.pending_invite || null;
+    document.querySelector(".banner h1").textContent = trip.trip_name || "Trip";
+    tripDashboardContent.innerHTML =
+      `<h2>${escapeHtml(trip.trip_name || "Trip")}</h2>
+       <p><strong>Trail:</strong> ${escapeHtml(trip.trail_name || "—")}</p>
+       <p><strong>Activity:</strong> ${escapeHtml(trip.activity_type || "—")}</p>
+       <p><strong>Start date:</strong> ${trip.intended_start_date ? escapeHtml(String(trip.intended_start_date).slice(0, 10)) : "—"}</p>
+       <p><strong>Created by:</strong> ${escapeHtml(trip.creator_username || "—")}</p>`;
+
+    const invitedSection = document.querySelector("#trip-dashboard-invited");
+    const membersSection = document.querySelector("#trip-dashboard-members");
+    const pendingSection = document.querySelector("#trip-dashboard-pending-invites");
+    const inviteSection = document.querySelector("#trip-dashboard-invite-friend");
+    const gearPoolSection = document.querySelector("#trip-dashboard-gear-pool");
+    const assignedGearSection = document.querySelector("#trip-dashboard-assigned-gear");
+    const checklistSection = document.querySelector("#trip-dashboard-checklist");
+    [invitedSection, membersSection, pendingSection, inviteSection, gearPoolSection, assignedGearSection, checklistSection].forEach((el) => {
+      if (el) el.style.display = "none";
+    });
+
+    if (pendingInvite) {
+      if (invitedSection) {
+        invitedSection.style.display = "block";
+        const msg = document.querySelector("#trip-invited-message");
+        if (msg) msg.textContent = "You've been invited to this trip. Accept to join.";
+        const acceptBtn = document.querySelector("#trip-invite-accept");
+        const declineBtn = document.querySelector("#trip-invite-decline");
+        if (acceptBtn) {
+          acceptBtn.onclick = async () => {
+            const r = await fetch(API_BASE + "/api/trip-invites/" + pendingInvite.id + "/accept", {
+              method: "POST",
+              credentials: "include",
+              headers: { "Content-Type": "application/json" },
+            });
+            if (r.ok) loadTripDashboard();
+          };
         }
-        if (res.status === 404 || !res.ok) {
-          tripDashboardLoading.remove();
-          tripDashboardContent.innerHTML = "<p>Trip not found.</p>";
-          return;
+        if (declineBtn) {
+          declineBtn.onclick = async () => {
+            const r = await fetch(API_BASE + "/api/trip-invites/" + pendingInvite.id + "/decline", {
+              method: "POST",
+              credentials: "include",
+              headers: { "Content-Type": "application/json" },
+            });
+            if (r.ok) window.location.href = "trip.html";
+          };
         }
-        const trip = await res.json();
-        document.querySelector(".banner h1").textContent = trip.trip_name || "Trip";
-        tripDashboardLoading.remove();
-        tripDashboardContent.innerHTML =
-          `<h2>${escapeHtml(trip.trip_name || "Trip")}</h2>
-           <p><strong>Trail:</strong> ${escapeHtml(trip.trail_name || "—")}</p>
-           <p><strong>Activity:</strong> ${escapeHtml(trip.activity_type || "—")}</p>
-           <p><strong>Start date:</strong> ${trip.intended_start_date ? escapeHtml(String(trip.intended_start_date).slice(0, 10)) : "—"}</p>
-           <p><strong>Created by:</strong> ${escapeHtml(trip.creator_username || "—")}</p>`;
-
-        const invitesRes = await fetch(API_BASE + "/api/trip-invites", { credentials: "include" });
-        const myInvites = invitesRes.ok ? await invitesRes.json() : [];
-        const pendingInvite = myInvites.find((inv) => String(inv.trip_id) === String(tripIdParam));
-
-        if (pendingInvite) {
-          const invitedSection = document.querySelector("#trip-dashboard-invited");
-          if (invitedSection) {
-            invitedSection.style.display = "block";
-            const msg = document.querySelector("#trip-invited-message");
-            if (msg) msg.textContent = "You've been invited to this trip. Accept to join.";
-            const acceptBtn = document.querySelector("#trip-invite-accept");
-            const declineBtn = document.querySelector("#trip-invite-decline");
-            if (acceptBtn) {
-              acceptBtn.onclick = async () => {
-                const r = await fetch(API_BASE + "/api/trip-invites/" + pendingInvite.id + "/accept", {
-                  method: "POST",
-                  credentials: "include",
-                  headers: { "Content-Type": "application/json" },
-                });
-                if (r.ok) window.location.reload();
-              };
-            }
-            if (declineBtn) {
-              declineBtn.onclick = async () => {
-                const r = await fetch(API_BASE + "/api/trip-invites/" + pendingInvite.id + "/decline", {
-                  method: "POST",
-                  credentials: "include",
-                  headers: { "Content-Type": "application/json" },
-                });
-                if (r.ok) window.location.href = "trip.html";
-              };
-            }
-          }
-        } else {
-          const collabRes = await fetch(API_BASE + "/api/trips/" + tripIdParam + "/collaborators", { credentials: "include" });
-          const collaborators = collabRes.ok ? await collabRes.json() : [];
-          let pendingInvitesList = [];
-          let friendsToShow = [];
-          if (trip.is_creator) {
-            const invitesListRes = await fetch(API_BASE + "/api/trips/" + tripIdParam + "/invites", { credentials: "include" });
-            const friendsRes = await fetch(API_BASE + "/api/friends", { credentials: "include" });
-            pendingInvitesList = invitesListRes.ok ? await invitesListRes.json() : [];
-            const friends = friendsRes.ok ? await friendsRes.json() : [];
-            const collabIds = new Set(collaborators.map((c) => c.id));
-            const pendingInviteeIds = new Set(pendingInvitesList.map((p) => p.invitee_id));
-            friendsToShow = friends.filter((f) => !collabIds.has(f.id) && !pendingInviteeIds.has(f.id));
-          }
-
-          const membersSection = document.querySelector("#trip-dashboard-members");
-          if (membersSection) {
-            membersSection.style.display = "block";
-            const listEl = document.querySelector("#trip-collaborators-list");
-            if (listEl) {
-              listEl.innerHTML = collaborators.length
-                ? collaborators.map((c) => `<p>${escapeHtml(c.username)} <span class="role-badge">${escapeHtml(c.role)}</span></p>`).join("")
-                : "<p>No members yet.</p>";
-            }
-          }
-
-          if (trip.is_creator) {
-            const pendingSection = document.querySelector("#trip-dashboard-pending-invites");
-            if (pendingSection && pendingInvitesList.length > 0) {
-              pendingSection.style.display = "block";
-              const listEl = document.querySelector("#trip-pending-invites-list");
-              if (listEl) listEl.innerHTML = pendingInvitesList.map((p) => `<p>${escapeHtml(p.invitee_username)} (pending)</p>`).join("");
-            }
-
-            const inviteSection = document.querySelector("#trip-dashboard-invite-friend");
-            if (inviteSection) {
-              inviteSection.style.display = "block";
-              const selectEl = document.querySelector("#trip-invite-friend-select");
-              const errEl = document.querySelector("#trip-invite-error");
-              if (selectEl) {
-                selectEl.innerHTML = "<option value=\"\">Choose a friend…</option>" +
-                  friendsToShow.map((f) => `<option value="${f.id}">${escapeHtml(f.username)}</option>`).join("");
-              }
-              const inviteBtn = document.querySelector("#trip-invite-friend-btn");
-              if (inviteBtn && selectEl) {
-                inviteBtn.onclick = async () => {
-                  const friendId = selectEl.value;
-                  if (!friendId) return;
-                  if (errEl) errEl.textContent = "";
-                  try {
-                    const r = await fetch(API_BASE + "/api/trips/" + tripIdParam + "/invites", {
-                      method: "POST",
-                      credentials: "include",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ user_id: parseInt(friendId, 10) }),
-                    });
-                    if (r.ok) {
-                      window.location.reload();
-                      return;
-                    }
-                    const data = await r.json().catch(() => ({}));
-                    if (errEl) errEl.textContent = data.error || "Could not send invite.";
-                  } catch (_) {
-                    if (errEl) errEl.textContent = "Could not reach the server.";
-                  }
-                };
-              }
-            }
-          }
-        }
-
-        // Load gear pool and assigned gear (if user is collaborator)
-        const gearPoolSection = document.querySelector("#trip-dashboard-gear-pool");
-        const assignedGearSection = document.querySelector("#trip-dashboard-assigned-gear");
-        if (!pendingInvite && gearPoolSection && assignedGearSection) {
-          try {
-            // Load gear pool
-            const poolRes = await fetch(API_BASE + "/api/trips/" + tripIdParam + "/gear/pool", { credentials: "include" });
-            if (poolRes.ok) {
-              const gearPool = await poolRes.json();
-              
-              // Load assigned gear
-              const assignedRes = await fetch(API_BASE + "/api/trips/" + tripIdParam + "/gear", { credentials: "include" });
-              const assignedGear = assignedRes.ok ? await assignedRes.json() : [];
-              const assignedIds = new Set(assignedGear.map(g => g.id));
-              
-              if (gearPool.length > 0) {
-                gearPoolSection.style.display = "block";
-                const poolList = document.querySelector("#trip-gear-pool-list");
-                
-                // Group by owner
-                const byOwner = {};
-                gearPool.forEach(item => {
-                  if (!byOwner[item.owner_username]) {
-                    byOwner[item.owner_username] = [];
-                  }
-                  byOwner[item.owner_username].push(item);
-                });
-                
-                poolList.innerHTML = Object.keys(byOwner).sort().map(owner => {
-                  const items = byOwner[owner];
-                  return `<div class="gear-owner-section">
-                    <h4>${escapeHtml(owner)}'s Gear</h4>
-                    <ul class="gear-pool-items">
-                      ${items.map(item => {
-                        const isAssigned = item.is_assigned;
-                        const typeLabel = item.requirement_display_name || item.type;
-                        const coversLabel = item.capacity_persons != null ? `covers ${item.capacity_persons} people` : "group";
-                        return `<li class="gear-pool-item ${isAssigned ? 'assigned' : ''}">
-                          <span class="gear-info">
-                            <strong>${escapeHtml(typeLabel)}</strong>: ${escapeHtml(item.name)}
-                            ${item.capacity ? ` (${escapeHtml(item.capacity)})` : ''}
-                            — <em>${coversLabel}</em>
-                            ${item.brand ? ` — ${escapeHtml(item.brand)}` : ''}
-                          </span>
-                          ${isAssigned ? 
-                            `<button type="button" class="btn-small btn-remove-gear" data-gear-id="${item.id}">Remove</button>` :
-                            `<button type="button" class="btn-small btn-add-gear" data-gear-id="${item.id}">Add to Trip</button>`
-                          }
-                        </li>`;
-                      }).join('')}
-                    </ul>
-                  </div>`;
-                }).join('');
-                
-                // Add event listeners for add/remove buttons
-                poolList.querySelectorAll('.btn-add-gear').forEach(btn => {
-                  btn.addEventListener('click', async () => {
-                    const gearId = btn.getAttribute('data-gear-id');
-                    try {
-                      const r = await fetch(API_BASE + "/api/trips/" + tripIdParam + "/gear/" + gearId, {
-                        method: "POST",
-                        credentials: "include",
-                        headers: { "Content-Type": "application/json" }
-                      });
-                      if (r.ok) window.location.reload();
-                    } catch (_) {}
-                  });
-                });
-                
-                poolList.querySelectorAll('.btn-remove-gear').forEach(btn => {
-                  btn.addEventListener('click', async () => {
-                    const gearId = btn.getAttribute('data-gear-id');
-                    try {
-                      const r = await fetch(API_BASE + "/api/trips/" + tripIdParam + "/gear/" + gearId, {
-                        method: "DELETE",
-                        credentials: "include"
-                      });
-                      if (r.ok) window.location.reload();
-                    } catch (_) {}
-                  });
-                });
-              }
-              
-              // Show assigned gear
-              if (assignedGear.length > 0) {
-                assignedGearSection.style.display = "block";
-                const assignedList = document.querySelector("#trip-assigned-gear-list");
-                assignedList.innerHTML = `<ul class="assigned-gear-list">
-                  ${assignedGear.map(item => {
-                    const typeLabel = item.requirement_display_name || item.type;
-                    const coversLabel = item.capacity_persons != null ? `covers ${item.capacity_persons} people` : "group";
-                    return `<li>
-                      <strong>${escapeHtml(typeLabel)}</strong>: ${escapeHtml(item.name)}
-                      ${item.capacity ? ` (${escapeHtml(item.capacity)})` : ''}
-                      — <em>${coversLabel}</em>
-                      — <em>Owned by ${escapeHtml(item.owner_username)}</em>
-                    </li>`;
-                  }).join('')}
-                </ul>`;
-              }
-            }
-          } catch (_) {}
-        }
-
-        // Load checklist (structured: required_count, covered_count, status per requirement)
-        const checklistSection = document.querySelector("#trip-dashboard-checklist");
-        const checklistList = document.querySelector("#trip-checklist-list");
-        if (!pendingInvite && checklistSection && checklistList) {
-          try {
-            const checklistRes = await fetch(API_BASE + "/api/trips/" + tripIdParam + "/checklist", { credentials: "include" });
-            if (checklistRes.ok) {
-              const items = await checklistRes.json();
-              if (items && items.length > 0) {
-                checklistList.innerHTML = items.map((item) => {
-                  const name = escapeHtml(item.requirement_display_name || item.requirement_key || "Item");
-                  let ruleText = "";
-                  if (item.rule === "per_group") ruleText = "1 per group";
-                  else if (item.rule === "per_person") ruleText = "1 per person";
-                  else if (item.rule === "per_N_persons" && item.n_persons) ruleText = `1 per ${item.n_persons} people`;
-                  const required = item.required_count;
-                  const covered = item.covered_count;
-                  const statusClass = item.status === "met" ? "checklist-met" : "checklist-short";
-                  return `<li class="checklist-item ${statusClass}">
-                    <strong>${name}</strong>: ${required} needed${ruleText ? ` (${ruleText})` : ""} — ${covered} covered <span class="checklist-status">(${item.status})</span>
-                  </li>`;
-                }).join("");
-                checklistSection.style.display = "block";
-              }
-            }
-          } catch (_) {}
-        }
-      } catch (_) {
-        tripDashboardLoading.remove();
-        tripDashboardContent.innerHTML = "<p>Could not load trip.</p>";
       }
-    })();
+      return;
+    }
+
+    const collaborators = data.collaborators || [];
+    if (membersSection) {
+      membersSection.style.display = "block";
+      const listEl = document.querySelector("#trip-collaborators-list");
+      if (listEl) {
+        listEl.innerHTML = collaborators.length
+          ? collaborators.map((c) => `<p>${escapeHtml(c.username)} <span class="role-badge">${escapeHtml(c.role)}</span></p>`).join("")
+          : "<p>No members yet.</p>";
+      }
+    }
+
+    if (trip.is_creator) {
+      const pendingInvitesList = data.pending_invites || [];
+      if (pendingSection && pendingInvitesList.length > 0) {
+        pendingSection.style.display = "block";
+        const listEl = document.querySelector("#trip-pending-invites-list");
+        if (listEl) listEl.innerHTML = pendingInvitesList.map((p) => `<p>${escapeHtml(p.invitee_username)} (pending)</p>`).join("");
+      }
+      const friendsToShow = data.friends || [];
+      if (inviteSection) {
+        inviteSection.style.display = "block";
+        const selectEl = document.querySelector("#trip-invite-friend-select");
+        const errEl = document.querySelector("#trip-invite-error");
+        if (selectEl) {
+          selectEl.innerHTML = "<option value=\"\">Choose a friend…</option>" +
+            friendsToShow.map((f) => `<option value="${f.id}">${escapeHtml(f.username)}</option>`).join("");
+        }
+        const inviteBtn = document.querySelector("#trip-invite-friend-btn");
+        if (inviteBtn && selectEl) {
+          inviteBtn.onclick = async () => {
+            const friendId = selectEl.value;
+            if (!friendId) return;
+            if (errEl) errEl.textContent = "";
+            try {
+              const r = await fetch(API_BASE + "/api/trips/" + tripIdParam + "/invites", {
+                method: "POST",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ user_id: parseInt(friendId, 10) }),
+              });
+              if (r.ok) loadTripDashboard();
+              else {
+                const resData = await r.json().catch(() => ({}));
+                if (errEl) errEl.textContent = resData.error || "Could not send invite.";
+              }
+            } catch (_) {
+              if (errEl) errEl.textContent = "Could not reach the server.";
+            }
+          };
+        }
+      }
+    }
+
+    const gearPool = data.gear_pool || [];
+    const assignedGear = data.assigned_gear || [];
+    if (gearPoolSection && assignedGearSection) {
+      if (gearPool.length > 0) {
+        gearPoolSection.style.display = "block";
+        const poolList = document.querySelector("#trip-gear-pool-list");
+        const byOwner = {};
+        gearPool.forEach((item) => {
+          if (!byOwner[item.owner_username]) byOwner[item.owner_username] = [];
+          byOwner[item.owner_username].push(item);
+        });
+        poolList.innerHTML = Object.keys(byOwner).sort().map((owner) => {
+          const items = byOwner[owner];
+          return `<div class="gear-owner-section">
+            <h4>${escapeHtml(owner)}'s Gear</h4>
+            <ul class="gear-pool-items">
+              ${items.map((item) => {
+                const isAssigned = item.is_assigned;
+                const typeLabel = item.requirement_display_name || item.type;
+                const coversLabel = item.capacity_persons != null ? `covers ${item.capacity_persons} people` : "group";
+                return `<li class="gear-pool-item ${isAssigned ? "assigned" : ""}">
+                  <span class="gear-info">
+                    <strong>${escapeHtml(typeLabel)}</strong>: ${escapeHtml(item.name)}
+                    ${item.capacity ? ` (${escapeHtml(item.capacity)})` : ""} — <em>${coversLabel}</em>
+                    ${item.brand ? ` — ${escapeHtml(item.brand)}` : ""}
+                  </span>
+                  ${isAssigned
+                    ? `<button type="button" class="btn-small btn-remove-gear" data-gear-id="${item.id}">Remove</button>`
+                    : `<button type="button" class="btn-small btn-add-gear" data-gear-id="${item.id}">Add to Trip</button>`
+                  }
+                </li>`;
+              }).join("")}
+            </ul>
+          </div>`;
+        }).join("");
+        poolList.querySelectorAll(".btn-add-gear").forEach((btn) => {
+          btn.addEventListener("click", async () => {
+            const gearId = btn.getAttribute("data-gear-id");
+            try {
+              const r = await fetch(API_BASE + "/api/trips/" + tripIdParam + "/gear/" + gearId, {
+                method: "POST",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+              });
+              if (r.ok) loadTripDashboard();
+            } catch (_) {}
+          });
+        });
+        poolList.querySelectorAll(".btn-remove-gear").forEach((btn) => {
+          btn.addEventListener("click", async () => {
+            const gearId = btn.getAttribute("data-gear-id");
+            try {
+              const r = await fetch(API_BASE + "/api/trips/" + tripIdParam + "/gear/" + gearId, {
+                method: "DELETE",
+                credentials: "include",
+              });
+              if (r.ok) loadTripDashboard();
+            } catch (_) {}
+          });
+        });
+      }
+      if (assignedGear.length > 0) {
+        assignedGearSection.style.display = "block";
+        const assignedList = document.querySelector("#trip-assigned-gear-list");
+        assignedList.innerHTML = `<ul class="assigned-gear-list">
+          ${assignedGear.map((item) => {
+            const typeLabel = item.requirement_display_name || item.type;
+            const coversLabel = item.capacity_persons != null ? `covers ${item.capacity_persons} people` : "group";
+            return `<li>
+              <strong>${escapeHtml(typeLabel)}</strong>: ${escapeHtml(item.name)}
+              ${item.capacity ? ` (${escapeHtml(item.capacity)})` : ""} — <em>${coversLabel}</em>
+              — <em>Owned by ${escapeHtml(item.owner_username)}</em>
+            </li>`;
+          }).join("")}
+        </ul>`;
+      }
+    }
+
+    const checklist = data.checklist || [];
+    if (checklistSection && checklist.length > 0) {
+      const checklistList = document.querySelector("#trip-checklist-list");
+      checklistList.innerHTML = checklist.map((item) => {
+        const name = escapeHtml(item.requirement_display_name || item.requirement_key || "Item");
+        let ruleText = "";
+        if (item.rule === "per_group") ruleText = "1 per group";
+        else if (item.rule === "per_person") ruleText = "1 per person";
+        else if (item.rule === "per_N_persons" && item.n_persons) ruleText = `1 per ${item.n_persons} people`;
+        const statusClass = item.status === "met" ? "checklist-met" : "checklist-short";
+        return `<li class="checklist-item ${statusClass}">
+          <strong>${name}</strong>: ${item.required_count} needed${ruleText ? ` (${ruleText})` : ""} — ${item.covered_count} covered <span class="checklist-status">(${item.status})</span>
+        </li>`;
+      }).join("");
+      checklistSection.style.display = "block";
+    }
+  }
+
+  async function loadTripDashboard() {
+    if (!tripDashboardContent || !tripIdParam) return;
+    try {
+      const res = await fetch(API_BASE + "/api/trips/" + tripIdParam + "/dashboard", { credentials: "include" });
+      if (res.status === 401) {
+        window.location.href = "login.html";
+        return;
+      }
+      if (res.status === 404 || !res.ok) {
+        if (tripDashboardLoading) tripDashboardLoading.remove();
+        tripDashboardContent.innerHTML = "<p>Trip not found.</p>";
+        return;
+      }
+      const data = await res.json();
+      if (tripDashboardLoading) tripDashboardLoading.remove();
+      renderTripDashboard(data);
+    } catch (_) {
+      if (tripDashboardLoading) tripDashboardLoading.remove();
+      tripDashboardContent.innerHTML = "<p>Could not load trip.</p>";
+    }
+  }
+
+  if (tripDashboardContent && tripIdParam) {
+    loadTripDashboard();
   } else if (tripDashboardContent && !tripIdParam) {
     tripDashboardLoading.remove();
     tripDashboardContent.innerHTML = "<p>No trip selected. <a href=\"trip.html\">Back to trips</a></p>";
