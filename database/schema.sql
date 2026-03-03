@@ -99,7 +99,8 @@ CREATE TABLE IF NOT EXISTS friend_requests (
 -- TRIP REPORT INFO (summarized trail/report data per trip; summarized_description instead of full description)
 CREATE TABLE IF NOT EXISTS trip_report_info (
   id BIGSERIAL PRIMARY KEY,
-  trip_id BIGINT NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
+  --trip_id BIGINT NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
+  trip_id BIGINT,
   summarized_description TEXT NOT NULL,
   hike_name TEXT,
   source_url TEXT,
