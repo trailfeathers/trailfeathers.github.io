@@ -63,7 +63,7 @@ body {
 
 .banner--dashboard {
   background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
-    url('images_for_site/rainier_valley.jpeg');
+    url('images_for_site/gothic.jpg');
   background-size: cover;
   background-position: center 67%;
   min-height: 200px;
