@@ -39,7 +39,7 @@ body {
 
 .banner--login {
   background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
-    url('images_for_site/mount_adams.jpg');
+    url('images_for_site/gothic.jpg');
   background-size: cover;
   background-position: center 82%;
   min-height: 200px;
