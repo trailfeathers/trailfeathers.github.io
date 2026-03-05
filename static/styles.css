@@ -13,10 +13,26 @@ body {
 
 /* shared banner */
 .banner {
+  position: relative;
   background: linear-gradient(135deg, #2c5f2d, #97bc62);
   color: white;
   padding: 4rem 2rem;
   text-align: center;
+}
+
+.banner-logo-link {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: block;
+  line-height: 0;
+}
+
+.banner-logo {
+  height: 48px;
+  width: auto;
+  display: block;
 }
 
 .banner h1 {
@@ -39,7 +55,7 @@ body {
 
 .banner--login {
   background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
-    url('images_for_site/mount_adams.jpg');
+    url('images_for_site/crystal.jpg');
   background-size: cover;
   background-position: center 82%;
   min-height: 200px;

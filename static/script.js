@@ -161,6 +161,20 @@ document.addEventListener("DOMContentLoaded", () => {
   const home = document.querySelector("#home");
   if (home) home.addEventListener("click", () => (window.location.href = "dashboard.html"));
 
+  // ---------- Banner: show "Welcome, {username}" on auth pages ----------
+  const bannerTitleEl = document.querySelector("#banner-title");
+  if (bannerTitleEl) {
+    (async () => {
+      try {
+        const res = await fetch(API_BASE + "/api/me", { credentials: "include" });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.username) bannerTitleEl.textContent = "Welcome, " + data.username;
+        }
+      } catch (_) {}
+    })();
+  }
+
   // ---------- Inventory (Gear Library dashboard): load gear by category and add form ----------
   const gearCategoriesEl = document.querySelector("#gear-categories");
   const gearLoadingEl = document.querySelector("#gear-loading");
