@@ -12,66 +12,53 @@
     <h1>Gear Library</h1>
   </header>
 
-  <main class="content">
-    <section class="inventory-list">
-      <h2>Your Equipment</h2>
+  <main class="content gear-dashboard">
+    <div class="gear-dashboard-layout">
+      <div class="gear-dashboard-main">
+        <section class="gear-dashboard-categories" id="gear-categories">
+          <!-- Category sections filled by script.js from GET /api/gear -->
+          <p class="gear-loading" id="gear-loading">Loading…</p>
+        </section>
+      </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Type</th>
-            <th>Name</th>
-            <th>Capacity</th>
-            <th>Weight (oz)</th>
-            <th>Brand</th>
-            <th>Condition</th>
-            <th>Notes</th>
-          </tr>
-        </thead>
-        <tbody id="inventory-table">
-          <!-- Rows filled by script.js from GET /api/gear -->
-        </tbody>
-      </table>
-    </section>
-
-    <section class="inventory-add">
-      <h2>Add Equipment</h2>
-      <form id="add-item-form" class="gear-form">
-        <label>
-          Type
-          <select id="gear-type" required>
-            <option value="other">Other</option>
-            <option value="Sleep System">Sleep System</option>
-            <option value="Cookware">Cookware</option>
-            <option value="Bag">Bag</option>
-            <option value="Shelter">Shelter</option>
-            <option value="Clothing">Clothing</option>
-            <option value="Navigation">Navigation</option>
-            <option value="Safety">Safety</option>
-          </select>
-        </label>
-        <label>
-          Name <input type="text" id="gear-name" placeholder="e.g. 2-person tent" required />
-        </label>
-        <label>
-          Capacity <input type="text" id="gear-capacity" placeholder="e.g. 2P" maxlength="50" />
-        </label>
-        <label>
-          Weight (oz) <input type="number" id="gear-weight" placeholder="optional" min="0" step="0.1" />
-        </label>
-        <label>
-          Brand <input type="text" id="gear-brand" placeholder="optional" />
-        </label>
-        <label>
-          Condition <input type="text" id="gear-condition" placeholder="e.g. like new" />
-        </label>
-        <label>
-          Notes <input type="text" id="gear-notes" placeholder="optional" />
-        </label>
-        <button type="submit" class="primary">Add</button>
-        <p id="add-gear-error" class="form-error" aria-live="polite"></p>
-      </form>
-    </section>
+      <aside class="gear-dashboard-add">
+        <section class="gear-dashboard-section">
+          <h2>Add Equipment</h2>
+          <form id="add-item-form" class="gear-form">
+            <label>
+              Type
+              <select id="gear-type" required>
+                <option value="">Loading…</option>
+              </select>
+            </label>
+            <label>
+              Name <input type="text" id="gear-name" placeholder="e.g. 2-person tent" required />
+            </label>
+            <label>
+              Capacity (text) <input type="text" id="gear-capacity" placeholder="e.g. 2P" maxlength="50" />
+            </label>
+            <label>
+              Capacity (people) <input type="number" id="gear-capacity-persons" placeholder="e.g. 2 for tent; leave blank for group-shareable" min="1" step="1" />
+              <span class="form-hint">Leave blank for group-shareable (e.g. water filter, stove).</span>
+            </label>
+            <label>
+              Weight (oz) <input type="number" id="gear-weight" placeholder="optional" min="0" step="0.1" />
+            </label>
+            <label>
+              Brand <input type="text" id="gear-brand" placeholder="optional" />
+            </label>
+            <label>
+              Condition <input type="text" id="gear-condition" placeholder="e.g. like new" />
+            </label>
+            <label>
+              Notes <input type="text" id="gear-notes" placeholder="optional" />
+            </label>
+            <button type="submit" class="primary">Add</button>
+            <p id="add-gear-error" class="form-error" aria-live="polite"></p>
+          </form>
+        </section>
+      </aside>
+    </div>
 
     <div id="dash-options">
       <button type="submit" id="home">Home</button>
