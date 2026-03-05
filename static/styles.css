@@ -26,16 +26,16 @@ body {
   top: 50%;
   transform: translateY(-50%);
   display: block;
-  line-height: 0;
-  background: transparent;
+  width: 140px;
+  height: 48px;
+  background: transparent url('images_for_site/logo_transparent.png') left center / auto 48px no-repeat;
+  text-indent: -9999px;
+  overflow: hidden;
 }
 
-.banner-logo {
-  height: 48px;
-  width: auto;
-  display: block;
-  background: transparent;
-  /* so transparent PNG pixels show the banner behind */
+.banner-logo-link:hover,
+.banner-logo-link:focus {
+  background-color: transparent;
 }
 
 .banner h1 {
