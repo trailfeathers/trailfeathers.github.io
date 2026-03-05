@@ -161,9 +161,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const home = document.querySelector("#home");
   if (home) home.addEventListener("click", () => (window.location.href = "dashboard.html"));
 
-  // ---------- Banner: show "Welcome, {username}" on auth pages ----------
+  // ---------- Banner: show "Welcome, {username}" only on dashboard ----------
   const bannerTitleEl = document.querySelector("#banner-title");
-  if (bannerTitleEl) {
+  const isDashboard = document.querySelector("#dash-options") != null;
+  if (bannerTitleEl && isDashboard) {
     (async () => {
       try {
         const res = await fetch(API_BASE + "/api/me", { credentials: "include" });

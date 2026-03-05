@@ -22,13 +22,12 @@ body {
 
 .banner-logo-link {
   position: absolute;
-  left: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
+  left: 0.75rem;
+  top: 0.75rem;
   display: block;
-  width: 140px;
-  height: 48px;
-  background: transparent url('images_for_site/logo_transparent.png') left center / auto 48px no-repeat;
+  width: 180px;
+  height: 72px;
+  background: transparent url('images_for_site/logo_transparent.png') left top / auto 72px no-repeat;
   text-indent: -9999px;
   overflow: hidden;
 }
