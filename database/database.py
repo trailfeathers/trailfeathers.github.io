@@ -144,6 +144,45 @@ def insert_trip_report_info(trip_id, info):
         return row["id"]
 
 
+def list_trip_report_info_for_selection():
+    """Return all trip_report_info rows for location catalog: id, hike_name, distance, elevation_gain, difficulty. Ordered by hike_name."""
+    with get_cursor() as cur:
+        cur.execute(
+            """SELECT id, hike_name, distance, elevation_gain, difficulty, source_url
+               FROM trip_report_info
+               WHERE (hike_name IS NOT NULL AND hike_name != '')
+               ORDER BY hike_name""",
+        )
+        return cur.fetchall()
+
+
+def get_trip_report_info_by_id(info_id):
+    """Return one trip_report_info row by id, or None."""
+    with get_cursor() as cur:
+        cur.execute(
+            """SELECT id, hike_name, summarized_description, source_url, distance,
+                      elevation_gain, highpoint, difficulty, trip_report_1, trip_report_2, lat, long
+               FROM trip_report_info WHERE id = %s""",
+            (info_id,),
+        )
+        return cur.fetchone()
+
+
+def get_trip_report_info_for_trip(trip_id):
+    """Return trip_report_info for a trip (via trips.trip_report_info_id), or None."""
+    with get_cursor() as cur:
+        cur.execute(
+            """SELECT tri.id, tri.hike_name, tri.summarized_description, tri.source_url,
+                      tri.distance, tri.elevation_gain, tri.highpoint, tri.difficulty,
+                      tri.trip_report_1, tri.trip_report_2, tri.lat, tri.long
+               FROM trips t
+               JOIN trip_report_info tri ON tri.id = t.trip_report_info_id
+               WHERE t.id = %s""",
+            (trip_id,),
+        )
+        return cur.fetchone()
+
+
 # ---------- Requirement types and activity requirements ----------
 def list_requirement_types():
     """Return all requirement types: id, key, display_name. Ordered by display_name."""
@@ -412,22 +451,34 @@ ACTIVITY_TYPES = frozenset({
 
 
 def create_trip(creator_id, payload):
-    """Create a trip and add creator as collaborator. Returns trip id."""
+    """Create a trip and add creator as collaborator. Location must be chosen from catalog (trip_report_info_id). Returns trip id."""
     trip_name = (payload.get("trip_name") or "").strip()
     if not trip_name:
         raise ValueError("Trip name is required")
-    trail_name = (payload.get("trail_name") or "").strip() or None
     activity_type = (payload.get("activity_type") or "").strip()
     if not activity_type or activity_type not in ACTIVITY_TYPES:
         raise ValueError("Activity type must be one of: " + ", ".join(sorted(ACTIVITY_TYPES)))
     intended_start_date = payload.get("intended_start_date")
     if intended_start_date is not None and intended_start_date != "":
         intended_start_date = intended_start_date.strip() or None
+
+    trip_report_info_id = payload.get("trip_report_info_id")
+    if trip_report_info_id is None:
+        raise ValueError("Please select a location from the catalog.")
+    try:
+        info_id = int(trip_report_info_id)
+    except (TypeError, ValueError):
+        raise ValueError("Invalid location selection.")
+    location = get_trip_report_info_by_id(info_id)
+    if not location:
+        raise ValueError("Selected location not found. Please choose from the list.")
+    trail_name = (location.get("hike_name") or "").strip() or "Unknown trail"
+
     with get_cursor() as cur:
         cur.execute(
-            """INSERT INTO trips (creator_id, trip_name, trail_name, activity_type, intended_start_date)
-               VALUES (%s, %s, %s, %s, %s) RETURNING id""",
-            (creator_id, trip_name, trail_name, activity_type, intended_start_date),
+            """INSERT INTO trips (creator_id, trip_name, trail_name, activity_type, intended_start_date, trip_report_info_id)
+               VALUES (%s, %s, %s, %s, %s, %s) RETURNING id""",
+            (creator_id, trip_name, trail_name, activity_type, intended_start_date, info_id),
         )
         row = cur.fetchone()
         trip_id = row["id"]
@@ -439,11 +490,11 @@ def create_trip(creator_id, payload):
 
 
 def list_trips_for_user(user_id):
-    """Return trips where user is creator or in trip_collaborators. Includes creator username."""
+    """Return trips where user is creator or in trip_collaborators. Includes creator username and trip_report_info_id."""
     with get_cursor() as cur:
         cur.execute(
             """SELECT t.id, t.trip_name, t.trail_name, t.activity_type, t.intended_start_date,
-                      t.creator_id, u.username AS creator_username, t.created_at
+                      t.creator_id, t.trip_report_info_id, u.username AS creator_username, t.created_at
                FROM trips t
                JOIN users u ON u.id = t.creator_id
                WHERE t.creator_id = %s
@@ -455,11 +506,11 @@ def list_trips_for_user(user_id):
 
 
 def get_trip(trip_id):
-    """Return one trip with creator username, or None."""
+    """Return one trip with creator username and trip_report_info_id, or None."""
     with get_cursor() as cur:
         cur.execute(
             """SELECT t.id, t.trip_name, t.trail_name, t.activity_type, t.intended_start_date,
-                      t.creator_id, u.username AS creator_username, t.created_at
+                      t.creator_id, t.trip_report_info_id, u.username AS creator_username, t.created_at
                FROM trips t
                JOIN users u ON u.id = t.creator_id
                WHERE t.id = %s""",

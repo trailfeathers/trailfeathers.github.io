@@ -475,6 +475,92 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   loadTripInvites();
 
+  // ---------- Location catalog: searchable combobox (must select from list) ----------
+  let locationsCatalog = [];
+  const locationSearchInput = document.querySelector("#trip-location-search");
+  const tripReportInfoIdInput = document.querySelector("#trip-report-info-id");
+  const locationListbox = document.querySelector("#trip-location-listbox");
+  const locationCombobox = document.querySelector(".location-combobox");
+
+  async function loadLocations() {
+    if (!locationSearchInput) return;
+    try {
+      const res = await fetch(API_BASE + "/api/locations", { credentials: "include" });
+      if (res.status === 401) return;
+      if (!res.ok) return;
+      locationsCatalog = await res.json();
+    } catch (_) {
+      locationsCatalog = [];
+    }
+  }
+
+  function filterLocations(query) {
+    const q = (query || "").trim().toLowerCase();
+    if (!q) return locationsCatalog.slice(0, 50);
+    return locationsCatalog.filter((loc) =>
+      (loc.hike_name || "").toLowerCase().includes(q)
+    ).slice(0, 50);
+  }
+
+  function renderLocationOptions(locations) {
+    if (!locationListbox) return;
+    if (locations.length === 0) {
+      locationListbox.innerHTML = "<li role=\"option\" class=\"location-no-results\">No matching trails. Type to search the catalog.</li>";
+      return;
+    }
+    locationListbox.innerHTML = locations.map((loc) => {
+      const meta = [loc.distance, loc.elevation_gain, loc.difficulty].filter(Boolean).join(" · ");
+      return `<li role="option" data-id="${loc.id}" data-hike-name="${escapeHtml(loc.hike_name || "")}">${escapeHtml(loc.hike_name || "Unnamed")}${meta ? `<div class="location-option-meta">${escapeHtml(meta)}</div>` : ""}</li>`;
+    }).join("");
+  }
+
+  function openListbox() {
+    if (!locationCombobox) return;
+    locationCombobox.setAttribute("aria-expanded", "true");
+    const query = locationSearchInput ? locationSearchInput.value.trim() : "";
+    const filtered = filterLocations(query);
+    renderLocationOptions(filtered);
+  }
+
+  function closeListbox() {
+    if (locationCombobox) locationCombobox.setAttribute("aria-expanded", "false");
+  }
+
+  function selectLocation(id, hikeName) {
+    if (tripReportInfoIdInput) tripReportInfoIdInput.value = id;
+    if (locationSearchInput) locationSearchInput.value = hikeName || "";
+    closeListbox();
+  }
+
+  function clearLocationSelection() {
+    if (tripReportInfoIdInput) tripReportInfoIdInput.value = "";
+  }
+
+  if (locationSearchInput && locationListbox) {
+    loadLocations();
+    locationSearchInput.addEventListener("focus", () => openListbox());
+    locationSearchInput.addEventListener("input", () => {
+      clearLocationSelection();
+      openListbox();
+    });
+    locationSearchInput.addEventListener("blur", () => {
+      setTimeout(closeListbox, 200);
+    });
+    locationSearchInput.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeListbox();
+        locationSearchInput.blur();
+      }
+    });
+    locationListbox.addEventListener("click", (e) => {
+      const opt = e.target.closest("[role=option][data-id]");
+      if (opt) {
+        e.preventDefault();
+        selectLocation(opt.getAttribute("data-id"), opt.getAttribute("data-hike-name"));
+      }
+    });
+  }
+
   if (createTripForm) {
     createTripForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -485,9 +571,14 @@ document.addEventListener("DOMContentLoaded", () => {
         if (errEl) errEl.textContent = "Trip name is required.";
         return;
       }
+      const trip_report_info_id = tripReportInfoIdInput ? tripReportInfoIdInput.value.trim() : "";
+      if (!trip_report_info_id) {
+        if (errEl) errEl.textContent = "Please select a location from the catalog (search and click a trail).";
+        return;
+      }
       const payload = {
         trip_name,
-        trail_name: document.querySelector("#trip-trail").value.trim() || undefined,
+        trip_report_info_id: parseInt(trip_report_info_id, 10),
         activity_type: document.querySelector("#trip-activity").value || undefined,
         intended_start_date: document.querySelector("#trip-date").value || undefined,
       };
@@ -501,6 +592,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (res.ok) {
           const data = await res.json().catch(() => ({}));
           createTripForm.reset();
+          clearLocationSelection();
           loadTrips();
           if (errEl) errEl.textContent = "";
           if (data.id) window.location.href = "trip_dashboard.html?id=" + encodeURIComponent(data.id);
@@ -523,13 +615,22 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderTripDashboard(data) {
     const trip = data.trip;
     const pendingInvite = data.pending_invite || null;
+    const locationSummary = data.location_summary || null;
     document.querySelector(".banner h1").textContent = trip.trip_name || "Trip";
-    tripDashboardContent.innerHTML =
+    let summaryHtml =
       `<h2>${escapeHtml(trip.trip_name || "Trip")}</h2>
        <p><strong>Trail:</strong> ${escapeHtml(trip.trail_name || "—")}</p>
        <p><strong>Activity:</strong> ${escapeHtml(trip.activity_type || "—")}</p>
        <p><strong>Start date:</strong> ${trip.intended_start_date ? escapeHtml(String(trip.intended_start_date).slice(0, 10)) : "—"}</p>
        <p><strong>Created by:</strong> ${escapeHtml(trip.creator_username || "—")}</p>`;
+    if (locationSummary && locationSummary.summarized_description) {
+      summaryHtml += `<section class="trip-dashboard-location-summary" aria-label="Trail report summary">
+         <h3>Trail report summary</h3>
+         <div class="trip-dashboard-ai-summary">${escapeHtml(locationSummary.summarized_description).replace(/\n/g, "<br>")}</div>
+         ${locationSummary.source_url ? `<p><a href="${escapeHtml(locationSummary.source_url)}" target="_blank" rel="noopener">View source</a></p>` : ""}
+       </section>`;
+    }
+    tripDashboardContent.innerHTML = summaryHtml;
 
     const invitedSection = document.querySelector("#trip-dashboard-invited");
     const membersSection = document.querySelector("#trip-dashboard-members");

@@ -545,6 +545,63 @@ body {
   width: auto;
 }
 
+/* Searchable location combobox: type to filter, must select from list */
+.location-combobox {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.location-combobox input[type="text"] {
+  width: 100%;
+}
+
+.location-listbox {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-height: 280px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  display: none;
+}
+
+.location-combobox[aria-expanded="true"] .location-listbox {
+  display: block;
+}
+
+.location-listbox [role="option"] {
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  font-size: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.location-listbox [role="option"]:last-child {
+  border-bottom: none;
+}
+
+.location-listbox [role="option"]:hover,
+.location-listbox [role="option"][aria-selected="true"] {
+  background: #e8f4e8;
+}
+
+.location-listbox .location-option-meta {
+  font-size: 0.85rem;
+  color: #555;
+  margin-top: 0.2rem;
+}
+
 #trip-form input,
 #trip-form textarea {
   padding: 0.6rem;
@@ -681,6 +738,31 @@ button:hover {
 .trip-dashboard-summary #trip-dashboard-content p {
   margin-bottom: 0.35rem;
   font-size: 1rem;
+}
+
+.trip-dashboard-location-summary {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.trip-dashboard-location-summary h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  color: #1a3d1a;
+}
+
+.trip-dashboard-ai-summary {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #444;
+  white-space: pre-wrap;
+}
+
+.location-no-results {
+  color: #666;
+  cursor: default;
+  pointer-events: none;
 }
 
 .trip-dashboard-block {

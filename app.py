@@ -36,6 +36,8 @@ from database.database import (
     get_trip_assigned_gear,
     assign_gear_to_trip,
     unassign_gear_from_trip,
+    list_trip_report_info_for_selection,
+    get_trip_report_info_for_trip,
 )
 
 def create_app():
@@ -96,6 +98,7 @@ def create_app():
     @app.route("/api/trips/<int:trip_id>/gear/pool", methods=["OPTIONS"])
     @app.route("/api/trips/<int:trip_id>/gear/<int:gear_id>", methods=["OPTIONS"])
     @app.route("/api/trips/<int:trip_id>/dashboard", methods=["OPTIONS"])
+    @app.route("/api/locations", methods=["OPTIONS"])
     def options_auth(request_id=None, trip_id=None, invite_id=None, gear_id=None):
         return "", 200
 
@@ -208,6 +211,8 @@ def create_app():
     # ----------------------
     def _trip_to_json(t):
         out = {"id": t["id"], "trip_name": t["trip_name"], "trail_name": t.get("trail_name"), "activity_type": t.get("activity_type"), "creator_username": t.get("creator_username")}
+        if t.get("trip_report_info_id") is not None:
+            out["trip_report_info_id"] = t["trip_report_info_id"]
         ca = t.get("created_at")
         out["created_at"] = ca.isoformat() if hasattr(ca, "isoformat") else ca
         idate = t.get("intended_start_date")
@@ -227,6 +232,25 @@ def create_app():
             return jsonify(_trip_to_json(trip)), 201
         except ValueError as e:
             return jsonify(error=str(e)), 400
+
+    @app.get("/api/locations")
+    def get_locations():
+        """Return location catalog (trip_report_info) for trip creation dropdown/search."""
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        rows = list_trip_report_info_for_selection()
+        out = []
+        for r in rows:
+            out.append({
+                "id": r["id"],
+                "hike_name": r.get("hike_name") or "",
+                "distance": r.get("distance"),
+                "elevation_gain": r.get("elevation_gain"),
+                "difficulty": r.get("difficulty"),
+                "source_url": r.get("source_url"),
+            })
+        return jsonify(out)
 
     @app.get("/api/trips")
     def get_trips():
@@ -328,6 +352,20 @@ def create_app():
                     "status": s["status"],
                 })
 
+        trip_report_info = get_trip_report_info_for_trip(trip_id)
+        location_summary = None
+        if trip_report_info:
+            location_summary = {
+                "hike_name": trip_report_info.get("hike_name"),
+                "summarized_description": trip_report_info.get("summarized_description"),
+                "source_url": trip_report_info.get("source_url"),
+                "distance": trip_report_info.get("distance"),
+                "elevation_gain": trip_report_info.get("elevation_gain"),
+                "difficulty": trip_report_info.get("difficulty"),
+                "trip_report_1": trip_report_info.get("trip_report_1"),
+                "trip_report_2": trip_report_info.get("trip_report_2"),
+            }
+
         return {
             "trip": trip_json,
             "pending_invite": pending_invite,
@@ -337,6 +375,7 @@ def create_app():
             "gear_pool": gear_pool,
             "assigned_gear": assigned_gear,
             "checklist": checklist,
+            "location_summary": location_summary,
         }
 
     @app.get("/api/trips/<int:trip_id>/dashboard")

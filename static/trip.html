@@ -28,7 +28,12 @@
         <h2>Create a Trip</h2>
         <form id="create-trip-form">
           <input type="text" id="trip-name" placeholder="Trip name" required />
-          <input type="text" id="trip-trail" placeholder="Trail name" />
+          <label for="trip-location-search">Location (search and select from catalog)</label>
+          <div class="location-combobox" role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-owns="trip-location-listbox">
+            <input type="text" id="trip-location-search" placeholder="e.g. Wonderland Trail" autocomplete="off" aria-autocomplete="list" aria-controls="trip-location-listbox" />
+            <input type="hidden" id="trip-report-info-id" name="trip_report_info_id" />
+            <ul id="trip-location-listbox" class="location-listbox" role="listbox" aria-label="Trail locations"></ul>
+          </div>
           <label for="trip-activity">Activity</label>
           <select id="trip-activity" required>
             <option value="">Select activity…</option>

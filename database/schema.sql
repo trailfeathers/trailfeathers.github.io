@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS gear (
   CONSTRAINT gear_capacity_persons_positive CHECK (capacity_persons IS NULL OR capacity_persons > 0)
 );
 
--- TRIPS (created by one user)
+-- TRIPS (created by one user). See migration 001 for trip_report_info_id.
 CREATE TABLE IF NOT EXISTS trips (
   id BIGSERIAL PRIMARY KEY,
   creator_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
