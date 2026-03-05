@@ -63,7 +63,7 @@ body {
 
 .banner--dashboard {
   background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
-    url('images_for_site/rainier_valley.jpeg');
+    url('images_for_site/gothic.jpg');
   background-size: cover;
   background-position: center 67%;
   min-height: 200px;
@@ -375,18 +375,26 @@ body {
   flex-wrap: wrap;
 }
 
+.trip-setup,
+.trip-overview {
+  background: white;
+  padding: 1.75rem 2rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+}
+
+.trip-setup h2,
+.trip-overview h2 {
+  margin-bottom: 1rem;
+  font-size: 1.4rem;
+}
+
 .trip-setup {
   flex: 0 1 420px;
-  background: #f6f8f6;
-  padding: 1.5rem;
-  border-radius: 10px;
 }
 
 .trip-overview {
   flex: 1 1 360px;
-  background: #f6f8f6;
-  padding: 1.5rem;
-  border-radius: 10px;
 }
 
 /* Create trip form: stacked, left-aligned, bigger inputs */
