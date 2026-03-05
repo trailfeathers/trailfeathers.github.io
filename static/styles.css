@@ -27,12 +27,15 @@ body {
   transform: translateY(-50%);
   display: block;
   line-height: 0;
+  background: transparent;
 }
 
 .banner-logo {
   height: 48px;
   width: auto;
   display: block;
+  background: transparent;
+  /* so transparent PNG pixels show the banner behind */
 }
 
 .banner h1 {
