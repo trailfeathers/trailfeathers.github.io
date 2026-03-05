@@ -25,9 +25,9 @@ body {
   left: 0.75rem;
   top: 0.75rem;
   display: block;
-  width: 220px;
-  height: 96px;
-  background: transparent url('images_for_site/logo_transparent.png') left top / auto 96px no-repeat;
+  width: 440px;
+  height: 192px;
+  background: transparent url('images_for_site/logo_transparent.png') left top / auto 192px no-repeat;
   text-indent: -9999px;
   overflow: hidden;
 }
