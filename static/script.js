@@ -161,9 +161,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const home = document.querySelector("#home");
   if (home) home.addEventListener("click", () => (window.location.href = "dashboard.html"));
 
-  // ---------- Banner: show "Welcome, {username}" only on dashboard ----------
+  // ---------- Banner: show "Welcome, {username}" only on dashboard (not inventory/trip/friends) ----------
   const bannerTitleEl = document.querySelector("#banner-title");
-  const isDashboard = document.querySelector("#dash-options") != null;
+  const path = (window.location.pathname || "").toLowerCase();
+  const isDashboard = path.endsWith("dashboard.html") && !path.includes("trip_dashboard");
   if (bannerTitleEl && isDashboard) {
     (async () => {
       try {
