@@ -17,31 +17,34 @@
       <h2>Trip invites</h2>
       <div id="trip-invites-list"></div>
     </section>
-    <section class="trip-overview">
-      <h2>Active Trips</h2>
-      <div id="trip-list"></div>
-    </section>
 
-    <section class="trip-setup">
-      <h2>Create a Trip</h2>
-      <form id="create-trip-form">
-        <input type="text" id="trip-name" placeholder="Trip name" required />
-        <input type="text" id="trip-trail" placeholder="Trail name" />
-        <label for="trip-activity">Activity</label>
-        <select id="trip-activity" required>
-          <option value="">Select activity…</option>
-          <option value="Backpacking">Backpacking</option>
-          <option value="Hiking">Hiking</option>
-          <option value="Car Camping">Car Camping</option>
-          <option value="Bird Watching">Bird Watching</option>
-          <option value="Backcountry Skiing">Backcountry Skiing</option>
-          <option value="Mountaineering">Mountaineering</option>
-        </select>
-        <input type="date" id="trip-date" placeholder="Start date" />
-        <button type="submit">Create trip</button>
-      </form>
-      <p id="create-trip-error" class="error"></p>
-    </section>
+    <div class="trip-planner-layout">
+      <section class="trip-setup">
+        <h2>Create a Trip</h2>
+        <form id="create-trip-form">
+          <input type="text" id="trip-name" placeholder="Trip name" required />
+          <input type="text" id="trip-trail" placeholder="Trail name" />
+          <label for="trip-activity">Activity</label>
+          <select id="trip-activity" required>
+            <option value="">Select activity…</option>
+            <option value="Backpacking">Backpacking</option>
+            <option value="Hiking">Hiking</option>
+            <option value="Car Camping">Car Camping</option>
+            <option value="Bird Watching">Bird Watching</option>
+            <option value="Backcountry Skiing">Backcountry Skiing</option>
+            <option value="Mountaineering">Mountaineering</option>
+          </select>
+          <input type="date" id="trip-date" placeholder="Start date" />
+          <button type="submit">Create trip</button>
+        </form>
+        <p id="create-trip-error" class="error"></p>
+      </section>
+
+      <section class="trip-overview">
+        <h2>Active Trips</h2>
+        <div id="trip-list"></div>
+      </section>
+    </div>
 
     <div id="dash-options">
       <button id="home">Home</button>

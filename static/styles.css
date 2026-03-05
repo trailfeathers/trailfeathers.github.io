@@ -39,7 +39,7 @@ body {
 
 .banner--login {
   background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
-    url('images_for_site/gothic.jpg');
+    url('images_for_site/mount_adams.jpg');
   background-size: cover;
   background-position: center 82%;
   min-height: 200px;
@@ -63,7 +63,7 @@ body {
 
 .banner--dashboard {
   background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
-    url('images_for_site/gothic.jpg');
+    url('images_for_site/IMG_5673.jpeg');
   background-size: cover;
   background-position: center 67%;
   min-height: 200px;
@@ -71,7 +71,7 @@ body {
 
 .banner--trip {
   background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
-    url('images_for_site/daniel_panarama.jpeg');
+    url('images_for_site/IMG_5899.jpeg');
   background-size: cover;
   background-position: center 67%;
   min-height: 200px;
@@ -195,25 +195,6 @@ body {
   font-size: 0.9rem;
   margin-top: 0.75rem;
   min-height: 1.25rem;
-}
-
-.form-hint {
-  display: block;
-  font-size: 0.8rem;
-  color: #666;
-  margin-top: 0.2rem;
-}
-
-.checklist-item.checklist-met {
-  color: #2c5f2d;
-}
-
-.checklist-item.checklist-short {
-  color: #c00;
-}
-
-.checklist-status {
-  font-style: italic;
 }
 
 /* Gear add form (inventory page) */
@@ -377,42 +358,80 @@ body {
 /* Trip Planner */
 /* trip planner layout */
 .trip-planner {
-  max-width: 900px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1rem;
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  align-items: stretch;
 }
 
-/* dashboard buttons */
-#dash-options {
+.trip-planner-layout {
   display: flex;
-  gap: 1rem;
-  justify-content: center;
+  flex-direction: row;
+  gap: 2rem;
+  align-items: flex-start;
   flex-wrap: wrap;
 }
 
-/* sections */
-.trip-setup,
-.trip-overview {
+.trip-setup {
+  flex: 0 1 420px;
   background: #f6f8f6;
   padding: 1.5rem;
   border-radius: 10px;
 }
 
-/* form */
+.trip-overview {
+  flex: 1 1 360px;
+  background: #f6f8f6;
+  padding: 1.5rem;
+  border-radius: 10px;
+}
+
+/* Create trip form: stacked, left-aligned, bigger inputs */
+#create-trip-form,
 #trip-form {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.25rem;
+  align-items: flex-start;
+  width: 100%;
+}
+
+#create-trip-form input,
+#create-trip-form select,
+#create-trip-form button,
+#trip-form input,
+#trip-form textarea {
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1.15rem;
+  min-height: 48px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+#create-trip-form label,
+#trip-form label {
+  font-size: 1.05rem;
+  margin-bottom: -0.5rem;
+}
+
+#create-trip-form button,
+#trip-form button {
+  min-height: 52px;
+  padding: 0.9rem 1.5rem;
+  font-size: 1.15rem;
+  cursor: pointer;
+  width: auto;
 }
 
 #trip-form input,
 #trip-form textarea {
   padding: 0.6rem;
-  border-radius: 6px;
-  border: 1px solid #ccc;
   font-size: 1rem;
 }
 
@@ -623,108 +642,6 @@ button:hover {
   .trip-dashboard-block.trip-dashboard-team #trip-dashboard-invite-friend {
     grid-column: 2;
   }
-}
-
-/* Gear library dashboard – categories left, add form right (same size as trip dashboard panel) */
-.gear-dashboard.content {
-  align-items: stretch;
-  margin-top: 1.5rem;
-}
-
-.gear-dashboard-layout {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 0 1rem 2rem;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-@media (min-width: 768px) {
-  .gear-dashboard-layout {
-    display: grid;
-    grid-template-columns: 1fr minmax(320px, 380px);
-    gap: 1.5rem;
-    align-items: start;
-  }
-}
-
-.gear-dashboard-main {
-  min-width: 0;
-}
-
-.gear-dashboard-categories {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.gear-dashboard-categories .gear-loading {
-  color: #555;
-  margin: 0;
-}
-
-.gear-category-section {
-  background: white;
-  padding: 1.25rem 1.5rem;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.gear-category-section h3 {
-  font-size: 1.15rem;
-  margin: 0 0 0.75rem 0;
-  color: #1a3d1a;
-  border-bottom: 1px solid #e5e5e5;
-  padding-bottom: 0.5rem;
-}
-
-.gear-category-section ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.gear-category-item {
-  padding: 0.6rem 0;
-  border-bottom: 1px solid #f0f0f0;
-  font-size: 0.95rem;
-}
-
-.gear-category-item:last-child {
-  border-bottom: none;
-}
-
-.gear-category-item strong {
-  color: #333;
-}
-
-.gear-category-item .gear-meta {
-  color: #555;
-  font-size: 0.9rem;
-  margin-top: 0.2rem;
-}
-
-.gear-dashboard-add {
-  min-width: 0;
-}
-
-.gear-dashboard-section {
-  background: white;
-  padding: 1.25rem 1.5rem;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.gear-dashboard-section h2 {
-  font-size: 1.15rem;
-  margin-bottom: 1rem;
-  color: #333;
-}
-
-.gear-dashboard-section .gear-form {
-  margin-top: 0;
 }
 
 .role-badge {
