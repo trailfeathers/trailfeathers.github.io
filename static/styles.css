@@ -1006,6 +1006,31 @@ button:hover {
   color: #1a3d1a;
 }
 
+.trip-dashboard-trail-stats {
+  font-size: 0.95rem;
+  color: #444;
+}
+
+.trip-dashboard-report-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.trip-dashboard-report-controls label {
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.trip-dashboard-report-select {
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+  background: white;
+}
+
 .trip-dashboard-ai-summary {
   font-size: 0.95rem;
   line-height: 1.5;

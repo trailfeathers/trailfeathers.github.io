@@ -514,7 +514,10 @@ def create_app():
                 "source_url": trip_report_info.get("source_url"),
                 "distance": trip_report_info.get("distance"),
                 "elevation_gain": trip_report_info.get("elevation_gain"),
+                "highpoint": trip_report_info.get("highpoint"),
                 "difficulty": trip_report_info.get("difficulty"),
+                "lat": trip_report_info.get("lat"),
+                "long": trip_report_info.get("long"),
                 "trip_report_1": trip_report_info.get("trip_report_1"),
                 "trip_report_2": trip_report_info.get("trip_report_2"),
             }

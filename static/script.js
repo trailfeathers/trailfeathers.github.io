@@ -1102,19 +1102,62 @@ document.addEventListener("DOMContentLoaded", () => {
        <p><strong>Activity:</strong> ${escapeHtml(trip.activity_type || "—")}</p>
        <p><strong>Start date:</strong> ${trip.intended_start_date ? escapeHtml(String(trip.intended_start_date).slice(0, 10)) : "—"}</p>
        <p><strong>Created by:</strong> ${escapeHtml(trip.creator_username || "—")}</p>`;
+    if (locationSummary) {
+      const stats = [];
+      if (locationSummary.distance) stats.push(`Distance: ${escapeHtml(locationSummary.distance)}`);
+      if (locationSummary.elevation_gain) stats.push(`Elevation gain: ${escapeHtml(locationSummary.elevation_gain)}`);
+      if (locationSummary.highpoint) stats.push(`Highpoint: ${escapeHtml(locationSummary.highpoint)}`);
+      if (locationSummary.difficulty) stats.push(`Difficulty: ${escapeHtml(locationSummary.difficulty)}`);
+      if (locationSummary.lat != null && locationSummary.long != null && String(locationSummary.lat).trim() && String(locationSummary.long).trim()) {
+        stats.push(`Coordinates: ${escapeHtml(String(locationSummary.lat).trim())}, ${escapeHtml(String(locationSummary.long).trim())}`);
+      }
+      if (stats.length) summaryHtml += `<p class="trip-dashboard-trail-stats"><strong>Trail info:</strong> ${stats.join(" · ")}</p>`;
+    }
     if (trip.is_creator) {
       summaryHtml += `<p class="trip-dashboard-actions"><button type="button" id="edit-trip-btn-dashboard" class="secondary">Edit trip</button> <button type="button" id="delete-trip-btn-dashboard" class="secondary">Delete trip</button></p>`;
     } else {
       summaryHtml += `<p class="trip-dashboard-actions"><button type="button" id="leave-trip-btn-dashboard" class="secondary">Leave trip</button></p>`;
     }
-    if (locationSummary && locationSummary.summarized_description) {
+    if (locationSummary) {
+      const summaryText = (locationSummary.summarized_description || "").trim();
+      const r1 = (locationSummary.trip_report_1 || "").trim();
+      const r2 = (locationSummary.trip_report_2 || "").trim();
+      const defaultVal = "summary";
       summaryHtml += `<section class="trip-dashboard-location-summary" aria-label="Trail report summary">
          <h3>Trail report summary</h3>
-         <div class="trip-dashboard-ai-summary">${escapeHtml(locationSummary.summarized_description).replace(/\n/g, "<br>")}</div>
+         <div class="trip-dashboard-report-controls">
+           <label for="trip-dashboard-report-select">Show:</label>
+           <select id="trip-dashboard-report-select" class="trip-dashboard-report-select" aria-label="Select report or summary">
+             <option value="summary">AI summary</option>
+             <option value="report1">Trip report 1</option>
+             <option value="report2">Trip report 2</option>
+           </select>
+         </div>
+         <div id="trip-dashboard-report-body" class="trip-dashboard-ai-summary">${summaryText ? escapeHtml(summaryText).replace(/\n/g, "<br>") : "No report available."}</div>
          ${locationSummary.source_url ? `<p><a href="${escapeHtml(locationSummary.source_url)}" target="_blank" rel="noopener">View source</a></p>` : ""}
        </section>`;
     }
     tripDashboardContent.innerHTML = summaryHtml;
+
+    if (locationSummary) {
+      const reportBody = document.getElementById("trip-dashboard-report-body");
+      const reportSelect = document.getElementById("trip-dashboard-report-select");
+      const summaryText = (locationSummary.summarized_description || "").trim();
+      const r1 = (locationSummary.trip_report_1 || "").trim();
+      const r2 = (locationSummary.trip_report_2 || "").trim();
+      function setBody(value) {
+        if (!reportBody) return;
+        let html;
+        if (value === "summary") html = summaryText ? escapeHtml(summaryText).replace(/\n/g, "<br>") : "No report available.";
+        else if (value === "report1") html = r1 ? escapeHtml(r1).replace(/\n/g, "<br>") : "No report available.";
+        else if (value === "report2") html = r2 ? escapeHtml(r2).replace(/\n/g, "<br>") : "No report available.";
+        else html = "No report available.";
+        reportBody.innerHTML = html;
+      }
+      if (reportSelect) {
+        reportSelect.addEventListener("change", () => setBody(reportSelect.value));
+      }
+    }
 
     const editBtnDash = document.querySelector("#edit-trip-btn-dashboard");
     const deleteBtnDash = document.querySelector("#delete-trip-btn-dashboard");
