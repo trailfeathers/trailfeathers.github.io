@@ -646,9 +646,12 @@ def list_trips_for_user(user_id):
 
 
 def update_trip(trip_id, user_id, payload):
-    """Update a trip. User must have access (creator or collaborator). Updates trip_name, trail/location, activity_type, intended_start_date."""
-    if not user_has_trip_access(user_id, trip_id):
-        raise ValueError("You do not have access to this trip.")
+    """Update a trip. Only the creator may update. Updates trip_name, trail/location, activity_type, intended_start_date."""
+    trip = get_trip(trip_id)
+    if not trip:
+        raise ValueError("Trip not found.")
+    if trip["creator_id"] != user_id:
+        raise ValueError("Only the trip creator can edit this trip.")
     trip_name = (payload.get("trip_name") or "").strip()
     if not trip_name:
         raise ValueError("Trip name is required")
@@ -690,6 +693,22 @@ def delete_trip(trip_id, user_id):
         raise ValueError("Only the trip creator can delete this trip.")
     with get_cursor() as cur:
         cur.execute("DELETE FROM trips WHERE id = %s", (trip_id,))
+
+
+def leave_trip(trip_id, user_id):
+    """Remove the current user from a trip (disband). Only members can leave; creator must delete the trip."""
+    trip = get_trip(trip_id)
+    if not trip:
+        raise ValueError("Trip not found.")
+    if trip["creator_id"] == user_id:
+        raise ValueError("Trip creator cannot leave; delete the trip instead.")
+    with get_cursor() as cur:
+        cur.execute(
+            "DELETE FROM trip_collaborators WHERE trip_id = %s AND user_id = %s",
+            (trip_id, user_id),
+        )
+        if cur.rowcount == 0:
+            raise ValueError("You are not a member of this trip.")
 
 
 def get_trip(trip_id):

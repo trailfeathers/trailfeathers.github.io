@@ -26,6 +26,7 @@ from database.database import (
     create_trip,
     update_trip,
     delete_trip,
+    leave_trip,
     list_trips_for_user,
     get_trip,
     user_has_trip_access,
@@ -398,7 +399,8 @@ def create_app():
             out["is_creator"] = trip["creator_id"] == user["id"]
             return jsonify(out)
         except ValueError as e:
-            return jsonify(error=str(e)), 400
+            err = str(e)
+            return jsonify(error=err), (403 if "creator" in err.lower() else 400)
 
     @app.delete("/api/trips/<int:trip_id>")
     def delete_trip_route(trip_id):
@@ -407,6 +409,19 @@ def create_app():
             return jsonify(error="Not logged in"), 401
         try:
             delete_trip(trip_id, user["id"])
+            login.refresh_session_cache(user["id"])
+            login.invalidate_trip_dashboard_cache()
+            return "", 204
+        except ValueError as e:
+            return jsonify(error=str(e)), 403
+
+    @app.post("/api/trips/<int:trip_id>/leave")
+    def leave_trip_route(trip_id):
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        try:
+            leave_trip(trip_id, user["id"])
             login.refresh_session_cache(user["id"])
             login.invalidate_trip_dashboard_cache()
             return "", 204

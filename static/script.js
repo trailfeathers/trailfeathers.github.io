@@ -657,6 +657,73 @@ document.addEventListener("DOMContentLoaded", () => {
   const createTripForm = document.querySelector("#create-trip-form");
 
   let currentUserId = null;
+  let tripEditMode = false;
+  let lastTrips = [];
+
+  function renderTripList(trips) {
+    if (!tripList || !trips.length) return;
+    const isCreator = (t) => currentUserId != null && t.creator_id === currentUserId;
+    const showActions = tripEditMode;
+    tripList.innerHTML = trips
+      .map(
+        (t) => {
+          let actions = "";
+          if (showActions) {
+            if (isCreator(t)) {
+              actions = `<div class="trip-actions"><button type="button" class="trip-edit-btn secondary" data-trip-id="${t.id}">Edit</button><button type="button" class="trip-delete-btn secondary" data-trip-id="${t.id}">Delete</button></div>`;
+            } else {
+              actions = `<div class="trip-actions"><button type="button" class="trip-disband-btn secondary" data-trip-id="${t.id}">Disband</button></div>`;
+            }
+          }
+          return `<div class="trip-card trip-card-clickable" data-trip-id="${t.id}">
+              <div class="trip-card-body">
+                <h3>${escapeHtml(t.trip_name || "Unnamed")}</h3>
+                <p><strong>Trail:</strong> ${escapeHtml(t.trail_name || "—")}</p>
+                <p><strong>Activity:</strong> ${escapeHtml(t.activity_type || "—")}</p>
+                <p><strong>Start:</strong> ${t.intended_start_date ? escapeHtml(String(t.intended_start_date).slice(0, 10)) : "—"}</p>
+                <p><strong>Created by:</strong> ${escapeHtml(t.creator_username || "—")}</p>
+              </div>
+              ${actions}
+            </div>`;
+        }
+      )
+      .join("");
+    tripList.querySelectorAll(".trip-card-clickable").forEach((el) => {
+      el.addEventListener("click", (e) => {
+        if (e.target.closest(".trip-actions")) return;
+        const id = el.getAttribute("data-trip-id");
+        window.location.href = "trip_dashboard.html?id=" + encodeURIComponent(id);
+      });
+    });
+    tripList.querySelectorAll(".trip-edit-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        openEditTripModal(btn.getAttribute("data-trip-id"));
+      });
+    });
+    tripList.querySelectorAll(".trip-delete-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const id = btn.getAttribute("data-trip-id");
+        if (confirm("Delete this trip? This cannot be undone.")) {
+          deleteTrip(id).then(() => loadTrips()).catch((err) => alert(err.message || "Could not delete trip"));
+        }
+      });
+    });
+    tripList.querySelectorAll(".trip-disband-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const id = btn.getAttribute("data-trip-id");
+        if (confirm("Leave this trip? You can be re-invited later.")) {
+          leaveTrip(id).then(() => loadTrips()).catch((err) => alert(err.message || "Could not leave trip"));
+        }
+      });
+    });
+  }
+
   async function loadTrips() {
     if (!tripList) return;
     try {
@@ -675,57 +742,25 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
       const trips = await res.json();
+      lastTrips = trips;
       if (trips.length === 0) {
         tripList.innerHTML = "<p>No trips yet. Create one below.</p>";
         return;
       }
-      const isCreator = (t) => currentUserId != null && t.creator_id === currentUserId;
-      tripList.innerHTML = trips
-        .map(
-          (t) => {
-            const actions = isCreator(t)
-              ? `<div class="trip-actions"><button type="button" class="trip-edit-btn secondary" data-trip-id="${t.id}">Edit</button><button type="button" class="trip-delete-btn secondary" data-trip-id="${t.id}">Delete</button></div>`
-              : "";
-            return `<div class="trip-card trip-card-clickable" data-trip-id="${t.id}">
-              <div class="trip-card-body">
-                <h3>${escapeHtml(t.trip_name || "Unnamed")}</h3>
-                <p><strong>Trail:</strong> ${escapeHtml(t.trail_name || "—")}</p>
-                <p><strong>Activity:</strong> ${escapeHtml(t.activity_type || "—")}</p>
-                <p><strong>Start:</strong> ${t.intended_start_date ? escapeHtml(String(t.intended_start_date).slice(0, 10)) : "—"}</p>
-                <p><strong>Created by:</strong> ${escapeHtml(t.creator_username || "—")}</p>
-              </div>
-              ${actions}
-            </div>`;
-          }
-        )
-        .join("");
-      tripList.querySelectorAll(".trip-card-clickable").forEach((el) => {
-        el.addEventListener("click", (e) => {
-          if (e.target.closest(".trip-actions")) return;
-          const id = el.getAttribute("data-trip-id");
-          window.location.href = "trip_dashboard.html?id=" + encodeURIComponent(id);
-        });
-      });
-      tripList.querySelectorAll(".trip-edit-btn").forEach((btn) => {
-        btn.addEventListener("click", (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          openEditTripModal(btn.getAttribute("data-trip-id"));
-        });
-      });
-      tripList.querySelectorAll(".trip-delete-btn").forEach((btn) => {
-        btn.addEventListener("click", (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          const id = btn.getAttribute("data-trip-id");
-          if (confirm("Delete this trip? This cannot be undone.")) {
-            deleteTrip(id).then(() => loadTrips()).catch((err) => alert(err.message || "Could not delete trip"));
-          }
-        });
-      });
+      renderTripList(trips);
     } catch (_) {
       tripList.innerHTML = "<p>Could not load trips.</p>";
     }
+  }
+
+  const editTripsBtn = document.querySelector("#edit-trips-btn");
+  if (editTripsBtn) {
+    editTripsBtn.addEventListener("click", () => {
+      tripEditMode = !tripEditMode;
+      editTripsBtn.textContent = tripEditMode ? "Done" : "Edit trips";
+      if (!tripEditMode) closeEditTripModal();
+      if (lastTrips.length) renderTripList(lastTrips);
+    });
   }
 
   if (tripList) loadTrips();
@@ -942,6 +977,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  async function leaveTrip(tripId) {
+    const res = await fetch(API_BASE + "/api/trips/" + encodeURIComponent(tripId) + "/leave", {
+      method: "POST",
+      credentials: "include",
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || "Could not leave trip");
+    }
+  }
+
   function renderEditLocationOptions(locations) {
     if (!editTripLocationListbox) return;
     if (!locations || locations.length === 0) {
@@ -1058,6 +1104,8 @@ document.addEventListener("DOMContentLoaded", () => {
        <p><strong>Created by:</strong> ${escapeHtml(trip.creator_username || "—")}</p>`;
     if (trip.is_creator) {
       summaryHtml += `<p class="trip-dashboard-actions"><button type="button" id="edit-trip-btn-dashboard" class="secondary">Edit trip</button> <button type="button" id="delete-trip-btn-dashboard" class="secondary">Delete trip</button></p>`;
+    } else {
+      summaryHtml += `<p class="trip-dashboard-actions"><button type="button" id="leave-trip-btn-dashboard" class="secondary">Leave trip</button></p>`;
     }
     if (locationSummary && locationSummary.summarized_description) {
       summaryHtml += `<section class="trip-dashboard-location-summary" aria-label="Trail report summary">
@@ -1077,6 +1125,14 @@ document.addEventListener("DOMContentLoaded", () => {
       deleteBtnDash.addEventListener("click", () => {
         if (confirm("Delete this trip? This cannot be undone.")) {
           deleteTrip(tripIdParam).then(() => { window.location.href = "trip.html"; }).catch((err) => alert(err.message || "Could not delete trip"));
+        }
+      });
+    }
+    const leaveTripBtnDash = document.querySelector("#leave-trip-btn-dashboard");
+    if (leaveTripBtnDash && tripIdParam) {
+      leaveTripBtnDash.addEventListener("click", () => {
+        if (confirm("Leave this trip? You can be re-invited later.")) {
+          leaveTrip(tripIdParam).then(() => { window.location.href = "trip.html"; }).catch((err) => alert(err.message || "Could not leave trip"));
         }
       });
     }
