@@ -1118,6 +1118,31 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       summaryHtml += `<p class="trip-dashboard-actions"><button type="button" id="leave-trip-btn-dashboard" class="secondary">Leave trip</button></p>`;
     }
+
+    const mapLat = (locationSummary && locationSummary.lat != null) ? String(locationSummary.lat).trim() : "";
+    const mapLng = (locationSummary && locationSummary.long != null) ? String(locationSummary.long).trim() : "";
+    const hasCoords = Boolean(mapLat && mapLng);
+    const mapQuery = hasCoords ? encodeURIComponent(`${mapLat},${mapLng}`) : "";
+
+    summaryHtml += `<section class="trip-dashboard-map" aria-label="Trail map">
+        <h3>Map</h3>
+        ${hasCoords ? `
+          <iframe
+            class="trip-dashboard-map-frame"
+            title="Google map"
+            loading="lazy"
+            allowfullscreen
+            referrerpolicy="no-referrer-when-downgrade"
+            src="https://www.google.com/maps?q=${mapQuery}&z=12&output=embed"
+          ></iframe>
+          <p class="trip-dashboard-map-links">
+            <a href="https://www.google.com/maps/search/?api=1&query=${mapQuery}" target="_blank" rel="noopener">Open in Google Maps</a>
+          </p>
+        ` : `
+          <p class="trip-dashboard-map-placeholder">No coordinates available for this trip location.</p>
+        `}
+      </section>`;
+
     if (locationSummary) {
       const summaryText = (locationSummary.summarized_description || "").trim();
       const r1 = (locationSummary.trip_report_1 || "").trim();

@@ -1000,6 +1000,35 @@ button:hover {
   border-top: 1px solid #e0e0e0;
 }
 
+.trip-dashboard-map {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.trip-dashboard-map h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+  color: #1a3d1a;
+}
+
+.trip-dashboard-map-frame {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  border-radius: 12px;
+}
+
+.trip-dashboard-map-links {
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.trip-dashboard-map-placeholder {
+  color: #444;
+  font-size: 0.95rem;
+}
+
 .trip-dashboard-location-summary h3 {
   font-size: 1.1rem;
   margin-bottom: 0.5rem;
