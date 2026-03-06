@@ -1029,6 +1029,33 @@ button:hover {
   font-size: 0.95rem;
 }
 
+.trip-dashboard-weather {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.trip-dashboard-weather h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+  color: #1a3d1a;
+}
+
+.trip-dashboard-weather p {
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.trip-weather-body p:last-child {
+  margin-bottom: 0;
+}
+
+.trip-weather-detailed {
+  font-size: 0.9rem;
+  color: #444;
+}
+
 .trip-dashboard-location-summary h3 {
   font-size: 1.1rem;
   margin-bottom: 0.5rem;

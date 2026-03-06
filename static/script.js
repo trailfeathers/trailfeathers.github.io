@@ -1143,6 +1143,14 @@ document.addEventListener("DOMContentLoaded", () => {
         `}
       </section>`;
 
+    summaryHtml += `<section class="trip-dashboard-weather" aria-label="Weather"><h3>Weather</h3>`;
+    if (hasCoords) {
+      summaryHtml += `<p id="trip-weather-loading">Loading weather…</p><div id="trip-weather-body" class="trip-weather-body"></div>`;
+    } else {
+      summaryHtml += `<p>No coordinates available for weather.</p>`;
+    }
+    summaryHtml += `</section>`;
+
     if (locationSummary) {
       const summaryText = (locationSummary.summarized_description || "").trim();
       const r1 = (locationSummary.trip_report_1 || "").trim();
@@ -1163,6 +1171,44 @@ document.addEventListener("DOMContentLoaded", () => {
        </section>`;
     }
     tripDashboardContent.innerHTML = summaryHtml;
+
+    if (hasCoords && tripIdParam) {
+      const loadingEl = document.getElementById("trip-weather-loading");
+      const bodyEl = document.getElementById("trip-weather-body");
+      fetch(API_BASE + "/api/trips/" + tripIdParam + "/weather", { credentials: "include" })
+        .then((r) => r.json())
+        .then((body) => {
+          if (loadingEl) loadingEl.remove();
+          if (!bodyEl) return;
+          if (body.error === "no_coordinates") {
+            bodyEl.innerHTML = "<p>No coordinates available for weather.</p>";
+            return;
+          }
+          if (body.error === "forecast_unavailable") {
+            bodyEl.innerHTML = "<p>Forecast unavailable. Try again later.</p>";
+            return;
+          }
+          const label = body.is_trip_date
+            ? "Weather for " + (body.for_date || "").slice(0, 10)
+            : "Current weather";
+          let html = "<p><strong>" + escapeHtml(label) + "</strong>";
+          if (body.temperature != null) {
+            html += " — " + escapeHtml(String(body.temperature)) + "°" + (body.temperatureUnit || "F");
+          }
+          html += "</p>";
+          if (body.shortForecast) {
+            html += "<p>" + escapeHtml(body.shortForecast) + "</p>";
+          }
+          if (body.detailedForecast) {
+            html += "<p class=\"trip-weather-detailed\">" + escapeHtml(body.detailedForecast).replace(/\n/g, "<br>") + "</p>";
+          }
+          bodyEl.innerHTML = html;
+        })
+        .catch(() => {
+          if (loadingEl) loadingEl.remove();
+          if (bodyEl) bodyEl.innerHTML = "<p>Forecast unavailable. Try again later.</p>";
+        });
+    }
 
     if (locationSummary) {
       const reportBody = document.getElementById("trip-dashboard-report-body");

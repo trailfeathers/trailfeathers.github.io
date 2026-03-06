@@ -1,5 +1,7 @@
+import json
 import os
-from datetime import timedelta
+import urllib.request
+from datetime import date, datetime, timedelta
 
 from flask import Flask, request, jsonify, session
 from flask_cors import CORS
@@ -108,6 +110,7 @@ def create_app():
     @app.route("/api/trips/<int:trip_id>/gear/pool", methods=["OPTIONS"])
     @app.route("/api/trips/<int:trip_id>/gear/<int:gear_id>", methods=["OPTIONS"])
     @app.route("/api/trips/<int:trip_id>/dashboard", methods=["OPTIONS"])
+    @app.route("/api/trips/<int:trip_id>/weather", methods=["OPTIONS"])
     @app.route("/api/locations", methods=["OPTIONS"])
     @app.route("/api/me/favorites", methods=["OPTIONS"])
     @app.route("/api/me/favorites/<int:trip_report_info_id>", methods=["OPTIONS"])
@@ -551,6 +554,114 @@ def create_app():
             session["trip_dashboard"] = {}
         session["trip_dashboard"][str(trip_id)] = payload
         return jsonify(payload)
+
+    def _fetch_nws_forecast(lat, lon, trip_date_str):
+        """Fetch NWS 7-day forecast for lat,lon. Return period for trip_date if in range, else first period.
+        Returns dict with for_date, is_trip_date, temperature, temperatureUnit, shortForecast, detailedForecast, periodName
+        or None on error.
+        """
+        try:
+            lat_f = float(str(lat).strip())
+            lon_f = float(str(lon).strip())
+            if not (-90 <= lat_f <= 90 and -180 <= lon_f <= 180):
+                return None
+        except (TypeError, ValueError):
+            return None
+        lat_s = f"{lat_f:.2f}"
+        lon_s = f"{lon_f:.2f}"
+        points_url = f"https://api.weather.gov/points/{lat_s},{lon_s}"
+        headers = {"User-Agent": "TrailFeathers/1.0 (https://github.com/trailfeathers)"}
+        req = urllib.request.Request(points_url, headers=headers)
+        try:
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                data = json.loads(resp.read().decode())
+        except (urllib.error.HTTPError, urllib.error.URLError, OSError, json.JSONDecodeError):
+            return None
+        props = data.get("properties") or {}
+        forecast_url = (props.get("forecast") or "").strip()
+        if not forecast_url:
+            return None
+        req2 = urllib.request.Request(forecast_url, headers=headers)
+        try:
+            with urllib.request.urlopen(req2, timeout=10) as resp2:
+                forecast_data = json.loads(resp2.read().decode())
+        except (urllib.error.HTTPError, urllib.error.URLError, OSError, json.JSONDecodeError):
+            return None
+        periods = (forecast_data.get("properties") or {}).get("periods") or []
+        if not periods:
+            return None
+        trip_date = None
+        if trip_date_str:
+            if hasattr(trip_date_str, "isoformat"):
+                trip_date = trip_date_str
+            else:
+                s = str(trip_date_str).strip()[:10]
+                try:
+                    trip_date = datetime.strptime(s, "%Y-%m-%d").date()
+                except ValueError:
+                    pass
+        chosen = periods[0]
+        is_trip_date = False
+        if trip_date:
+            for p in periods:
+                start_s = (p.get("startTime") or "").strip()
+                end_s = (p.get("endTime") or "").strip()
+                if not start_s:
+                    continue
+                try:
+                    start_dt = datetime.fromisoformat(start_s.replace("Z", "+00:00"))
+                    start_d = start_dt.date()
+                except (ValueError, TypeError):
+                    continue
+                if end_s:
+                    try:
+                        end_dt = datetime.fromisoformat(end_s.replace("Z", "+00:00"))
+                        end_d = end_dt.date()
+                    except (ValueError, TypeError):
+                        end_d = start_d
+                else:
+                    end_d = start_d
+                if start_d <= trip_date <= end_d:
+                    chosen = p
+                    is_trip_date = True
+                    break
+        for_date = trip_date.isoformat() if trip_date else (chosen.get("startTime") or "")[:10]
+        if not for_date or len(for_date) > 10:
+            for_date = (chosen.get("startTime") or "")[:10]
+        return {
+            "for_date": for_date,
+            "is_trip_date": is_trip_date,
+            "temperature": chosen.get("temperature"),
+            "temperatureUnit": chosen.get("temperatureUnit") or "F",
+            "shortForecast": chosen.get("shortForecast") or "",
+            "detailedForecast": chosen.get("detailedForecast") or "",
+            "periodName": chosen.get("name") or "",
+        }
+
+    @app.get("/api/trips/<int:trip_id>/weather")
+    def get_trip_weather(trip_id):
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        if not user_has_trip_access(user["id"], trip_id) and not has_pending_invite_to_trip(user["id"], trip_id):
+            return jsonify(error="Not found"), 404
+        trip = get_trip(trip_id)
+        if not trip:
+            return jsonify(error="Not found"), 404
+        trip_report_info = get_trip_report_info_for_trip(trip_id)
+        if not trip_report_info:
+            return jsonify(error="no_coordinates"), 200
+        lat = trip_report_info.get("lat")
+        lon = trip_report_info.get("long")
+        if lat is None or lon is None or not str(lat).strip() or not str(lon).strip():
+            return jsonify(error="no_coordinates"), 200
+        intended_start = trip.get("intended_start_date")
+        if hasattr(intended_start, "isoformat"):
+            intended_start = intended_start.isoformat()
+        result = _fetch_nws_forecast(lat, lon, intended_start)
+        if result is None:
+            return jsonify(error="forecast_unavailable", message="Weather service unavailable"), 200
+        return jsonify(result), 200
 
     @app.get("/api/trips/<int:trip_id>/checklist")
     def get_trip_checklist(trip_id):
