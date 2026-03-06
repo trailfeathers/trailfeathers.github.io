@@ -541,6 +541,117 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // ---------- Friends page: My favorite hikes ----------
+  const myFavoritesList = document.querySelector("#my-favorites-list");
+  const addFavoriteSelect = document.querySelector("#add-favorite-select");
+  const addFavoriteBtn = document.querySelector("#add-favorite-btn");
+
+  async function loadMyFavorites() {
+    if (!myFavoritesList) return;
+    try {
+      const res = await fetch(API_BASE + "/api/me/favorites", { credentials: "include" });
+      if (res.status === 401) {
+        window.location.href = "login.html";
+        return;
+      }
+      if (!res.ok) {
+        myFavoritesList.innerHTML = "<p>Could not load favorites.</p>";
+        return;
+      }
+      const favorites = await res.json();
+      if (favorites.length === 0) {
+        myFavoritesList.innerHTML = "<p>No favorite hikes yet. Add some from the catalog above.</p>";
+        return;
+      }
+      myFavoritesList.innerHTML = favorites
+        .map(
+          (f) =>
+            `<div class="favorite-hike-item" data-id="${f.id}">
+              <div class="favorite-hike-info">
+                <strong>${escapeHtml(f.hike_name)}</strong>
+                ${f.distance || f.elevation_gain ? `<span class="favorite-hike-meta">${[f.distance, f.elevation_gain].filter(Boolean).join(" · ")}</span>` : ""}
+                ${f.source_url ? `<a href="${escapeHtml(f.source_url)}" target="_blank" rel="noopener" class="favorite-hike-link">Source</a>` : ""}
+              </div>
+              <button type="button" class="remove-favorite secondary" data-id="${f.id}">Remove</button>
+            </div>`
+        )
+        .join("");
+      myFavoritesList.querySelectorAll(".remove-favorite").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const id = parseInt(btn.getAttribute("data-id"), 10);
+          try {
+            const r = await fetch(API_BASE + "/api/me/favorites/" + id, {
+              method: "DELETE",
+              credentials: "include",
+            });
+            if (r.ok) {
+              loadMyFavorites();
+              loadLocationsForFavorites();
+            }
+          } catch (_) {}
+        });
+      });
+    } catch (_) {
+      myFavoritesList.innerHTML = "<p>Could not load favorites.</p>";
+    }
+  }
+
+  async function loadLocationsForFavorites() {
+    if (!addFavoriteSelect) return;
+    try {
+      const [locRes, favRes] = await Promise.all([
+        fetch(API_BASE + "/api/locations", { credentials: "include" }),
+        fetch(API_BASE + "/api/me/favorites", { credentials: "include" }),
+      ]);
+      if (!locRes.ok || !favRes.ok) return;
+      const locations = await locRes.json();
+      const favorites = await favRes.json();
+      const favoritedIds = new Set(favorites.map((f) => f.id));
+      const options = locations.filter((loc) => !favoritedIds.has(loc.id));
+      addFavoriteSelect.innerHTML =
+        '<option value="">Choose a hike…</option>' +
+        options
+          .map(
+            (loc) =>
+              `<option value="${loc.id}">${escapeHtml(loc.hike_name || "Unnamed")}${loc.distance ? " — " + loc.distance : ""}</option>`
+          )
+          .join("");
+    } catch (_) {}
+  }
+
+  if (myFavoritesList) loadMyFavorites();
+  if (addFavoriteSelect) loadLocationsForFavorites();
+
+  if (addFavoriteBtn && addFavoriteSelect) {
+    addFavoriteBtn.addEventListener("click", async () => {
+      const errEl = document.querySelector("#add-favorite-error");
+      if (errEl) errEl.textContent = "";
+      const id = addFavoriteSelect.value;
+      if (!id) {
+        if (errEl) errEl.textContent = "Choose a hike from the list.";
+        return;
+      }
+      try {
+        const res = await fetch(API_BASE + "/api/me/favorites", {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ trip_report_info_id: parseInt(id, 10) }),
+        });
+        if (res.ok) {
+          loadMyFavorites();
+          loadLocationsForFavorites();
+          addFavoriteSelect.value = "";
+          return;
+        }
+        const data = await res.json().catch(() => ({}));
+        if (errEl) errEl.textContent = data.error || "Could not add favorite.";
+      } catch (_) {
+        if (errEl) errEl.textContent = "Could not reach the server. Try again later.";
+      }
+    });
+  }
+
   // ---------- Trip list and create trip ----------
   const tripList = document.querySelector("#trip-list");
   const createTripForm = document.querySelector("#create-trip-form");
