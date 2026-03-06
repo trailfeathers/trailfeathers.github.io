@@ -52,6 +52,7 @@ def _serialize_trip(t):
         "activity_type": t.get("activity_type"),
         "creator_id": t.get("creator_id"),
         "creator_username": t.get("creator_username"),
+        "trip_report_info_id": t.get("trip_report_info_id"),
     }
     ca = t.get("created_at")
     out["created_at"] = ca.isoformat() if hasattr(ca, "isoformat") else ca

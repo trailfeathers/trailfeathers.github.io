@@ -398,9 +398,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const tripList = document.querySelector("#trip-list");
   const createTripForm = document.querySelector("#create-trip-form");
 
+  let currentUserId = null;
   async function loadTrips() {
     if (!tripList) return;
     try {
+      const meRes = await fetch(API_BASE + "/api/me", { credentials: "include" });
+      if (meRes.ok) {
+        const me = await meRes.json();
+        currentUserId = me.id != null ? me.id : null;
+      }
       const res = await fetch(API_BASE + "/api/trips", { credentials: "include" });
       if (res.status === 401) {
         window.location.href = "login.html";
@@ -415,22 +421,48 @@ document.addEventListener("DOMContentLoaded", () => {
         tripList.innerHTML = "<p>No trips yet. Create one below.</p>";
         return;
       }
+      const isCreator = (t) => currentUserId != null && t.creator_id === currentUserId;
       tripList.innerHTML = trips
         .map(
-          (t) =>
-            `<div class="trip-card trip-card-clickable" data-trip-id="${t.id}">
-              <h3>${escapeHtml(t.trip_name || "Unnamed")}</h3>
-              <p><strong>Trail:</strong> ${escapeHtml(t.trail_name || "—")}</p>
-              <p><strong>Activity:</strong> ${escapeHtml(t.activity_type || "—")}</p>
-              <p><strong>Start:</strong> ${t.intended_start_date ? escapeHtml(String(t.intended_start_date).slice(0, 10)) : "—"}</p>
-              <p><strong>Created by:</strong> ${escapeHtml(t.creator_username || "—")}</p>
-            </div>`
+          (t) => {
+            const actions = isCreator(t)
+              ? `<div class="trip-actions"><button type="button" class="trip-edit-btn secondary" data-trip-id="${t.id}">Edit</button><button type="button" class="trip-delete-btn secondary" data-trip-id="${t.id}">Delete</button></div>`
+              : "";
+            return `<div class="trip-card trip-card-clickable" data-trip-id="${t.id}">
+              <div class="trip-card-body">
+                <h3>${escapeHtml(t.trip_name || "Unnamed")}</h3>
+                <p><strong>Trail:</strong> ${escapeHtml(t.trail_name || "—")}</p>
+                <p><strong>Activity:</strong> ${escapeHtml(t.activity_type || "—")}</p>
+                <p><strong>Start:</strong> ${t.intended_start_date ? escapeHtml(String(t.intended_start_date).slice(0, 10)) : "—"}</p>
+                <p><strong>Created by:</strong> ${escapeHtml(t.creator_username || "—")}</p>
+              </div>
+              ${actions}
+            </div>`;
+          }
         )
         .join("");
       tripList.querySelectorAll(".trip-card-clickable").forEach((el) => {
-        el.addEventListener("click", () => {
+        el.addEventListener("click", (e) => {
+          if (e.target.closest(".trip-actions")) return;
           const id = el.getAttribute("data-trip-id");
           window.location.href = "trip_dashboard.html?id=" + encodeURIComponent(id);
+        });
+      });
+      tripList.querySelectorAll(".trip-edit-btn").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          openEditTripModal(btn.getAttribute("data-trip-id"));
+        });
+      });
+      tripList.querySelectorAll(".trip-delete-btn").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const id = btn.getAttribute("data-trip-id");
+          if (confirm("Delete this trip? This cannot be undone.")) {
+            deleteTrip(id).then(() => loadTrips()).catch((err) => alert(err.message || "Could not delete trip"));
+          }
         });
       });
     } catch (_) {
@@ -622,6 +654,133 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // ---------- Edit trip modal and delete ----------
+  const editTripModal = document.querySelector("#edit-trip-modal");
+  const editTripForm = document.querySelector("#edit-trip-form");
+  const editTripIdEl = document.querySelector("#edit-trip-id");
+  const editTripNameEl = document.querySelector("#edit-trip-name");
+  const editTripLocationSearch = document.querySelector("#edit-trip-location-search");
+  const editTripReportInfoIdEl = document.querySelector("#edit-trip-report-info-id");
+  const editTripLocationListbox = document.querySelector("#edit-trip-location-listbox");
+  const editTripActivityEl = document.querySelector("#edit-trip-activity");
+  const editTripDateEl = document.querySelector("#edit-trip-date");
+  const editTripErrorEl = document.querySelector("#edit-trip-error");
+  const editTripCancelBtn = document.querySelector("#edit-trip-cancel");
+  const editTripCombobox = document.querySelector(".edit-trip-combobox");
+
+  function closeEditTripModal() {
+    if (editTripModal) editTripModal.style.display = "none";
+    if (editTripErrorEl) editTripErrorEl.textContent = "";
+  }
+
+  async function deleteTrip(tripId) {
+    const res = await fetch(API_BASE + "/api/trips/" + encodeURIComponent(tripId), {
+      method: "DELETE",
+      credentials: "include",
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || "Could not delete trip");
+    }
+  }
+
+  function renderEditLocationOptions(locations) {
+    if (!editTripLocationListbox) return;
+    if (!locations || locations.length === 0) {
+      editTripLocationListbox.innerHTML = '<li role="option" class="location-no-results">No matching trails. Type to search the catalog.</li>';
+      return;
+    }
+    editTripLocationListbox.innerHTML = locations.map((loc) => {
+      const meta = [loc.distance, loc.elevation_gain, loc.difficulty].filter(Boolean).join(" · ");
+      return `<li role="option" data-id="${loc.id}" data-hike-name="${escapeHtml(loc.hike_name || "")}">${escapeHtml(loc.hike_name || "Unnamed")}${meta ? `<div class="location-option-meta">${escapeHtml(meta)}</div>` : ""}</li>`;
+    }).join("");
+  }
+
+  async function openEditTripModal(tripId) {
+    if (!editTripModal || !editTripForm) return;
+    if (editTripErrorEl) editTripErrorEl.textContent = "";
+    try {
+      const res = await fetch(API_BASE + "/api/trips/" + encodeURIComponent(tripId), { credentials: "include" });
+      if (!res.ok) return;
+      const trip = await res.json();
+      if (editTripIdEl) editTripIdEl.value = tripId;
+      if (editTripNameEl) editTripNameEl.value = trip.trip_name || "";
+      if (editTripActivityEl) editTripActivityEl.value = trip.activity_type || "";
+      if (editTripDateEl) editTripDateEl.value = trip.intended_start_date ? String(trip.intended_start_date).slice(0, 10) : "";
+      const infoId = trip.trip_report_info_id;
+      if (editTripReportInfoIdEl) editTripReportInfoIdEl.value = infoId != null ? infoId : "";
+      if (editTripLocationSearch) editTripLocationSearch.value = trip.trail_name || "";
+      if (editTripCombobox) editTripCombobox.setAttribute("aria-expanded", "false");
+      editTripModal.style.display = "flex";
+    } catch (_) {}
+  }
+
+  if (editTripForm) {
+    editTripForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (editTripErrorEl) editTripErrorEl.textContent = "";
+      const id = editTripIdEl && editTripIdEl.value;
+      if (!id) return;
+      const trip_report_info_id = editTripReportInfoIdEl && editTripReportInfoIdEl.value.trim();
+      if (!trip_report_info_id) {
+        if (editTripErrorEl) editTripErrorEl.textContent = "Please select a location from the catalog.";
+        return;
+      }
+      const payload = {
+        trip_name: (editTripNameEl && editTripNameEl.value.trim()) || "",
+        trip_report_info_id: parseInt(trip_report_info_id, 10),
+        activity_type: editTripActivityEl && editTripActivityEl.value,
+        intended_start_date: (editTripDateEl && editTripDateEl.value) || undefined,
+      };
+      try {
+        const res = await fetch(API_BASE + "/api/trips/" + encodeURIComponent(id), {
+          method: "PUT",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (res.ok) {
+          closeEditTripModal();
+          if (tripList) loadTrips();
+          if (typeof loadTripDashboard === "function") loadTripDashboard();
+          return;
+        }
+        const data = await res.json().catch(() => ({}));
+        if (editTripErrorEl) editTripErrorEl.textContent = data.error || "Could not update trip.";
+      } catch (_) {
+        if (editTripErrorEl) editTripErrorEl.textContent = "Could not reach the server. Try again later.";
+      }
+    });
+  }
+  if (editTripCancelBtn) editTripCancelBtn.addEventListener("click", closeEditTripModal);
+  if (editTripModal) {
+    const backdrop = editTripModal.querySelector(".edit-trip-modal-backdrop");
+    if (backdrop) backdrop.addEventListener("click", closeEditTripModal);
+  }
+  if (editTripLocationSearch && editTripLocationListbox) {
+    editTripLocationSearch.addEventListener("focus", () => {
+      if (editTripCombobox) editTripCombobox.setAttribute("aria-expanded", "true");
+      renderEditLocationOptions(filterLocations(editTripLocationSearch.value));
+    });
+    editTripLocationSearch.addEventListener("input", () => {
+      editTripReportInfoIdEl.value = "";
+      if (editTripCombobox) editTripCombobox.setAttribute("aria-expanded", "true");
+      renderEditLocationOptions(filterLocations(editTripLocationSearch.value));
+    });
+    editTripLocationSearch.addEventListener("blur", () => {
+      setTimeout(() => { if (editTripCombobox) editTripCombobox.setAttribute("aria-expanded", "false"); }, 200);
+    });
+    editTripLocationListbox.addEventListener("click", (e) => {
+      const opt = e.target.closest("[role=option][data-id]");
+      if (opt) {
+        e.preventDefault();
+        editTripReportInfoIdEl.value = opt.getAttribute("data-id");
+        editTripLocationSearch.value = opt.getAttribute("data-hike-name") || "";
+        if (editTripCombobox) editTripCombobox.setAttribute("aria-expanded", "false");
+      }
+    });
+  }
+
   // ---------- Trip dashboard (trip_dashboard.html?id=...) ----------
   const tripDashboardContent = document.querySelector("#trip-dashboard-content");
   const tripDashboardLoading = document.querySelector("#trip-dashboard-loading");
@@ -639,6 +798,9 @@ document.addEventListener("DOMContentLoaded", () => {
        <p><strong>Activity:</strong> ${escapeHtml(trip.activity_type || "—")}</p>
        <p><strong>Start date:</strong> ${trip.intended_start_date ? escapeHtml(String(trip.intended_start_date).slice(0, 10)) : "—"}</p>
        <p><strong>Created by:</strong> ${escapeHtml(trip.creator_username || "—")}</p>`;
+    if (trip.is_creator) {
+      summaryHtml += `<p class="trip-dashboard-actions"><button type="button" id="edit-trip-btn-dashboard" class="secondary">Edit trip</button> <button type="button" id="delete-trip-btn-dashboard" class="secondary">Delete trip</button></p>`;
+    }
     if (locationSummary && locationSummary.summarized_description) {
       summaryHtml += `<section class="trip-dashboard-location-summary" aria-label="Trail report summary">
          <h3>Trail report summary</h3>
@@ -647,6 +809,19 @@ document.addEventListener("DOMContentLoaded", () => {
        </section>`;
     }
     tripDashboardContent.innerHTML = summaryHtml;
+
+    const editBtnDash = document.querySelector("#edit-trip-btn-dashboard");
+    const deleteBtnDash = document.querySelector("#delete-trip-btn-dashboard");
+    if (editBtnDash && tripIdParam) {
+      editBtnDash.addEventListener("click", () => openEditTripModal(tripIdParam));
+    }
+    if (deleteBtnDash && tripIdParam) {
+      deleteBtnDash.addEventListener("click", () => {
+        if (confirm("Delete this trip? This cannot be undone.")) {
+          deleteTrip(tripIdParam).then(() => { window.location.href = "trip.html"; }).catch((err) => alert(err.message || "Could not delete trip"));
+        }
+      });
+    }
 
     const invitedSection = document.querySelector("#trip-dashboard-invited");
     const membersSection = document.querySelector("#trip-dashboard-members");

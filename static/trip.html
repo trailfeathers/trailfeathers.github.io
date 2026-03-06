@@ -59,6 +59,41 @@
     </div>
   </main>
 
+  <div id="edit-trip-modal" class="edit-trip-modal" role="dialog" aria-labelledby="edit-trip-modal-title" aria-modal="true" style="display: none;">
+    <div class="edit-trip-modal-backdrop"></div>
+    <div class="edit-trip-modal-content">
+      <h2 id="edit-trip-modal-title">Edit trip</h2>
+      <form id="edit-trip-form">
+        <input type="hidden" id="edit-trip-id" />
+        <label for="edit-trip-name">Trip name</label>
+        <input type="text" id="edit-trip-name" placeholder="Trip name" required />
+        <label for="edit-trip-location-search">Location (search and select from catalog)</label>
+        <div class="location-combobox edit-trip-combobox" role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-owns="edit-trip-location-listbox">
+          <input type="text" id="edit-trip-location-search" placeholder="e.g. Wonderland Trail" autocomplete="off" aria-autocomplete="list" aria-controls="edit-trip-location-listbox" />
+          <input type="hidden" id="edit-trip-report-info-id" />
+          <ul id="edit-trip-location-listbox" class="location-listbox" role="listbox" aria-label="Trail locations"></ul>
+        </div>
+        <label for="edit-trip-activity">Activity</label>
+        <select id="edit-trip-activity" required>
+          <option value="">Select activity…</option>
+          <option value="Backpacking">Backpacking</option>
+          <option value="Hiking">Hiking</option>
+          <option value="Car Camping">Car Camping</option>
+          <option value="Bird Watching">Bird Watching</option>
+          <option value="Backcountry Skiing">Backcountry Skiing</option>
+          <option value="Mountaineering">Mountaineering</option>
+        </select>
+        <label for="edit-trip-date">Start date</label>
+        <input type="date" id="edit-trip-date" />
+        <div class="edit-trip-modal-actions">
+          <button type="button" id="edit-trip-cancel" class="secondary">Cancel</button>
+          <button type="submit">Save changes</button>
+        </div>
+      </form>
+      <p id="edit-trip-error" class="error"></p>
+    </div>
+  </div>
+
   <script src="script.js"></script>
 </body>
 </html>

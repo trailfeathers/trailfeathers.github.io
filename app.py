@@ -18,6 +18,8 @@ from database.database import (
     decline_friend_request,
     list_friends,
     create_trip,
+    update_trip,
+    delete_trip,
     list_trips_for_user,
     get_trip,
     user_has_trip_access,
@@ -274,6 +276,38 @@ def create_app():
         out = _trip_to_json(trip)
         out["is_creator"] = trip["creator_id"] == user["id"]
         return jsonify(out)
+
+    @app.put("/api/trips/<int:trip_id>")
+    def put_trip(trip_id):
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        if not user_has_trip_access(user["id"], trip_id):
+            return jsonify(error="Not found"), 404
+        payload = request.get_json(silent=True) or {}
+        try:
+            update_trip(trip_id, user["id"], payload)
+            login.refresh_session_cache(user["id"])
+            login.invalidate_trip_dashboard_cache(trip_id)
+            trip = get_trip(trip_id)
+            out = _trip_to_json(trip)
+            out["is_creator"] = trip["creator_id"] == user["id"]
+            return jsonify(out)
+        except ValueError as e:
+            return jsonify(error=str(e)), 400
+
+    @app.delete("/api/trips/<int:trip_id>")
+    def delete_trip_route(trip_id):
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        try:
+            delete_trip(trip_id, user["id"])
+            login.refresh_session_cache(user["id"])
+            login.invalidate_trip_dashboard_cache()
+            return "", 204
+        except ValueError as e:
+            return jsonify(error=str(e)), 403
 
     def _build_trip_dashboard(trip_id, user):
         """Build full dashboard payload for a trip (trip, collaborators, gear, checklist, etc.)."""

@@ -505,6 +505,53 @@ def list_trips_for_user(user_id):
         return cur.fetchall()
 
 
+def update_trip(trip_id, user_id, payload):
+    """Update a trip. User must have access (creator or collaborator). Updates trip_name, trail/location, activity_type, intended_start_date."""
+    if not user_has_trip_access(user_id, trip_id):
+        raise ValueError("You do not have access to this trip.")
+    trip_name = (payload.get("trip_name") or "").strip()
+    if not trip_name:
+        raise ValueError("Trip name is required")
+    activity_type = (payload.get("activity_type") or "").strip()
+    if not activity_type or activity_type not in ACTIVITY_TYPES:
+        raise ValueError("Activity type must be one of: " + ", ".join(sorted(ACTIVITY_TYPES)))
+    intended_start_date = payload.get("intended_start_date")
+    if intended_start_date is not None and intended_start_date != "":
+        intended_start_date = intended_start_date.strip() or None
+    else:
+        intended_start_date = None
+
+    trip_report_info_id = payload.get("trip_report_info_id")
+    if trip_report_info_id is None:
+        raise ValueError("Please select a location from the catalog.")
+    try:
+        info_id = int(trip_report_info_id)
+    except (TypeError, ValueError):
+        raise ValueError("Invalid location selection.")
+    location = get_trip_report_info_by_id(info_id)
+    if not location:
+        raise ValueError("Selected location not found. Please choose from the list.")
+    trail_name = (location.get("hike_name") or "").strip() or "Unknown trail"
+
+    with get_cursor() as cur:
+        cur.execute(
+            """UPDATE trips SET trip_name = %s, trail_name = %s, activity_type = %s, intended_start_date = %s, trip_report_info_id = %s
+               WHERE id = %s""",
+            (trip_name, trail_name, activity_type, intended_start_date, info_id, trip_id),
+        )
+
+
+def delete_trip(trip_id, user_id):
+    """Delete a trip. Only the creator may delete. CASCADE removes collaborators, invites, gear."""
+    trip = get_trip(trip_id)
+    if not trip:
+        raise ValueError("Trip not found.")
+    if trip["creator_id"] != user_id:
+        raise ValueError("Only the trip creator can delete this trip.")
+    with get_cursor() as cur:
+        cur.execute("DELETE FROM trips WHERE id = %s", (trip_id,))
+
+
 def get_trip(trip_id):
     """Return one trip with creator username and trip_report_info_id, or None."""
     with get_cursor() as cur:

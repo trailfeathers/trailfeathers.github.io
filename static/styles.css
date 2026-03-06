@@ -653,6 +653,66 @@ body {
   gap: 0.5rem;
 }
 
+.trip-dashboard-actions {
+  margin-top: 0.75rem;
+}
+.trip-dashboard-actions button {
+  margin-right: 0.5rem;
+}
+
+/* Edit trip modal */
+.edit-trip-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.edit-trip-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+}
+.edit-trip-modal-content {
+  position: relative;
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  max-width: 420px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+.edit-trip-modal-content h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+.edit-trip-modal-content label {
+  display: block;
+  margin-top: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+.edit-trip-modal-content input,
+.edit-trip-modal-content select {
+  width: 100%;
+  padding: 0.5rem;
+  box-sizing: border-box;
+}
+.edit-trip-modal-actions {
+  margin-top: 1.25rem;
+  display: flex;
+  gap: 0.5rem;
+}
+.edit-trip-combobox {
+  position: relative;
+}
+.edit-trip-combobox .location-listbox {
+  max-height: 200px;
+}
+
 /* buttons */
 button {
   padding: 0.5rem 1rem;
