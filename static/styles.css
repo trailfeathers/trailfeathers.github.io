@@ -27,7 +27,7 @@ body {
   display: block;
   width: 440px;
   height: 192px;
-  background: transparent url('images_for_site/logo_transparent.png') left top / auto 192px no-repeat;
+  background: transparent url('images_for_site/banners/logo_transparent.png') left top / auto 192px no-repeat;
   text-indent: -9999px;
   overflow: hidden;
 }
@@ -57,7 +57,7 @@ body {
 
 .banner--login {
   background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
-    url('images_for_site/crystal.jpg');
+    url('images_for_site/banners/crystal.jpg');
   background-size: cover;
   background-position: center 82%;
   min-height: 200px;
@@ -65,7 +65,7 @@ body {
 
 .banner--friends {
   background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
-    url('images_for_site/mount_adams.jpg');
+    url('images_for_site/banners/mount_adams.jpg');
   background-size: cover;
   background-position: center 62%;
   min-height: 200px;
@@ -73,7 +73,7 @@ body {
 
 .banner--inventory {
   background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
-    url('images_for_site/mount_daniel.jpeg');
+    url('images_for_site/banners/mount_daniel.jpeg');
   background-size: cover;
   background-position: center 67%;
   min-height: 200px;
@@ -81,7 +81,7 @@ body {
 
 .banner--dashboard {
   background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
-    url('images_for_site/gothic.jpg');
+    url('images_for_site/banners/gothic.jpg');
   background-size: cover;
   background-position: center 67%;
   min-height: 200px;
@@ -89,7 +89,7 @@ body {
 
 .banner--trip {
   background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
-    url('images_for_site/daniel_panarama.jpeg');
+    url('images_for_site/banners/daniel_panarama.jpeg');
   background-size: cover;
   background-position: center 67%;
   min-height: 200px;
