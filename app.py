@@ -11,6 +11,9 @@ from auth import login
 from database.database import (
     add_gear_item,
     list_gear,
+    get_gear_item,
+    update_gear_item,
+    delete_gear_item,
     get_user_by_username,
     create_friend_request,
     list_incoming_requests,
@@ -82,6 +85,7 @@ def create_app():
     @app.route("/api/signup", methods=["OPTIONS"])
     @app.route("/api/login", methods=["OPTIONS"])
     @app.route("/api/gear", methods=["OPTIONS"])
+    @app.route("/api/gear/<int:gear_id>", methods=["OPTIONS"])
     @app.route("/api/friends/request", methods=["OPTIONS"])
     @app.route("/api/friends/requests", methods=["OPTIONS"])
     @app.route("/api/friends", methods=["OPTIONS"])
@@ -102,6 +106,7 @@ def create_app():
     @app.route("/api/trips/<int:trip_id>/dashboard", methods=["OPTIONS"])
     @app.route("/api/locations", methods=["OPTIONS"])
     def options_auth(request_id=None, trip_id=None, invite_id=None, gear_id=None):
+        # gear_id used by OPTIONS /api/gear/<int:gear_id>
         return "", 200
 
     # ----------------------
@@ -142,6 +147,52 @@ def create_app():
         if session.get("gear") is None:
             login.refresh_session_cache(user["id"])
         return jsonify(session["gear"])
+
+    @app.get("/api/gear/<int:gear_id>")
+    def get_gear_by_id(gear_id):
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        item = get_gear_item(gear_id, user["id"])
+        if not item:
+            return jsonify(error="Not found"), 404
+        row = dict(item)
+        if row.get("created_at") and hasattr(row["created_at"], "isoformat"):
+            row["created_at"] = row["created_at"].isoformat()
+        if row.get("weight_oz") is not None:
+            row["weight_oz"] = float(row["weight_oz"])
+        return jsonify(row)
+
+    @app.put("/api/gear/<int:gear_id>")
+    def put_gear(gear_id):
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        payload = request.get_json(silent=True) or {}
+        try:
+            update_gear_item(gear_id, user["id"], payload)
+            login.refresh_session_cache(user["id"])
+            item = get_gear_item(gear_id, user["id"])
+            row = dict(item)
+            if row.get("created_at") and hasattr(row["created_at"], "isoformat"):
+                row["created_at"] = row["created_at"].isoformat()
+            if row.get("weight_oz") is not None:
+                row["weight_oz"] = float(row["weight_oz"])
+            return jsonify(row)
+        except ValueError as e:
+            return jsonify(error=str(e)), 400
+
+    @app.delete("/api/gear/<int:gear_id>")
+    def delete_gear_route(gear_id):
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        try:
+            delete_gear_item(gear_id, user["id"])
+            login.refresh_session_cache(user["id"])
+            return "", 204
+        except ValueError:
+            return jsonify(error="Not found"), 404
 
     # ----------------------
     # Friends API

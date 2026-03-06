@@ -383,6 +383,29 @@ body {
   margin-top: 0.2rem;
 }
 
+.gear-item-editable {
+  cursor: pointer;
+}
+.gear-item-editable:hover {
+  background: #f5f5f5;
+  border-radius: 4px;
+}
+
+.gear-library-toolbar {
+  margin-bottom: 0.75rem;
+}
+
+.edit-gear-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.edit-gear-delete {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
 .gear-dashboard-add {
   min-width: 0;
 }
