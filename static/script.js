@@ -411,6 +411,18 @@ document.addEventListener("DOMContentLoaded", () => {
     return div.innerHTML;
   }
 
+  function shortForecastToIcon(shortForecast) {
+    if (!shortForecast || typeof shortForecast !== "string") return "partly_cloudy";
+    const s = shortForecast.toLowerCase();
+    if (/snow/.test(s)) return "snow";
+    if (/rain|shower|thunder/.test(s)) return "rain";
+    if (/wind/.test(s)) return "windy";
+    if (/fog|haze/.test(s)) return "fog";
+    if (/(^|\s)sunny|clear/.test(s) && !/partly|mostly/.test(s)) return "sunny";
+    if (/partly|cloudy|mostly/.test(s)) return "partly_cloudy";
+    return "partly_cloudy";
+  }
+
   if (gearCategoriesEl) loadGear();
   if (document.querySelector("#gear-type")) loadRequirementTypes();
 
@@ -1096,7 +1108,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const pendingInvite = data.pending_invite || null;
     const locationSummary = data.location_summary || null;
     document.querySelector(".banner h1").textContent = trip.trip_name || "Trip";
-    let summaryHtml =
+    let tripInfoHtml =
       `<h2>${escapeHtml(trip.trip_name || "Trip")}</h2>
        <p><strong>Trail:</strong> ${escapeHtml(trip.trail_name || "—")}</p>
        <p><strong>Activity:</strong> ${escapeHtml(trip.activity_type || "—")}</p>
@@ -1111,18 +1123,32 @@ document.addEventListener("DOMContentLoaded", () => {
       if (locationSummary.lat != null && locationSummary.long != null && String(locationSummary.lat).trim() && String(locationSummary.long).trim()) {
         stats.push(`Coordinates: ${escapeHtml(String(locationSummary.lat).trim())}, ${escapeHtml(String(locationSummary.long).trim())}`);
       }
-      if (stats.length) summaryHtml += `<p class="trip-dashboard-trail-stats"><strong>Trail info:</strong> ${stats.join(" · ")}</p>`;
+      if (stats.length) tripInfoHtml += `<p class="trip-dashboard-trail-stats"><strong>Trail info:</strong> ${stats.join(" · ")}</p>`;
     }
     if (trip.is_creator) {
-      summaryHtml += `<p class="trip-dashboard-actions"><button type="button" id="edit-trip-btn-dashboard" class="secondary">Edit trip</button> <button type="button" id="delete-trip-btn-dashboard" class="secondary">Delete trip</button></p>`;
+      tripInfoHtml += `<p class="trip-dashboard-actions"><button type="button" id="edit-trip-btn-dashboard" class="secondary">Edit trip</button> <button type="button" id="delete-trip-btn-dashboard" class="secondary">Delete trip</button></p>`;
     } else {
-      summaryHtml += `<p class="trip-dashboard-actions"><button type="button" id="leave-trip-btn-dashboard" class="secondary">Leave trip</button></p>`;
+      tripInfoHtml += `<p class="trip-dashboard-actions"><button type="button" id="leave-trip-btn-dashboard" class="secondary">Leave trip</button></p>`;
     }
 
     const mapLat = (locationSummary && locationSummary.lat != null) ? String(locationSummary.lat).trim() : "";
     const mapLng = (locationSummary && locationSummary.long != null) ? String(locationSummary.long).trim() : "";
     const hasCoords = Boolean(mapLat && mapLng);
     const mapQuery = hasCoords ? encodeURIComponent(`${mapLat},${mapLng}`) : "";
+
+    let weatherBlockHtml = `<section class="trip-dashboard-weather" aria-label="Weather"><h3>Weather</h3>`;
+    if (hasCoords) {
+      weatherBlockHtml += `<p id="trip-weather-loading">Loading weather…</p><div id="trip-weather-body" class="trip-weather-body"></div>`;
+    } else {
+      weatherBlockHtml += `<p>No coordinates available for weather.</p>`;
+    }
+    weatherBlockHtml += `</section>`;
+
+    let summaryHtml =
+      `<div class="trip-dashboard-top">
+         <div class="trip-dashboard-trip-info">${tripInfoHtml}</div>
+         <div class="trip-dashboard-weather-top">${weatherBlockHtml}</div>
+       </div>`;
 
     summaryHtml += `<section class="trip-dashboard-map" aria-label="Trail map">
         <h3>Map</h3>
@@ -1142,14 +1168,6 @@ document.addEventListener("DOMContentLoaded", () => {
           <p class="trip-dashboard-map-placeholder">No coordinates available for this trip location.</p>
         `}
       </section>`;
-
-    summaryHtml += `<section class="trip-dashboard-weather" aria-label="Weather"><h3>Weather</h3>`;
-    if (hasCoords) {
-      summaryHtml += `<p id="trip-weather-loading">Loading weather…</p><div id="trip-weather-body" class="trip-weather-body"></div>`;
-    } else {
-      summaryHtml += `<p>No coordinates available for weather.</p>`;
-    }
-    summaryHtml += `</section>`;
 
     if (locationSummary) {
       const summaryText = (locationSummary.summarized_description || "").trim();
@@ -1191,11 +1209,13 @@ document.addEventListener("DOMContentLoaded", () => {
           const label = body.is_trip_date
             ? "Weather for " + (body.for_date || "").slice(0, 10)
             : "Current weather";
-          let html = "<p><strong>" + escapeHtml(label) + "</strong>";
+          const iconName = shortForecastToIcon(body.shortForecast);
+          const iconAlt = iconName.replace(/_/g, " ");
+          let html = "<div class=\"trip-weather-header\"><img class=\"trip-weather-icon\" src=\"images_for_site/weather_icons/" + iconName + ".png\" alt=\"" + escapeHtml(iconAlt) + "\" /><p><strong>" + escapeHtml(label) + "</strong>";
           if (body.temperature != null) {
             html += " — " + escapeHtml(String(body.temperature)) + "°" + (body.temperatureUnit || "F");
           }
-          html += "</p>";
+          html += "</p></div>";
           if (body.shortForecast) {
             html += "<p>" + escapeHtml(body.shortForecast) + "</p>";
           }
