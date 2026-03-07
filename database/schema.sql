@@ -54,6 +54,7 @@ CREATE TABLE IF NOT EXISTS trips (
   trail_name TEXT NOT NULL,
   activity_type TEXT NOT NULL,
   intended_start_date TIMESTAMPTZ,
+  notes TEXT DEFAULT '',
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 

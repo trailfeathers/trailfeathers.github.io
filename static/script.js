@@ -934,6 +934,7 @@ document.addEventListener("DOMContentLoaded", () => {
         trip_report_info_id: parseInt(trip_report_info_id, 10),
         activity_type: document.querySelector("#trip-activity").value || undefined,
         intended_start_date: document.querySelector("#trip-date").value || undefined,
+        notes: (document.querySelector("#trip-notes") && document.querySelector("#trip-notes").value) || "",
       };
       try {
         const res = await fetch(API_BASE + "/api/trips", {
@@ -969,6 +970,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const editTripLocationListbox = document.querySelector("#edit-trip-location-listbox");
   const editTripActivityEl = document.querySelector("#edit-trip-activity");
   const editTripDateEl = document.querySelector("#edit-trip-date");
+  const editTripNotesEl = document.querySelector("#edit-trip-notes");
   const editTripErrorEl = document.querySelector("#edit-trip-error");
   const editTripCancelBtn = document.querySelector("#edit-trip-cancel");
   const editTripCombobox = document.querySelector(".edit-trip-combobox");
@@ -1045,6 +1047,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (editTripNameEl) editTripNameEl.value = trip.trip_name || "";
       if (editTripActivityEl) editTripActivityEl.value = trip.activity_type || "";
       if (editTripDateEl) editTripDateEl.value = trip.intended_start_date ? String(trip.intended_start_date).slice(0, 10) : "";
+      if (editTripNotesEl) editTripNotesEl.value = trip.notes || "";
       const infoId = trip.trip_report_info_id;
       if (editTripReportInfoIdEl) editTripReportInfoIdEl.value = infoId != null ? infoId : "";
       if (editTripLocationSearch) editTripLocationSearch.value = trip.trail_name || "";
@@ -1069,6 +1072,7 @@ document.addEventListener("DOMContentLoaded", () => {
         trip_report_info_id: parseInt(trip_report_info_id, 10),
         activity_type: editTripActivityEl && editTripActivityEl.value,
         intended_start_date: (editTripDateEl && editTripDateEl.value) || undefined,
+        notes: (editTripNotesEl && editTripNotesEl.value) || "",
       };
       try {
         const res = await fetch(API_BASE + "/api/trips/" + encodeURIComponent(id), {
@@ -1210,7 +1214,46 @@ document.addEventListener("DOMContentLoaded", () => {
          ${locationSummary.source_url ? `<p><a href="${escapeHtml(locationSummary.source_url)}" target="_blank" rel="noopener">View source</a></p>` : ""}
        </section>`;
     }
+    summaryHtml += `<section class="trip-dashboard-notes" aria-label="Trip notes">
+        <h3>Notes</h3>
+        <textarea id="trip-notes-textarea" placeholder="e.g. Can you buy meals? I don't have a filter." rows="4"></textarea>
+        <button type="button" id="trip-notes-save" class="secondary">Save notes</button>
+      </section>`;
     tripDashboardContent.innerHTML = summaryHtml;
+
+    const notesTextarea = document.getElementById("trip-notes-textarea");
+    const notesSaveBtn = document.getElementById("trip-notes-save");
+    if (notesTextarea) notesTextarea.value = trip.notes || "";
+    if (notesSaveBtn && tripIdParam) {
+      notesSaveBtn.addEventListener("click", async () => {
+        const notesVal = notesTextarea ? notesTextarea.value : "";
+        const payload = {
+          trip_name: trip.trip_name || "",
+          trip_report_info_id: trip.trip_report_info_id,
+          activity_type: trip.activity_type || "",
+          intended_start_date: trip.intended_start_date ? String(trip.intended_start_date).slice(0, 10) : undefined,
+          notes: notesVal,
+        };
+        try {
+          const res = await fetch(API_BASE + "/api/trips/" + encodeURIComponent(tripIdParam), {
+            method: "PUT",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          if (res.ok) {
+            trip.notes = notesVal;
+            notesSaveBtn.textContent = "Saved";
+            setTimeout(() => { notesSaveBtn.textContent = "Save notes"; }, 2000);
+          } else {
+            const data = await res.json().catch(() => ({}));
+            alert(data.error || "Could not save notes");
+          }
+        } catch (_) {
+          alert("Could not save notes. Try again.");
+        }
+      });
+    }
 
     if (hasCoords && tripIdParam) {
       const loadingEl = document.getElementById("trip-weather-loading");

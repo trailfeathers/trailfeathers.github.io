@@ -49,6 +49,8 @@
             <option value="Mountaineering">Mountaineering</option>
           </select>
           <input type="date" id="trip-date" placeholder="Start date" />
+          <label for="trip-notes">Notes (optional)</label>
+          <textarea id="trip-notes" placeholder="e.g. Can you buy meals? I don't have a filter." rows="3"></textarea>
           <button type="submit">Create trip</button>
         </form>
         <p id="create-trip-error" class="error"></p>
@@ -88,6 +90,8 @@
         </select>
         <label for="edit-trip-date">Start date</label>
         <input type="date" id="edit-trip-date" />
+        <label for="edit-trip-notes">Notes</label>
+        <textarea id="edit-trip-notes" placeholder="e.g. Can you buy meals? I don't have a filter." rows="3"></textarea>
         <div class="edit-trip-modal-actions">
           <button type="button" id="edit-trip-cancel" class="secondary">Cancel</button>
           <button type="submit">Save changes</button>

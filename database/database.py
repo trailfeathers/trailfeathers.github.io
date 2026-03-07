@@ -614,11 +614,13 @@ def create_trip(creator_id, payload):
         raise ValueError("Selected location not found. Please choose from the list.")
     trail_name = (location.get("hike_name") or "").strip() or "Unknown trail"
 
+    notes = (payload.get("notes") or "").strip() if payload.get("notes") is not None else ""
+
     with get_cursor() as cur:
         cur.execute(
-            """INSERT INTO trips (creator_id, trip_name, trail_name, activity_type, intended_start_date, trip_report_info_id)
-               VALUES (%s, %s, %s, %s, %s, %s) RETURNING id""",
-            (creator_id, trip_name, trail_name, activity_type, intended_start_date, info_id),
+            """INSERT INTO trips (creator_id, trip_name, trail_name, activity_type, intended_start_date, trip_report_info_id, notes)
+               VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING id""",
+            (creator_id, trip_name, trail_name, activity_type, intended_start_date, info_id, notes),
         )
         row = cur.fetchone()
         trip_id = row["id"]
@@ -634,7 +636,7 @@ def list_trips_for_user(user_id):
     with get_cursor() as cur:
         cur.execute(
             """SELECT t.id, t.trip_name, t.trail_name, t.activity_type, t.intended_start_date,
-                      t.creator_id, t.trip_report_info_id, u.username AS creator_username, t.created_at
+                      t.creator_id, t.trip_report_info_id, u.username AS creator_username, t.created_at, t.notes
                FROM trips t
                JOIN users u ON u.id = t.creator_id
                WHERE t.creator_id = %s
@@ -646,12 +648,19 @@ def list_trips_for_user(user_id):
 
 
 def update_trip(trip_id, user_id, payload):
-    """Update a trip. Only the creator may update. Updates trip_name, trail/location, activity_type, intended_start_date."""
+    """Update a trip. Creator may update all fields including notes; collaborators may update only notes."""
     trip = get_trip(trip_id)
     if not trip:
         raise ValueError("Trip not found.")
+    notes = (payload.get("notes") or "").strip() if payload.get("notes") is not None else ""
+
     if trip["creator_id"] != user_id:
-        raise ValueError("Only the trip creator can edit this trip.")
+        # Collaborator: only allow updating notes
+        with get_cursor() as cur:
+            cur.execute("""UPDATE trips SET notes = %s WHERE id = %s""", (notes, trip_id))
+        return
+
+    # Creator: update all fields
     trip_name = (payload.get("trip_name") or "").strip()
     if not trip_name:
         raise ValueError("Trip name is required")
@@ -678,9 +687,9 @@ def update_trip(trip_id, user_id, payload):
 
     with get_cursor() as cur:
         cur.execute(
-            """UPDATE trips SET trip_name = %s, trail_name = %s, activity_type = %s, intended_start_date = %s, trip_report_info_id = %s
+            """UPDATE trips SET trip_name = %s, trail_name = %s, activity_type = %s, intended_start_date = %s, trip_report_info_id = %s, notes = %s
                WHERE id = %s""",
-            (trip_name, trail_name, activity_type, intended_start_date, info_id, trip_id),
+            (trip_name, trail_name, activity_type, intended_start_date, info_id, notes, trip_id),
         )
 
 
@@ -716,7 +725,7 @@ def get_trip(trip_id):
     with get_cursor() as cur:
         cur.execute(
             """SELECT t.id, t.trip_name, t.trail_name, t.activity_type, t.intended_start_date,
-                      t.creator_id, t.trip_report_info_id, u.username AS creator_username, t.created_at
+                      t.creator_id, t.trip_report_info_id, u.username AS creator_username, t.created_at, t.notes
                FROM trips t
                JOIN users u ON u.id = t.creator_id
                WHERE t.id = %s""",

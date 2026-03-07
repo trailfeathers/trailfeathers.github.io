@@ -324,7 +324,7 @@ def create_app():
     # Trips API
     # ----------------------
     def _trip_to_json(t):
-        out = {"id": t["id"], "trip_name": t["trip_name"], "trail_name": t.get("trail_name"), "activity_type": t.get("activity_type"), "creator_username": t.get("creator_username")}
+        out = {"id": t["id"], "trip_name": t["trip_name"], "trail_name": t.get("trail_name"), "activity_type": t.get("activity_type"), "creator_username": t.get("creator_username"), "notes": (t.get("notes") or "")}
         if t.get("trip_report_info_id") is not None:
             out["trip_report_info_id"] = t["trip_report_info_id"]
         ca = t.get("created_at")
