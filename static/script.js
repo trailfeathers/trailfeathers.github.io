@@ -1000,6 +1000,28 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  async function kickTripMember(tripId, userId) {
+    const res = await fetch(API_BASE + "/api/trips/" + encodeURIComponent(tripId) + "/collaborators/" + encodeURIComponent(userId), {
+      method: "DELETE",
+      credentials: "include",
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || "Could not remove member");
+    }
+  }
+
+  async function cancelTripInvite(inviteId) {
+    const res = await fetch(API_BASE + "/api/trip-invites/" + encodeURIComponent(inviteId), {
+      method: "DELETE",
+      credentials: "include",
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || "Could not cancel invite");
+    }
+  }
+
   function renderEditLocationOptions(locations) {
     if (!editTripLocationListbox) return;
     if (!locations || locations.length === 0) {
@@ -1319,8 +1341,27 @@ document.addEventListener("DOMContentLoaded", () => {
       const listEl = document.querySelector("#trip-collaborators-list");
       if (listEl) {
         listEl.innerHTML = collaborators.length
-          ? collaborators.map((c) => `<p>${escapeHtml(c.username)} <span class="role-badge">${escapeHtml(c.role)}</span></p>`).join("")
+          ? collaborators.map((c) => {
+              const kickBtn = trip.is_creator && c.role !== "creator"
+                ? ` <button type="button" class="secondary kick-member-btn" data-user-id="${c.id}">Kick</button>`
+                : "";
+              return `<p>${escapeHtml(c.username)} <span class="role-badge">${escapeHtml(c.role)}</span>${kickBtn}</p>`;
+            }).join("")
           : "<p>No members yet.</p>";
+        if (tripIdParam && trip.is_creator) {
+          listEl.querySelectorAll(".kick-member-btn").forEach((btn) => {
+            btn.addEventListener("click", async () => {
+              const userId = btn.getAttribute("data-user-id");
+              if (!userId || !confirm("Remove this member from the trip?")) return;
+              try {
+                await kickTripMember(tripIdParam, userId);
+                loadTripDashboard();
+              } catch (err) {
+                alert(err.message || "Could not remove member");
+              }
+            });
+          });
+        }
       }
     }
 
@@ -1329,7 +1370,25 @@ document.addEventListener("DOMContentLoaded", () => {
       if (pendingSection && pendingInvitesList.length > 0) {
         pendingSection.style.display = "block";
         const listEl = document.querySelector("#trip-pending-invites-list");
-        if (listEl) listEl.innerHTML = pendingInvitesList.map((p) => `<p>${escapeHtml(p.invitee_username)} (pending)</p>`).join("");
+        if (listEl) {
+          listEl.innerHTML = pendingInvitesList.map((p) =>
+            `<p>${escapeHtml(p.invitee_username)} (pending) <button type="button" class="secondary cancel-invite-btn" data-invite-id="${p.id}">Cancel invite</button></p>`
+          ).join("");
+          if (tripIdParam) {
+            listEl.querySelectorAll(".cancel-invite-btn").forEach((btn) => {
+              btn.addEventListener("click", async () => {
+                const inviteId = btn.getAttribute("data-invite-id");
+                if (!inviteId || !confirm("Cancel this invite?")) return;
+                try {
+                  await cancelTripInvite(inviteId);
+                  loadTripDashboard();
+                } catch (err) {
+                  alert(err.message || "Could not cancel invite");
+                }
+              });
+            });
+          }
+        }
       }
       const friendsToShow = data.friends || [];
       if (inviteSection) {

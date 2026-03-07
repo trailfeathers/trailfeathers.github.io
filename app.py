@@ -41,6 +41,8 @@ from database.database import (
     accept_trip_invite,
     decline_trip_invite,
     get_trip_id_for_invite,
+    remove_trip_collaborator,
+    cancel_trip_invite,
     list_requirement_types,
     get_trip_requirement_summary,
     get_trip_gear_pool,
@@ -102,8 +104,10 @@ def create_app():
     @app.route("/api/trips/<int:trip_id>/checklist", methods=["OPTIONS"])
     @app.route("/api/requirement-types", methods=["OPTIONS"])
     @app.route("/api/trips/<int:trip_id>/collaborators", methods=["OPTIONS"])
+    @app.route("/api/trips/<int:trip_id>/collaborators/<int:user_id>", methods=["OPTIONS"])
     @app.route("/api/trips/<int:trip_id>/invites", methods=["OPTIONS"])
     @app.route("/api/trip-invites", methods=["OPTIONS"])
+    @app.route("/api/trip-invites/<int:invite_id>", methods=["OPTIONS"])
     @app.route("/api/trip-invites/<int:invite_id>/accept", methods=["OPTIONS"])
     @app.route("/api/trip-invites/<int:invite_id>/decline", methods=["OPTIONS"])
     @app.route("/api/trips/<int:trip_id>/gear", methods=["OPTIONS"])
@@ -114,8 +118,8 @@ def create_app():
     @app.route("/api/locations", methods=["OPTIONS"])
     @app.route("/api/me/favorites", methods=["OPTIONS"])
     @app.route("/api/me/favorites/<int:trip_report_info_id>", methods=["OPTIONS"])
-    def options_auth(request_id=None, trip_id=None, invite_id=None, gear_id=None, trip_report_info_id=None):
-        # gear_id used by OPTIONS /api/gear/<int:gear_id>
+    def options_auth(request_id=None, trip_id=None, invite_id=None, gear_id=None, trip_report_info_id=None, user_id=None):
+        # gear_id used by OPTIONS /api/gear/<int:gear_id>; user_id for DELETE collaborators
         return "", 200
 
     # ----------------------
@@ -803,6 +807,39 @@ def create_app():
             if tid is not None:
                 login.invalidate_trip_dashboard_cache(tid)
             return jsonify(ok=True), 200
+        return jsonify(error="Invite not found or already responded to"), 404
+
+    @app.delete("/api/trips/<int:trip_id>/collaborators/<int:user_id>")
+    def delete_trip_collaborator(trip_id, user_id):
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        trip = get_trip(trip_id)
+        if not trip:
+            return jsonify(error="Not found"), 404
+        if trip["creator_id"] != user["id"]:
+            return jsonify(error="Only the trip creator can remove members"), 403
+        try:
+            remove_trip_collaborator(trip_id, user_id, user["id"])
+            login.invalidate_trip_dashboard_cache(trip_id)
+            return "", 200
+        except ValueError as e:
+            return jsonify(error=str(e)), 400
+
+    @app.delete("/api/trip-invites/<int:invite_id>")
+    def cancel_trip_invite_route(invite_id):
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        trip_id = get_trip_id_for_invite(invite_id)
+        if trip_id is None:
+            return jsonify(error="Invite not found"), 404
+        trip = get_trip(trip_id)
+        if not trip or trip["creator_id"] != user["id"]:
+            return jsonify(error="Only the trip creator can cancel invites"), 404
+        if cancel_trip_invite(invite_id, user["id"]):
+            login.invalidate_trip_dashboard_cache(trip_id)
+            return "", 200
         return jsonify(error="Invite not found or already responded to"), 404
 
     # ----------------------

@@ -872,6 +872,43 @@ def get_trip_id_for_invite(invite_id):
         return row["trip_id"] if row else None
 
 
+def remove_trip_collaborator(trip_id, user_id, removed_by_user_id):
+    """Remove a collaborator from a trip. Only the trip creator may remove; cannot remove the creator.
+    Raises ValueError if not creator, trip not found, or target is creator."""
+    trip = get_trip(trip_id)
+    if not trip:
+        raise ValueError("Trip not found.")
+    if trip["creator_id"] != removed_by_user_id:
+        raise ValueError("Only the trip creator can remove members.")
+    if trip["creator_id"] == user_id:
+        raise ValueError("Cannot remove the trip creator.")
+    with get_cursor() as cur:
+        cur.execute(
+            "DELETE FROM trip_collaborators WHERE trip_id = %s AND user_id = %s",
+            (trip_id, user_id),
+        )
+        if cur.rowcount == 0:
+            raise ValueError("User is not a member of this trip.")
+
+
+def cancel_trip_invite(invite_id, cancelled_by_user_id):
+    """Cancel a pending invite. Only the trip creator may cancel. Deletes the invite row.
+    Returns True if a row was deleted, False otherwise."""
+    with get_cursor() as cur:
+        cur.execute(
+            """SELECT ti.id, ti.trip_id, ti.status
+               FROM trip_invites ti
+               JOIN trips t ON t.id = ti.trip_id
+               WHERE ti.id = %s AND ti.status = 'pending' AND t.creator_id = %s""",
+            (invite_id, cancelled_by_user_id),
+        )
+        row = cur.fetchone()
+        if not row:
+            return False
+        cur.execute("DELETE FROM trip_invites WHERE id = %s", (invite_id,))
+        return cur.rowcount > 0
+
+
 # ---------- Trip Gear (Equipment Assignment) ----------
 def get_trip_gear_pool(trip_id):
     """Get all gear from trip collaborators that could be assigned to this trip. Includes requirement_type and capacity_persons."""
