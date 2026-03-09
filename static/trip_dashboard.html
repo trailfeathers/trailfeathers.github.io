@@ -17,7 +17,7 @@
   <main class="content trip-dashboard">
     <div class="trip-dashboard-layout">
       <nav class="trip-dashboard-nav">
-        <button type="button" id="back-to-trips" class="secondary">← Back to trips</button>
+        <button type="button" id="back-to-trips" class="secondary">← Back to Trips</button>
       </nav>
 
       <section class="trip-dashboard-summary">
@@ -38,7 +38,7 @@
           <div id="trip-assigned-gear-list"></div>
         </section>
         <section id="trip-dashboard-checklist" class="trip-dashboard-section" style="display: none;">
-          <h2>What to bring</h2>
+          <h2>What to Bring</h2>
           <ul id="trip-checklist-list"></ul>
         </section>
       </div>
@@ -52,19 +52,19 @@
 
       <div class="trip-dashboard-block trip-dashboard-team">
         <section id="trip-dashboard-members" class="trip-dashboard-section" style="display: none;">
-          <h2>Trip members</h2>
+          <h2>Trip Members</h2>
           <div id="trip-collaborators-list"></div>
         </section>
         <section id="trip-dashboard-pending-invites" class="trip-dashboard-section" style="display: none;">
-          <h2>Pending invites</h2>
+          <h2>Pending Invites</h2>
           <div id="trip-pending-invites-list"></div>
         </section>
         <section id="trip-dashboard-invite-friend" class="trip-dashboard-section" style="display: none;">
-          <h2>Invite a friend</h2>
+          <h2>Invite a Friend</h2>
           <select id="trip-invite-friend-select">
             <option value="">Choose a friend…</option>
           </select>
-          <button type="button" id="trip-invite-friend-btn">Send invite</button>
+          <button type="button" id="trip-invite-friend-btn">Send Invite</button>
           <p id="trip-invite-error" class="error"></p>
         </section>
       </div>
@@ -74,11 +74,11 @@
   <div id="edit-trip-modal" class="edit-trip-modal" role="dialog" aria-labelledby="edit-trip-modal-title" aria-modal="true" style="display: none;">
     <div class="edit-trip-modal-backdrop"></div>
     <div class="edit-trip-modal-content">
-      <h2 id="edit-trip-modal-title">Edit trip</h2>
+      <h2 id="edit-trip-modal-title">Edit Trip</h2>
       <form id="edit-trip-form">
         <input type="hidden" id="edit-trip-id" />
-        <label for="edit-trip-name">Trip name</label>
-        <input type="text" id="edit-trip-name" placeholder="Trip name" required />
+        <label for="edit-trip-name">Trip Name</label>
+        <input type="text" id="edit-trip-name" placeholder="Trip Name" required />
         <label for="edit-trip-location-search">Location (search and select from catalog)</label>
         <div class="location-combobox edit-trip-combobox" role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-owns="edit-trip-location-listbox">
           <input type="text" id="edit-trip-location-search" placeholder="e.g. Wonderland Trail" autocomplete="off" aria-autocomplete="list" aria-controls="edit-trip-location-listbox" />
@@ -87,7 +87,7 @@
         </div>
         <label for="edit-trip-activity">Activity</label>
         <select id="edit-trip-activity" required>
-          <option value="">Select activity…</option>
+          <option value="">Select Activity…</option>
           <option value="Backpacking">Backpacking</option>
           <option value="Hiking">Hiking</option>
           <option value="Car Camping">Car Camping</option>
@@ -101,7 +101,7 @@
         <textarea id="edit-trip-notes" placeholder="e.g. Can you buy meals? I don't have a filter." rows="3"></textarea>
         <div class="edit-trip-modal-actions">
           <button type="button" id="edit-trip-cancel" class="secondary">Cancel</button>
-          <button type="submit">Save changes</button>
+          <button type="submit">Save Changes</button>
         </div>
       </form>
       <p id="edit-trip-error" class="error"></p>

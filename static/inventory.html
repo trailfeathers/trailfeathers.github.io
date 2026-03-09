@@ -15,19 +15,9 @@
 
   <main class="content gear-dashboard">
     <div class="gear-dashboard-layout">
-      <div class="gear-dashboard-main">
-        <div class="gear-library-toolbar">
-          <button type="button" id="edit-gear-btn" class="secondary">Edit gear</button>
-        </div>
-        <section class="gear-dashboard-categories" id="gear-categories">
-          <!-- Category sections filled by script.js from GET /api/gear -->
-          <p class="gear-loading" id="gear-loading">Loading…</p>
-        </section>
-      </div>
-
-      <aside class="gear-dashboard-add">
+      <aside class="gear-dashboard-sidebar">
         <section id="edit-gear-section" class="gear-dashboard-section" style="display: none;">
-          <h2>Edit item</h2>
+          <h2>Edit Item</h2>
           <form id="edit-gear-form" class="gear-form">
             <input type="hidden" id="edit-gear-id" />
             <label>Type <select id="edit-gear-type"><option value="">Loading…</option></select></label>
@@ -48,6 +38,19 @@
             </div>
           </form>
         </section>
+      </aside>
+
+      <div class="gear-dashboard-main">
+        <div class="gear-library-toolbar">
+          <button type="button" id="edit-gear-btn" class="secondary">Edit Gear</button>
+        </div>
+        <section class="gear-dashboard-categories" id="gear-categories">
+          <!-- Category sections filled by script.js from GET /api/gear -->
+          <p class="gear-loading" id="gear-loading">Loading…</p>
+        </section>
+      </div>
+
+      <aside class="gear-dashboard-add">
         <section class="gear-dashboard-section">
           <h2>Add Equipment</h2>
           <form id="add-item-form" class="gear-form">
