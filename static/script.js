@@ -208,13 +208,34 @@ document.addEventListener("DOMContentLoaded", () => {
             const meta = [item.capacity ? `Capacity: ${escapeHtml(String(item.capacity))}` : null, coversLabel, item.weight_oz != null ? `${item.weight_oz} oz` : null, item.brand ? escapeHtml(item.brand) : null].filter(Boolean).join(" · ");
             const liClass = gearEditMode ? "gear-category-item gear-item-editable" : "gear-category-item";
             const dataId = gearEditMode ? ` data-gear-id="${item.id}"` : "";
-            return `<li class="${liClass}"${dataId}><strong>${escapeHtml(typeLabel)}</strong>: ${escapeHtml(item.name || "—")}${item.condition || item.notes ? ` <span class="gear-meta">${[item.condition, item.notes].filter(Boolean).map(escapeHtml).join(" — ")}</span>` : ""}${meta ? ` <span class="gear-meta">${meta}</span>` : ""}</li>`;
+            const deleteBtn = `<button type="button" class="btn-delete-gear" data-gear-id="${item.id}" title="Delete this item">×</button>`;
+            return `<li class="${liClass}"${dataId}><span class="gear-item-content"><strong>${escapeHtml(typeLabel)}</strong>: ${escapeHtml(item.name || "—")}${item.condition || item.notes ? ` <span class="gear-meta">${[item.condition, item.notes].filter(Boolean).map(escapeHtml).join(" — ")}</span>` : ""}${meta ? ` <span class="gear-meta">${meta}</span>` : ""}</span>${deleteBtn}</li>`;
           })
           .join("");
         return `<div class="gear-category-section"><h3>${escapeHtml(category)}</h3><ul>${listItems}</ul></div>`;
       })
       .join("");
     gearCategoriesEl.innerHTML = html;
+    
+    // Add delete button handlers
+    gearCategoriesEl.querySelectorAll(".btn-delete-gear").forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        const id = btn.getAttribute("data-gear-id");
+        if (!id) return;
+        if (!confirm("Delete this item? This cannot be undone.")) return;
+        try {
+          const r = await fetch(API_BASE + "/api/gear/" + encodeURIComponent(id), {
+            method: "DELETE",
+            credentials: "include"
+          });
+          if (r.ok) {
+            loadGear();
+          }
+        } catch (_) {}
+      });
+    });
+    
     if (gearEditMode) {
       gearCategoriesEl.querySelectorAll(".gear-item-editable").forEach((el) => {
         el.addEventListener("click", () => {

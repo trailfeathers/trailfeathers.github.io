@@ -367,6 +367,10 @@ body {
   padding: 0.6rem 0;
   border-bottom: 1px solid #f0f0f0;
   font-size: 0.95rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .gear-category-item:last-child {
@@ -381,6 +385,33 @@ body {
   color: #555;
   font-size: 0.9rem;
   margin-top: 0.2rem;
+}
+
+.gear-item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.btn-delete-gear {
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.2s;
+}
+
+.btn-delete-gear:hover {
+  background: #c82333;
 }
 
 .gear-item-editable {
@@ -575,27 +606,34 @@ body {
 #create-trip-form button,
 #trip-form input,
 #trip-form textarea {
-  padding: 0.85rem 1rem;
+  padding: 0.65rem 0.85rem;
   border-radius: 8px;
   border: 1px solid #ccc;
-  font-size: 1.15rem;
-  min-height: 48px;
+  font-size: 0.95rem;
+  min-height: 40px;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
 }
 
+#create-trip-form textarea,
+#trip-form textarea {
+  font-size: 1rem;
+  min-height: 100px;
+  resize: vertical;
+}
+
 #create-trip-form label,
 #trip-form label {
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   margin-bottom: -0.5rem;
 }
 
 #create-trip-form button,
 #trip-form button {
-  min-height: 52px;
-  padding: 0.9rem 1.5rem;
-  font-size: 1.15rem;
+  min-height: 40px;
+  padding: 0.65rem 1rem;
+  font-size: 0.95rem;
   cursor: pointer;
   width: auto;
 }

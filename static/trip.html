@@ -15,7 +15,7 @@
 
   <main class="content trip-planner">
     <section class="trip-invites-section" id="trip-invites-section" style="display: none;">
-      <h2>Trip invites</h2>
+      <h2>Trip Invites</h2>
       <div id="trip-invites-list"></div>
     </section>
 
@@ -23,7 +23,7 @@
       <section class="trip-overview">
         <div class="trip-overview-toolbar">
           <h2>Active Trips</h2>
-          <button type="button" id="edit-trips-btn" class="secondary">Edit trips</button>
+          <button type="button" id="edit-trips-btn" class="secondary">Edit Trips</button>
         </div>
         <div id="trip-list"></div>
       </section>
@@ -51,7 +51,7 @@
           <input type="date" id="trip-date" placeholder="Start date" />
           <label for="trip-notes">Notes (optional)</label>
           <textarea id="trip-notes" placeholder="e.g. Can you buy meals? I don't have a filter." rows="3"></textarea>
-          <button type="submit">Create trip</button>
+          <button type="submit">Create Trip</button>
         </form>
         <p id="create-trip-error" class="error"></p>
       </section>
@@ -67,10 +67,10 @@
   <div id="edit-trip-modal" class="edit-trip-modal" role="dialog" aria-labelledby="edit-trip-modal-title" aria-modal="true" style="display: none;">
     <div class="edit-trip-modal-backdrop"></div>
     <div class="edit-trip-modal-content">
-      <h2 id="edit-trip-modal-title">Edit trip</h2>
+      <h2 id="edit-trip-modal-title">Edit Trip</h2>
       <form id="edit-trip-form">
         <input type="hidden" id="edit-trip-id" />
-        <label for="edit-trip-name">Trip name</label>
+        <label for="edit-trip-name">Trip Name</label>
         <input type="text" id="edit-trip-name" placeholder="Trip name" required />
         <label for="edit-trip-location-search">Location (search and select from catalog)</label>
         <div class="location-combobox edit-trip-combobox" role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-owns="edit-trip-location-listbox">
@@ -94,7 +94,7 @@
         <textarea id="edit-trip-notes" placeholder="e.g. Can you buy meals? I don't have a filter." rows="3"></textarea>
         <div class="edit-trip-modal-actions">
           <button type="button" id="edit-trip-cancel" class="secondary">Cancel</button>
-          <button type="submit">Save changes</button>
+          <button type="submit">Save Changes</button>
         </div>
       </form>
       <p id="edit-trip-error" class="error"></p>
