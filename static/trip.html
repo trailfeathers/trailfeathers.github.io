@@ -20,6 +20,10 @@
     </section>
 
     <div class="trip-planner-layout">
+      <nav class="trip-planner-nav">
+        <a href="dashboard.html" class="secondary nav-back">← Back to Home</a>
+      </nav>
+
       <section class="trip-overview">
         <div class="trip-overview-toolbar">
           <h2>Active Trips</h2>
@@ -31,7 +35,7 @@
       <section class="trip-setup">
         <h2>Create a Trip</h2>
         <form id="create-trip-form">
-          <input type="text" id="trip-name" placeholder="Trip name" required />
+          <input type="text" id="trip-name" placeholder="Trip Name" required />
           <label for="trip-location-search">Location (search and select from catalog)</label>
           <div class="location-combobox" role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-owns="trip-location-listbox">
             <input type="text" id="trip-location-search" placeholder="e.g. Wonderland Trail" autocomplete="off" aria-autocomplete="list" aria-controls="trip-location-listbox" />
@@ -40,7 +44,7 @@
           </div>
           <label for="trip-activity">Activity</label>
           <select id="trip-activity" required>
-            <option value="">Select activity…</option>
+            <option value="">Select Activity…</option>
             <option value="Backpacking">Backpacking</option>
             <option value="Hiking">Hiking</option>
             <option value="Car Camping">Car Camping</option>
@@ -71,7 +75,7 @@
       <form id="edit-trip-form">
         <input type="hidden" id="edit-trip-id" />
         <label for="edit-trip-name">Trip Name</label>
-        <input type="text" id="edit-trip-name" placeholder="Trip name" required />
+        <input type="text" id="edit-trip-name" placeholder="Trip Name" required />
         <label for="edit-trip-location-search">Location (search and select from catalog)</label>
         <div class="location-combobox edit-trip-combobox" role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-owns="edit-trip-location-listbox">
           <input type="text" id="edit-trip-location-search" placeholder="e.g. Wonderland Trail" autocomplete="off" aria-autocomplete="list" aria-controls="edit-trip-location-listbox" />
@@ -80,7 +84,7 @@
         </div>
         <label for="edit-trip-activity">Activity</label>
         <select id="edit-trip-activity" required>
-          <option value="">Select activity…</option>
+          <option value="">Select Activity…</option>
           <option value="Backpacking">Backpacking</option>
           <option value="Hiking">Hiking</option>
           <option value="Car Camping">Car Camping</option>

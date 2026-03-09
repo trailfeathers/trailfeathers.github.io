@@ -331,6 +331,27 @@ body {
   gap: 1.5rem;
 }
 
+.gear-dashboard-nav {
+  margin-bottom: 0;
+  grid-column: 1 / -1;
+}
+
+.gear-dashboard-nav .nav-back {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 2px solid #2c5f2d;
+  background-color: white;
+  color: #2c5f2d;
+  font-size: 0.95rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.gear-dashboard-nav .nav-back:hover {
+  background-color: #f0f5eb;
+}
+
 @media (min-width: 1024px) {
   .gear-dashboard-layout {
     display: grid;
@@ -577,6 +598,27 @@ body {
   gap: 2rem;
   align-items: flex-start;
   flex-wrap: wrap;
+}
+
+.trip-planner-nav {
+  margin-bottom: 0;
+  width: 100%;
+}
+
+.trip-planner-nav .nav-back {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 2px solid #2c5f2d;
+  background-color: white;
+  color: #2c5f2d;
+  font-size: 0.95rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.trip-planner-nav .nav-back:hover {
+  background-color: #f0f5eb;
 }
 
 .trip-setup,
