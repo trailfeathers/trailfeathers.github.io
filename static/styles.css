@@ -251,6 +251,9 @@ body {
   margin-top: 0.35rem;
   padding: 0.5rem;
   font-size: 1rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 .gear-form button {
   margin-top: 0.5rem;
