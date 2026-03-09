@@ -335,6 +335,18 @@ body {
     gap: 1.5rem;
     align-items: start;
   }
+  
+  .gear-dashboard-sidebar-left {
+    grid-column: 1;
+  }
+  
+  .gear-dashboard-main {
+    grid-column: 2;
+  }
+  
+  .gear-dashboard-sidebar-right {
+    grid-column: 3;
+  }
 }
 
 .gear-dashboard-main {
