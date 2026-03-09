@@ -319,7 +319,7 @@ body {
 }
 
 .gear-dashboard-layout {
-  max-width: 1100px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 0 1rem 2rem;
   width: 100%;
@@ -328,16 +328,24 @@ body {
   gap: 1.5rem;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .gear-dashboard-layout {
     display: grid;
-    grid-template-columns: 1fr minmax(360px, 420px);
+    grid-template-columns: minmax(280px, 320px) 1fr minmax(280px, 320px);
     gap: 1.5rem;
     align-items: start;
   }
 }
 
 .gear-dashboard-main {
+  min-width: 0;
+}
+
+.gear-dashboard-sidebar-left {
+  min-width: 0;
+}
+
+.gear-dashboard-sidebar-right {
   min-width: 0;
 }
 
@@ -445,10 +453,6 @@ body {
   margin-top: 1.25rem;
   padding-top: 1rem;
   border-top: 1px solid #eee;
-}
-
-.gear-dashboard-add {
-  min-width: 0;
 }
 
 .gear-dashboard-section {
