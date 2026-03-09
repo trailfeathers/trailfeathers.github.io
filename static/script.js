@@ -1679,3 +1679,23 @@ if (backToTrips) {
     window.location.href = "trip.html";
   });
 }
+
+// Logout button (appears on all authenticated pages)
+const logoutBtn = document.querySelector("#logout-btn");
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", async () => {
+    try {
+      const res = await fetch(API_BASE + "/api/logout", {
+        method: "POST",
+        credentials: "include"
+      });
+      if (res.ok) {
+        window.location.href = "login.html";
+      }
+    } catch (err) {
+      console.error("Logout failed:", err);
+      // Still redirect to login on error
+      window.location.href = "login.html";
+    }
+  });
+}
