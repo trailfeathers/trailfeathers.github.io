@@ -16,6 +16,38 @@
   <main class="content gear-dashboard">
     <div class="gear-dashboard-layout">
       <aside class="gear-dashboard-sidebar-left">
+        <section id="edit-gear-section" class="gear-dashboard-section" style="display: none;">
+          <h2>Edit Item</h2>
+          <form id="edit-gear-form" class="gear-form">
+            <input type="hidden" id="edit-gear-id" />
+            <label>Type <select id="edit-gear-type"><option value="">Loading…</option></select></label>
+            <label>Name <input type="text" id="edit-gear-name" placeholder="e.g. 2-person tent" required /></label>
+            <label>Capacity (text) <input type="text" id="edit-gear-capacity" placeholder="e.g. 2P" maxlength="50" /></label>
+            <label>Capacity (people) <input type="number" id="edit-gear-capacity-persons" placeholder="e.g. 2" min="1" step="1" /></label>
+            <label>Weight (oz) <input type="number" id="edit-gear-weight" placeholder="optional" min="0" step="0.1" /></label>
+            <label>Brand <input type="text" id="edit-gear-brand" placeholder="optional" /></label>
+            <label>Condition <input type="text" id="edit-gear-condition" placeholder="e.g. like new" /></label>
+            <label>Notes <input type="text" id="edit-gear-notes" placeholder="optional" /></label>
+            <div class="edit-gear-actions">
+              <button type="submit" class="primary">Save</button>
+              <button type="button" id="edit-gear-cancel" class="secondary">Cancel</button>
+            </div>
+            <p id="edit-gear-error" class="form-error" aria-live="polite"></p>
+          </form>
+        </section>
+      </aside>
+
+      <div class="gear-dashboard-main">
+        <div class="gear-library-toolbar">
+          <button type="button" id="edit-gear-btn" class="secondary">Edit Gear</button>
+        </div>
+        <section class="gear-dashboard-categories" id="gear-categories">
+          <!-- Category sections filled by script.js from GET /api/gear -->
+          <p class="gear-loading" id="gear-loading">Loading…</p>
+        </section>
+      </div>
+
+      <aside class="gear-dashboard-sidebar-right">
         <section class="gear-dashboard-section">
           <h2>Add Equipment</h2>
           <form id="add-item-form" class="gear-form">
@@ -49,41 +81,6 @@
             </label>
             <button type="submit" class="primary">Add</button>
             <p id="add-gear-error" class="form-error" aria-live="polite"></p>
-          </form>
-        </section>
-      </aside>
-
-      <div class="gear-dashboard-main">
-        <div class="gear-library-toolbar">
-          <button type="button" id="edit-gear-btn" class="secondary">Edit Gear</button>
-        </div>
-        <section class="gear-dashboard-categories" id="gear-categories">
-          <!-- Category sections filled by script.js from GET /api/gear -->
-          <p class="gear-loading" id="gear-loading">Loading…</p>
-        </section>
-      </div>
-
-      <aside class="gear-dashboard-sidebar-right">
-        <section id="edit-gear-section" class="gear-dashboard-section" style="display: none;">
-          <h2>Edit Item</h2>
-          <form id="edit-gear-form" class="gear-form">
-            <input type="hidden" id="edit-gear-id" />
-            <label>Type <select id="edit-gear-type"><option value="">Loading…</option></select></label>
-            <label>Name <input type="text" id="edit-gear-name" placeholder="e.g. 2-person tent" required /></label>
-            <label>Capacity (text) <input type="text" id="edit-gear-capacity" placeholder="e.g. 2P" maxlength="50" /></label>
-            <label>Capacity (people) <input type="number" id="edit-gear-capacity-persons" placeholder="e.g. 2" min="1" step="1" /></label>
-            <label>Weight (oz) <input type="number" id="edit-gear-weight" placeholder="optional" min="0" step="0.1" /></label>
-            <label>Brand <input type="text" id="edit-gear-brand" placeholder="optional" /></label>
-            <label>Condition <input type="text" id="edit-gear-condition" placeholder="e.g. like new" /></label>
-            <label>Notes <input type="text" id="edit-gear-notes" placeholder="optional" /></label>
-            <div class="edit-gear-actions">
-              <button type="submit" class="primary">Save</button>
-              <button type="button" id="edit-gear-cancel" class="secondary">Cancel</button>
-            </div>
-            <p id="edit-gear-error" class="form-error" aria-live="polite"></p>
-            <div class="edit-gear-delete">
-              <button type="button" id="edit-gear-delete-btn" class="danger">Delete item</button>
-            </div>
           </form>
         </section>
       </aside>

@@ -449,11 +449,6 @@ body {
   gap: 0.5rem;
   margin-top: 1rem;
 }
-.edit-gear-delete {
-  margin-top: 1.25rem;
-  padding-top: 1rem;
-  border-top: 1px solid #eee;
-}
 
 .gear-dashboard-section {
   background: white;

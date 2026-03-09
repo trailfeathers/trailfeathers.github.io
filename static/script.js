@@ -289,7 +289,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const editGearNotesEl = document.querySelector("#edit-gear-notes");
   const editGearErrorEl = document.querySelector("#edit-gear-error");
   const editGearCancelBtn = document.querySelector("#edit-gear-cancel");
-  const editGearDeleteBtn = document.querySelector("#edit-gear-delete-btn");
 
   async function loadEditGearTypes() {
     if (!editGearTypeSelect) return;
@@ -380,20 +379,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
   if (editGearCancelBtn) editGearCancelBtn.addEventListener("click", closeEditGearPanel);
-  if (editGearDeleteBtn) {
-    editGearDeleteBtn.addEventListener("click", async () => {
-      const id = editGearIdEl && editGearIdEl.value;
-      if (!id) return;
-      try {
-        const r = await fetch(API_BASE + "/api/gear/" + encodeURIComponent(id), { method: "DELETE", credentials: "include" });
-        if (r.ok) {
-          closeEditGearPanel();
-          loadGear();
-          return;
-        }
-      } catch (_) {}
-    });
-  }
 
   const editGearBtn = document.querySelector("#edit-gear-btn");
   if (editGearBtn) {
