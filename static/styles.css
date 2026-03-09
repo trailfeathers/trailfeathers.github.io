@@ -99,9 +99,19 @@ body {
 .content {
   display: flex;
   justify-content: center;
-  margin-top: 3rem;
+  margin-top: 2rem;
   flex-direction: column;
   align-items: center;
+}
+
+#welcome {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+#welcome-message {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
 }
 
 
@@ -261,7 +271,7 @@ body {
   display: flex;
   justify-content: center;
   gap: 2rem;
-  margin: 3rem auto;
+  margin: 1rem auto;
   padding: 0 2rem;
   max-width: none;        /* use full width; remove to allow very wide layouts */
   width: 100%;
@@ -309,7 +319,7 @@ body {
 }
 
 .gear-dashboard-layout {
-  max-width: 960px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 0 1rem 2rem;
   width: 100%;
@@ -321,7 +331,7 @@ body {
 @media (min-width: 768px) {
   .gear-dashboard-layout {
     display: grid;
-    grid-template-columns: 1fr minmax(320px, 380px);
+    grid-template-columns: 1fr minmax(360px, 420px);
     gap: 1.5rem;
     align-items: start;
   }
