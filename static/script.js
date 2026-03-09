@@ -399,7 +399,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (editGearBtn) {
     editGearBtn.addEventListener("click", () => {
       gearEditMode = !gearEditMode;
-      editGearBtn.textContent = gearEditMode ? "Done" : "Edit gear";
+      editGearBtn.textContent = gearEditMode ? "Done" : "Edit Gear";
       if (!gearEditMode) closeEditGearPanel();
       if (lastGearItems.length) renderGearList(lastGearItems);
     });
