@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TrailFeathers — Trip Report</title>
+  <link rel="stylesheet" href="social_styles.css" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #f7f7f7; color: #222; line-height: 1.5; min-height: 100vh; }
+    .content { max-width: 960px; margin: 0 auto; padding: 0 1rem 2rem; width: 100%; }
+    .banner { background: linear-gradient(135deg, #2c5f2d, #97bc62); color: white; padding: 2rem; text-align: center; }
+    .banner h1 { font-size: 2rem; margin-bottom: 0.25rem; }
+    .banner-subtitle { font-size: 1rem; opacity: 0.95; }
+    .banner a { color: white; }
+  </style>
+</head>
+<body>
+  <p style="margin:0; padding:0.5rem 1rem; background:#2c5f2d; color:white; font-size:1rem;">TrailFeathers — Trip Report</p>
+  <header class="banner">
+    <a href="../dashboard.html" aria-label="Trail Feathers home">Trail Feathers</a>
+    <h1 id="report-title">Loading…</h1>
+    <p class="banner-subtitle" id="report-trail"></p>
+  </header>
+
+  <main class="content">
+    <nav class="report-view-nav">
+      <a href="friends.html">← Back to Social Center</a>
+      <button type="button" id="btn-edit-report" class="btn btn-secondary" style="display:none;">Edit report</button>
+    </nav>
+
+    <div class="report-view-body">
+      <div class="report-image" aria-label="Trip report photo">
+        <span class="report-image-placeholder">Image</span>
+      </div>
+      <div class="report-text">
+        <div class="report-view-display" id="report-display">
+          <p class="report-meta"><strong>Date hiked:</strong> <span id="display-date">—</span></p>
+          <div class="report-body" id="report-body"></div>
+        </div>
+        <form id="report-edit-form" class="report-view-edit report-edit-form hidden">
+          <label for="edit-title">Title</label>
+          <input type="text" id="edit-title" placeholder="Trip report title" required />
+          <label for="edit-trail">Trail (from catalog)</label>
+          <select id="edit-trail">
+            <option value="">Choose a hike…</option>
+          </select>
+          <label for="edit-date">Date hiked</label>
+          <input type="date" id="edit-date" />
+          <label for="edit-body">Report</label>
+          <textarea id="edit-body" placeholder="How it went, conditions, highlights…"></textarea>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Save</button>
+            <button type="button" id="btn-cancel-edit" class="btn btn-secondary">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+  <script src="social_script.js"></script>
+</body>
+</html>

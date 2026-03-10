@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TrailFeathers — Profile</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #f7f7f7; color: #222; line-height: 1.4; min-height: 100vh; }
+    .content { max-width: 960px; margin: 0 auto; padding: 0 1rem 2rem; width: 100%; display: block; }
+    .banner { background: linear-gradient(135deg, #2c5f2d, #97bc62); color: white; padding: 2rem; text-align: center; }
+    .banner h1 { font-size: 2rem; margin-bottom: 0.25rem; }
+    .banner-subtitle { font-size: 1rem; opacity: 0.95; }
+    .banner a { color: white; }
+    .profile-view-layout { display: block; }
+    .profile-view-nav { margin-bottom: 1rem; }
+    .profile-view-nav a { color: #2c5f2d; }
+    .profile-view-block { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem; }
+    @media (min-width: 768px) {
+      .profile-view-block.profile-view-block--two { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    }
+    .friends-dashboard-section { margin: 0; background: white; padding: 1.25rem 1.5rem; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 1.5rem; }
+    .friends-dashboard-section h2 { font-size: 1.15rem; margin-bottom: 0.5rem; color: #333; }
+    .friends-section-desc { font-size: 0.9rem; color: #555; margin-bottom: 0.5rem; }
+    .friends-form .primary { padding: 0.45rem 0.9rem; background: #2c5f2d; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; }
+    .friends-form .secondary { padding: 0.45rem 0.9rem; background: #fff; color: #2c5f2d; border: 2px solid #2c5f2d; border-radius: 8px; cursor: pointer; font-size: 0.85rem; margin-right: 0.5rem; }
+    .profile-picture-circle { width: 80px; height: 80px; border-radius: 50%; background: #e0e0e0; flex-shrink: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .profile-picture-circle img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+    .profile-picture-placeholder { font-size: 0.7rem; color: #999; }
+    .profile-view-header { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 0; }
+    .profile-display-name { font-size: 1.1rem; font-weight: 600; color: #222; margin-bottom: 0.25rem; }
+    .profile-display-bio { font-size: 0.95rem; color: #555; white-space: pre-wrap; }
+    .relationship-status { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+    .relationship-status-badge { font-size: 0.9rem; color: #555; padding: 0.35rem 0.6rem; background: #f0f0f0; border-radius: 6px; }
+    .relationship-status-badge.friend { background: #e8f0e8; color: #2c5f2d; }
+    .relationship-status-badge.pending { background: #fff8e0; color: #8a7000; }
+    .top-four-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 0.75rem; }
+    @media (max-width: 640px) { .top-four-cards { grid-template-columns: repeat(2, 1fr); } }
+    .top-four-card { text-align: center; }
+    .top-four-thumb { width: 100%; aspect-ratio: 1; max-width: 140px; margin: 0 auto 0.5rem; border-radius: 8px; background: #e0e0e0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .top-four-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .top-four-thumb-placeholder { font-size: 0.7rem; color: #999; }
+    .top-four-name { font-size: 0.85rem; color: #333; }
+    .trip-reports-list .trip-report-item { padding: 0.5rem 0; font-size: 0.9rem; border-bottom: 1px solid #eee; }
+    .trip-reports-list .trip-report-item:last-child { border-bottom: none; }
+    .trip-reports-list .trip-report-item a { color: #2c5f2d; }
+    .friends-preview-notice { text-align: center; color: #555; padding: 0.75rem; background: #e8f0e8; border-radius: 8px; margin-bottom: 1rem; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <p style="margin:0; padding:0.5rem 1rem; background:#2c5f2d; color:white; font-size:1rem;">TrailFeathers — Profile</p>
+  <header class="banner banner--friends">
+    <a href="../dashboard.html" class="banner-logo-link" aria-label="Trail Feathers home">Trail Feathers</a>
+    <h1 id="banner-title">Profile</h1>
+    <p class="banner-subtitle" id="banner-username"></p>
+  </header>
+
+  <main class="content">
+    <div class="profile-view-layout">
+      <nav class="profile-view-nav">
+        <a href="friends.html" class="secondary nav-back">← Back to Social Center</a>
+      </nav>
+
+      <!-- Profile (left) + Relationship status (right) -->
+      <div class="profile-view-block profile-view-block--two">
+        <section class="friends-dashboard-section">
+          <h2>Profile</h2>
+          <div class="profile-view-header">
+            <div id="profile-picture-circle" class="profile-picture-circle" aria-label="Profile picture">
+              <span class="profile-picture-placeholder">Photo</span>
+            </div>
+            <div style="flex:1; min-width:0;">
+              <p id="profile-display-name" class="profile-display-name"></p>
+              <p id="profile-display-bio" class="profile-display-bio"></p>
+            </div>
+          </div>
+        </section>
+        <section class="friends-dashboard-section" id="relationship-section">
+          <h2>Relationship</h2>
+          <p id="relationship-status-text" class="friends-section-desc"></p>
+          <div class="relationship-status">
+            <span id="relationship-badge" class="relationship-status-badge"></span>
+            <button type="button" id="btn-manage-friend" class="secondary" style="display:none;"></button>
+            <button type="button" id="btn-manage-friend-2" class="secondary" style="display:none;"></button>
+          </div>
+        </section>
+      </div>
+
+      <!-- Top four hikes (display only) -->
+      <section class="friends-dashboard-section">
+        <h2>Top four hikes</h2>
+        <p class="friends-section-desc">Their four favorite hikes from the catalog.</p>
+        <div id="top-four-cards" class="top-four-cards"></div>
+      </section>
+
+      <!-- Trip reports -->
+      <section class="friends-dashboard-section">
+        <h2>Trip reports</h2>
+        <p class="friends-section-desc">Hikes they've written about.</p>
+        <div id="profile-trip-reports-list" class="trip-reports-list">
+          <p class="friends-section-desc">No trip reports yet.</p>
+        </div>
+      </section>
+    </div>
+
+    <div id="dash-options" style="display: flex; justify-content: center; gap: 1rem; margin: 2rem 0; flex-wrap: wrap;">
+      <button type="button" id="home">Home</button>
+      <button type="button" id="inventory">My Gear Library</button>
+      <button type="button" id="plan-trip">Plan a Trip</button>
+    </div>
+  </main>
+
+  <script src="profile_view.js"></script>
+</body>
+</html>

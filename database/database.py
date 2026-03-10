@@ -556,11 +556,18 @@ def list_favorite_hikes(user_id):
 
 
 def add_favorite_hike(user_id, trip_report_info_id):
-    """Add a hike to user's favorites. Ignores if already present. Raises ValueError if trip_report_info_id invalid."""
+    """Add a hike to user's favorites. At most 4 per user. Ignores if already present. Raises ValueError if trip_report_info_id invalid or limit reached."""
     location = get_trip_report_info_by_id(trip_report_info_id)
     if not location:
         raise ValueError("Location not found in catalog.")
     with get_cursor() as cur:
+        cur.execute(
+            """SELECT COUNT(*) AS n FROM user_favorite_hikes WHERE user_id = %s""",
+            (user_id,),
+        )
+        n = cur.fetchone()["n"]
+        if n >= 4:
+            raise ValueError("You can have at most 4 favorite hikes.")
         cur.execute(
             """INSERT INTO user_favorite_hikes (user_id, trip_report_info_id)
                VALUES (%s, %s)
@@ -577,6 +584,280 @@ def remove_favorite_hike(user_id, trip_report_info_id):
                WHERE user_id = %s AND trip_report_info_id = %s""",
             (user_id, trip_report_info_id),
         )
+
+
+# ---------- User profiles ----------
+def get_user_profile(user_id):
+    """Return profile row for user_id: display_name, bio, updated_at. None if no row."""
+    with get_cursor() as cur:
+        cur.execute(
+            """SELECT user_id, display_name, bio, updated_at
+               FROM user_profiles WHERE user_id = %s""",
+            (user_id,),
+        )
+        return cur.fetchone()
+
+
+def upsert_user_profile(user_id, display_name=None, bio=None):
+    """Insert or update user profile. display_name and bio can be None to clear."""
+    with get_cursor() as cur:
+        cur.execute(
+            """INSERT INTO user_profiles (user_id, display_name, bio, updated_at)
+               VALUES (%s, %s, %s, NOW())
+               ON CONFLICT (user_id) DO UPDATE SET
+                 display_name = COALESCE(EXCLUDED.display_name, user_profiles.display_name),
+                 bio = COALESCE(EXCLUDED.bio, user_profiles.bio),
+                 updated_at = NOW()""",
+            (user_id, display_name, bio),
+        )
+
+
+# ---------- Top four hikes ----------
+def list_top_four_hikes(user_id):
+    """Return list of up to 4 items: position, trip_report_info_id, hike_name, etc. from trip_report_info. Positions 1-4; missing positions are not in list."""
+    with get_cursor() as cur:
+        cur.execute(
+            """SELECT ut.position, ut.trip_report_info_id, tri.hike_name, tri.distance, tri.elevation_gain, tri.difficulty, tri.source_url
+               FROM user_top_four_hikes ut
+               JOIN trip_report_info tri ON tri.id = ut.trip_report_info_id
+               WHERE ut.user_id = %s
+               ORDER BY ut.position""",
+            (user_id,),
+        )
+        return cur.fetchall()
+
+
+def set_top_four_slot(user_id, position, trip_report_info_id):
+    """Set one slot (1-4) to a trip_report_info_id. Validates position and that location exists."""
+    if position not in (1, 2, 3, 4):
+        raise ValueError("Position must be 1, 2, 3, or 4")
+    loc = get_trip_report_info_by_id(trip_report_info_id)
+    if not loc:
+        raise ValueError("Location not found in catalog.")
+    with get_cursor() as cur:
+        cur.execute(
+            """INSERT INTO user_top_four_hikes (user_id, position, trip_report_info_id)
+               VALUES (%s, %s, %s)
+               ON CONFLICT (user_id, position) DO UPDATE SET trip_report_info_id = EXCLUDED.trip_report_info_id""",
+            (user_id, position, trip_report_info_id),
+        )
+
+
+def clear_top_four_slot(user_id, position):
+    """Clear one slot (1-4). No-op if already empty."""
+    if position not in (1, 2, 3, 4):
+        raise ValueError("Position must be 1, 2, 3, or 4")
+    with get_cursor() as cur:
+        cur.execute(
+            """DELETE FROM user_top_four_hikes WHERE user_id = %s AND position = %s""",
+            (user_id, position),
+        )
+
+
+def replace_top_four(user_id, slots):
+    """Replace user's top four. slots: list of dicts with position (1-4) and trip_report_info_id. Clears any position not in list."""
+    with get_cursor() as cur:
+        cur.execute("""DELETE FROM user_top_four_hikes WHERE user_id = %s""", (user_id,))
+        for s in slots:
+            pos = s.get("position")
+            info_id = s.get("trip_report_info_id")
+            if pos in (1, 2, 3, 4) and info_id is not None:
+                loc = get_trip_report_info_by_id(info_id)
+                if loc:
+                    cur.execute(
+                        """INSERT INTO user_top_four_hikes (user_id, position, trip_report_info_id)
+                           VALUES (%s, %s, %s)
+                           ON CONFLICT (user_id, position) DO UPDATE SET trip_report_info_id = EXCLUDED.trip_report_info_id""",
+                        (user_id, pos, info_id),
+                    )
+
+
+# ---------- User trip reports ----------
+def list_user_trip_reports(user_id):
+    """Return list of trip reports for user: id, title, trip_report_info_id, hike_name, date_hiked, created_at, updated_at."""
+    with get_cursor() as cur:
+        cur.execute(
+            """SELECT utr.id, utr.title, utr.trip_report_info_id, utr.body, utr.date_hiked, utr.created_at, utr.updated_at,
+                      tri.hike_name
+               FROM user_trip_reports utr
+               JOIN trip_report_info tri ON tri.id = utr.trip_report_info_id
+               WHERE utr.user_id = %s
+               ORDER BY utr.created_at DESC""",
+            (user_id,),
+        )
+        return cur.fetchall()
+
+
+def get_user_trip_report(report_id, user_id=None):
+    """Return one trip report by id. If user_id given, only return if owner; else return any (for public view). Includes hike_name and trail info."""
+    with get_cursor() as cur:
+        if user_id is not None:
+            cur.execute(
+                """SELECT utr.id, utr.user_id, utr.trip_report_info_id, utr.title, utr.body, utr.date_hiked, utr.created_at, utr.updated_at,
+                          tri.hike_name
+                   FROM user_trip_reports utr
+                   JOIN trip_report_info tri ON tri.id = utr.trip_report_info_id
+                   WHERE utr.id = %s AND utr.user_id = %s""",
+                (report_id, user_id),
+            )
+        else:
+            cur.execute(
+                """SELECT utr.id, utr.user_id, utr.trip_report_info_id, utr.title, utr.body, utr.date_hiked, utr.created_at, utr.updated_at,
+                          tri.hike_name
+                   FROM user_trip_reports utr
+                   JOIN trip_report_info tri ON tri.id = utr.trip_report_info_id
+                   WHERE utr.id = %s""",
+                (report_id,),
+            )
+        return cur.fetchone()
+
+
+def create_user_trip_report(user_id, trip_report_info_id, title, body="", date_hiked=None):
+    """Create a trip report. Returns new report id."""
+    title = (title or "").strip()
+    if not title:
+        raise ValueError("Title is required")
+    loc = get_trip_report_info_by_id(trip_report_info_id)
+    if not loc:
+        raise ValueError("Location not found in catalog.")
+    body = (body or "").strip() or ""
+    with get_cursor() as cur:
+        cur.execute(
+            """INSERT INTO user_trip_reports (user_id, trip_report_info_id, title, body, date_hiked, updated_at)
+               VALUES (%s, %s, %s, %s, %s, NOW()) RETURNING id""",
+            (user_id, trip_report_info_id, title, body, date_hiked),
+        )
+        return cur.fetchone()["id"]
+
+
+def update_user_trip_report(report_id, user_id, trip_report_info_id=None, title=None, body=None, date_hiked=None):
+    """Update a trip report. Only owner. Optional fields: trip_report_info_id, title, body, date_hiked."""
+    report = get_user_trip_report(report_id, user_id)
+    if not report:
+        raise ValueError("Trip report not found.")
+    updates = []
+    params = []
+    if title is not None:
+        t = (title or "").strip()
+        if not t:
+            raise ValueError("Title cannot be empty")
+        updates.append("title = %s")
+        params.append(t)
+    if body is not None:
+        updates.append("body = %s")
+        params.append((body or "").strip() or "")
+    if date_hiked is not None:
+        updates.append("date_hiked = %s")
+        params.append(date_hiked)
+    if trip_report_info_id is not None:
+        loc = get_trip_report_info_by_id(trip_report_info_id)
+        if not loc:
+            raise ValueError("Location not found in catalog.")
+        updates.append("trip_report_info_id = %s")
+        params.append(trip_report_info_id)
+    if not updates:
+        return
+    updates.append("updated_at = NOW()")
+    params.extend([report_id, user_id])
+    with get_cursor() as cur:
+        cur.execute(
+            """UPDATE user_trip_reports SET """ + ", ".join(updates) + """ WHERE id = %s AND user_id = %s""",
+            params,
+        )
+
+
+def delete_user_trip_report(report_id, user_id):
+    """Delete a trip report. Only owner. Raises ValueError if not found."""
+    report = get_user_trip_report(report_id, user_id)
+    if not report:
+        raise ValueError("Trip report not found.")
+    with get_cursor() as cur:
+        cur.execute("""DELETE FROM user_trip_reports WHERE id = %s AND user_id = %s""", (report_id, user_id))
+
+
+# ---------- Wishlist ----------
+def list_wishlist(user_id):
+    """Return list of wishlist items: id (trip_report_info_id), hike_name, distance, elevation_gain, difficulty, source_url."""
+    with get_cursor() as cur:
+        cur.execute(
+            """SELECT tri.id, tri.hike_name, tri.distance, tri.elevation_gain, tri.difficulty, tri.source_url
+               FROM user_wishlist uw
+               JOIN trip_report_info tri ON tri.id = uw.trip_report_info_id
+               WHERE uw.user_id = %s
+               ORDER BY tri.hike_name""",
+            (user_id,),
+        )
+        return cur.fetchall()
+
+
+def add_wishlist_item(user_id, trip_report_info_id):
+    """Add a hike to wishlist. Raises ValueError if location not found."""
+    loc = get_trip_report_info_by_id(trip_report_info_id)
+    if not loc:
+        raise ValueError("Location not found in catalog.")
+    with get_cursor() as cur:
+        cur.execute(
+            """INSERT INTO user_wishlist (user_id, trip_report_info_id)
+               VALUES (%s, %s)
+               ON CONFLICT (user_id, trip_report_info_id) DO NOTHING""",
+            (user_id, trip_report_info_id),
+        )
+
+
+def remove_wishlist_item(user_id, trip_report_info_id):
+    """Remove a hike from wishlist. No-op if not present."""
+    with get_cursor() as cur:
+        cur.execute(
+            """DELETE FROM user_wishlist WHERE user_id = %s AND trip_report_info_id = %s""",
+            (user_id, trip_report_info_id),
+        )
+
+
+# ---------- Relationship (for profile view) ----------
+def get_relationship(viewer_id, target_user_id):
+    """Return relationship from viewer to target: 'friend' | 'pending_out' | 'pending_in' | 'none'. Optional request_id for pending_in (for accept/decline)."""
+    if viewer_id == target_user_id:
+        return {"status": "self", "request_id": None}
+    with get_cursor() as cur:
+        cur.execute(
+            """SELECT id, sender_id, receiver_id, status
+               FROM friend_requests
+               WHERE (sender_id = %s AND receiver_id = %s) OR (sender_id = %s AND receiver_id = %s)""",
+            (viewer_id, target_user_id, target_user_id, viewer_id),
+        )
+        row = cur.fetchone()
+    if not row:
+        return {"status": "none", "request_id": None}
+    if row["status"] == "accepted":
+        return {"status": "friend", "request_id": None}
+    if row["sender_id"] == viewer_id:
+        return {"status": "pending_out", "request_id": row["id"]}
+    return {"status": "pending_in", "request_id": row["id"]}
+
+
+def remove_friend(viewer_id, target_user_id):
+    """Remove friendship (unfriend). Both must be in the accepted pair. Returns True if a row was updated/deleted."""
+    if viewer_id == target_user_id:
+        return False
+    with get_cursor() as cur:
+        cur.execute(
+            """DELETE FROM friend_requests
+               WHERE status = 'accepted'
+                 AND ((sender_id = %s AND receiver_id = %s) OR (sender_id = %s AND receiver_id = %s))""",
+            (viewer_id, target_user_id, target_user_id, viewer_id),
+        )
+        return cur.rowcount > 0
+
+
+def cancel_friend_request(request_id, user_id):
+    """Cancel a pending friend request. Only the sender can cancel. Returns True if deleted."""
+    with get_cursor() as cur:
+        cur.execute(
+            """DELETE FROM friend_requests
+               WHERE id = %s AND sender_id = %s AND status = 'pending'""",
+            (request_id, user_id),
+        )
+        return cur.rowcount > 0
 
 
 # ---------- Trips ----------

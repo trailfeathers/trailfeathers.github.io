@@ -16,15 +16,31 @@ from database.database import (
     get_gear_item,
     update_gear_item,
     delete_gear_item,
+    get_user_by_id,
     get_user_by_username,
     create_friend_request,
     list_incoming_requests,
     accept_friend_request,
     decline_friend_request,
     list_friends,
+    remove_friend,
+    cancel_friend_request,
     list_favorite_hikes,
     add_favorite_hike,
     remove_favorite_hike,
+    get_user_profile,
+    upsert_user_profile,
+    list_top_four_hikes,
+    replace_top_four,
+    list_user_trip_reports,
+    get_user_trip_report,
+    create_user_trip_report,
+    update_user_trip_report,
+    delete_user_trip_report,
+    list_wishlist,
+    add_wishlist_item,
+    remove_wishlist_item,
+    get_relationship,
     create_trip,
     update_trip,
     delete_trip,
@@ -118,7 +134,17 @@ def create_app():
     @app.route("/api/locations", methods=["OPTIONS"])
     @app.route("/api/me/favorites", methods=["OPTIONS"])
     @app.route("/api/me/favorites/<int:trip_report_info_id>", methods=["OPTIONS"])
-    def options_auth(request_id=None, trip_id=None, invite_id=None, gear_id=None, trip_report_info_id=None, user_id=None):
+    @app.route("/api/me/profile", methods=["OPTIONS"])
+    @app.route("/api/me/top-four", methods=["OPTIONS"])
+    @app.route("/api/me/trip-reports", methods=["OPTIONS"])
+    @app.route("/api/me/trip-reports/<int:report_id>", methods=["OPTIONS"])
+    @app.route("/api/trip-reports/<int:report_id>", methods=["OPTIONS"])
+    @app.route("/api/me/wishlist", methods=["OPTIONS"])
+    @app.route("/api/me/wishlist/<int:trip_report_info_id>", methods=["OPTIONS"])
+    @app.route("/api/users/<path:username>", methods=["OPTIONS"])
+    @app.route("/api/friends/<int:friend_user_id>", methods=["OPTIONS"])
+    @app.route("/api/friends/requests/<int:request_id>", methods=["OPTIONS"])
+    def options_auth(request_id=None, trip_id=None, invite_id=None, gear_id=None, trip_report_info_id=None, user_id=None, report_id=None, username=None, friend_user_id=None):
         # gear_id used by OPTIONS /api/gear/<int:gear_id>; user_id for DELETE collaborators
         return "", 200
 
@@ -319,6 +345,315 @@ def create_app():
             return jsonify(error="Not logged in"), 401
         remove_favorite_hike(user["id"], trip_report_info_id)
         return "", 204
+
+    # ----------------------
+    # Profile API
+    # ----------------------
+    @app.get("/api/me/profile")
+    def get_my_profile():
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        profile = get_user_profile(user["id"])
+        out = {"username": user["username"], "display_name": None, "bio": None}
+        if profile:
+            out["display_name"] = profile.get("display_name")
+            out["bio"] = profile.get("bio")
+        return jsonify(out)
+
+    @app.put("/api/me/profile")
+    def put_my_profile():
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        payload = request.get_json(silent=True) or {}
+        display_name = (payload.get("display_name") or "").strip() or None
+        bio = (payload.get("bio") or "").strip() or None
+        upsert_user_profile(user["id"], display_name=display_name, bio=bio)
+        profile = get_user_profile(user["id"])
+        out = {"username": user["username"], "display_name": None, "bio": None}
+        if profile:
+            out["display_name"] = profile.get("display_name")
+            out["bio"] = profile.get("bio")
+        return jsonify(out)
+
+    def _public_profile_for_user(target_user_id):
+        """Build public profile payload for a user (for profile view page)."""
+        target = get_user_by_id(target_user_id)
+        if not target:
+            return None
+        profile = get_user_profile(target_user_id)
+        top_four = list_top_four_hikes(target_user_id)
+        reports = list_user_trip_reports(target_user_id)
+        out = {
+            "user_id": target["id"],
+            "username": target["username"],
+            "display_name": (profile.get("display_name") if profile else None) or target["username"],
+            "bio": (profile.get("bio") if profile else None) or "",
+            "top_four": [
+                {"position": r["position"], "trip_report_info_id": r["trip_report_info_id"], "hike_name": r.get("hike_name") or ""}
+                for r in top_four
+            ],
+            "trip_reports": [
+                {
+                    "id": r["id"],
+                    "title": r.get("title") or "",
+                    "hike_name": r.get("hike_name") or "",
+                    "date_hiked": r["date_hiked"].isoformat() if hasattr(r.get("date_hiked"), "isoformat") else r.get("date_hiked"),
+                    "created_at": r["created_at"].isoformat() if hasattr(r.get("created_at"), "isoformat") else r.get("created_at"),
+                }
+                for r in reports
+            ],
+        }
+        return out
+
+    @app.get("/api/users/<path:username>/profile")
+    def get_user_profile_route(username):
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        target = get_user_by_username(username)
+        if not target:
+            return jsonify(error="User not found"), 404
+        payload = _public_profile_for_user(target["id"])
+        if not payload:
+            return jsonify(error="User not found"), 404
+        return jsonify(payload)
+
+    @app.get("/api/users/<path:username>/relationship")
+    def get_user_relationship(username):
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        target = get_user_by_username(username)
+        if not target:
+            return jsonify(error="User not found"), 404
+        rel = get_relationship(user["id"], target["id"])
+        return jsonify({"status": rel["status"], "request_id": rel.get("request_id")})
+
+    # ----------------------
+    # Top four API
+    # ----------------------
+    @app.get("/api/me/top-four")
+    def get_my_top_four():
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        rows = list_top_four_hikes(user["id"])
+        out = [{"position": p, "trip_report_info_id": None, "hike_name": None} for p in [1, 2, 3, 4]]
+        for r in rows:
+            pos = r["position"]
+            if 1 <= pos <= 4:
+                out[pos - 1] = {
+                    "position": pos,
+                    "trip_report_info_id": r["trip_report_info_id"],
+                    "hike_name": r.get("hike_name") or "",
+                }
+        return jsonify(out)
+
+    @app.put("/api/me/top-four")
+    def put_my_top_four():
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        payload = request.get_json(silent=True) or {}
+        slots = payload.get("slots") if isinstance(payload.get("slots"), list) else []
+        try:
+            replace_top_four(user["id"], slots)
+            rows = list_top_four_hikes(user["id"])
+            out = [{"position": p, "trip_report_info_id": None, "hike_name": None} for p in [1, 2, 3, 4]]
+            for r in rows:
+                pos = r["position"]
+                if 1 <= pos <= 4:
+                    out[pos - 1] = {"position": pos, "trip_report_info_id": r["trip_report_info_id"], "hike_name": r.get("hike_name") or ""}
+            return jsonify(out)
+        except ValueError as e:
+            return jsonify(error=str(e)), 400
+
+    # ----------------------
+    # Trip reports API
+    # ----------------------
+    @app.get("/api/me/trip-reports")
+    def get_my_trip_reports():
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        rows = list_user_trip_reports(user["id"])
+        out = []
+        for r in rows:
+            out.append({
+                "id": r["id"],
+                "title": r.get("title") or "",
+                "trip_report_info_id": r["trip_report_info_id"],
+                "hike_name": r.get("hike_name") or "",
+                "date_hiked": r["date_hiked"].isoformat() if hasattr(r.get("date_hiked"), "isoformat") else r.get("date_hiked"),
+                "created_at": r["created_at"].isoformat() if hasattr(r.get("created_at"), "isoformat") else r.get("created_at"),
+            })
+        return jsonify(out)
+
+    @app.post("/api/me/trip-reports")
+    def post_my_trip_report():
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        payload = request.get_json(silent=True) or {}
+        trip_report_info_id = payload.get("trip_report_info_id")
+        title = (payload.get("title") or "").strip()
+        body = (payload.get("body") or "").strip() or ""
+        date_hiked = payload.get("date_hiked")
+        if date_hiked == "":
+            date_hiked = None
+        if trip_report_info_id is None:
+            return jsonify(error="trip_report_info_id required"), 400
+        try:
+            info_id = int(trip_report_info_id)
+        except (TypeError, ValueError):
+            return jsonify(error="Invalid trip_report_info_id"), 400
+        try:
+            report_id = create_user_trip_report(user["id"], info_id, title, body, date_hiked)
+            report = get_user_trip_report(report_id, user["id"])
+            out = {
+                "id": report["id"],
+                "title": report.get("title") or "",
+                "trip_report_info_id": report["trip_report_info_id"],
+                "hike_name": report.get("hike_name") or "",
+                "date_hiked": report["date_hiked"].isoformat() if hasattr(report.get("date_hiked"), "isoformat") else report.get("date_hiked"),
+                "created_at": report["created_at"].isoformat() if hasattr(report.get("created_at"), "isoformat") else report.get("created_at"),
+            }
+            return jsonify(out), 201
+        except ValueError as e:
+            return jsonify(error=str(e)), 400
+
+    @app.get("/api/trip-reports/<int:report_id>")
+    def get_trip_report_route(report_id):
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        report = get_user_trip_report(report_id, user_id=None)
+        if not report:
+            return jsonify(error="Not found"), 404
+        is_owner = report["user_id"] == user["id"]
+        out = {
+            "id": report["id"],
+            "title": report.get("title") or "",
+            "hike_name": report.get("hike_name") or "",
+            "trip_report_info_id": report["trip_report_info_id"],
+            "body": report.get("body") or "",
+            "date_hiked": report["date_hiked"].isoformat() if hasattr(report.get("date_hiked"), "isoformat") else report.get("date_hiked"),
+            "created_at": report["created_at"].isoformat() if hasattr(report.get("created_at"), "isoformat") else report.get("created_at"),
+            "is_owner": is_owner,
+        }
+        return jsonify(out)
+
+    @app.put("/api/me/trip-reports/<int:report_id>")
+    def put_my_trip_report(report_id):
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        payload = request.get_json(silent=True) or {}
+        trip_report_info_id = payload.get("trip_report_info_id")
+        title = (payload.get("title") or "").strip() if "title" in payload else None
+        body = (payload.get("body") or "").strip() if "body" in payload else None
+        date_hiked = payload.get("date_hiked") if "date_hiked" in payload else None
+        if date_hiked == "":
+            date_hiked = None
+        try:
+            update_user_trip_report(report_id, user["id"], trip_report_info_id=trip_report_info_id, title=title, body=body, date_hiked=date_hiked)
+            report = get_user_trip_report(report_id, user["id"])
+            out = {
+                "id": report["id"],
+                "title": report.get("title") or "",
+                "hike_name": report.get("hike_name") or "",
+                "trip_report_info_id": report["trip_report_info_id"],
+                "body": report.get("body") or "",
+                "date_hiked": report["date_hiked"].isoformat() if hasattr(report.get("date_hiked"), "isoformat") else report.get("date_hiked"),
+                "is_owner": True,
+            }
+            return jsonify(out)
+        except ValueError as e:
+            return jsonify(error=str(e)), 400
+
+    @app.delete("/api/me/trip-reports/<int:report_id>")
+    def delete_my_trip_report(report_id):
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        try:
+            delete_user_trip_report(report_id, user["id"])
+            return "", 204
+        except ValueError:
+            return jsonify(error="Not found"), 404
+
+    # ----------------------
+    # Wishlist API
+    # ----------------------
+    @app.get("/api/me/wishlist")
+    def get_my_wishlist():
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        rows = list_wishlist(user["id"])
+        out = []
+        for r in rows:
+            out.append({
+                "id": r["id"],
+                "hike_name": r.get("hike_name") or "",
+                "distance": r.get("distance"),
+                "elevation_gain": r.get("elevation_gain"),
+                "difficulty": r.get("difficulty"),
+                "source_url": r.get("source_url"),
+            })
+        return jsonify(out)
+
+    @app.post("/api/me/wishlist")
+    def post_my_wishlist():
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        payload = request.get_json(silent=True) or {}
+        trip_report_info_id = payload.get("trip_report_info_id")
+        if trip_report_info_id is None:
+            return jsonify(error="trip_report_info_id required"), 400
+        try:
+            info_id = int(trip_report_info_id)
+        except (TypeError, ValueError):
+            return jsonify(error="Invalid trip_report_info_id"), 400
+        try:
+            add_wishlist_item(user["id"], info_id)
+            return jsonify(ok=True), 201
+        except ValueError as e:
+            return jsonify(error=str(e)), 400
+
+    @app.delete("/api/me/wishlist/<int:trip_report_info_id>")
+    def delete_my_wishlist_item(trip_report_info_id):
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        remove_wishlist_item(user["id"], trip_report_info_id)
+        return "", 204
+
+    # ----------------------
+    # Unfriend / Cancel friend request
+    # ----------------------
+    @app.delete("/api/friends/<int:friend_user_id>")
+    def delete_friend(friend_user_id):
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        if remove_friend(user["id"], friend_user_id):
+            login.refresh_session_cache(user["id"])
+            return "", 204
+        return jsonify(error="Not friends or not found"), 404
+
+    @app.delete("/api/friends/requests/<int:request_id>")
+    def cancel_friend_request_route(request_id):
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        if cancel_friend_request(request_id, user["id"]):
+            login.refresh_session_cache(user["id"])
+            return "", 204
+        return jsonify(error="Request not found or already handled"), 404
 
     # ----------------------
     # Trips API

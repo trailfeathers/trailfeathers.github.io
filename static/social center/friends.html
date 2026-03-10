@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TrailFeathers Social Center</title>
+  <link rel="stylesheet" href="../styles.css" />
+  <style>
+    .friends-dashboard-layout { display: block; }
+    .friends-dashboard-nav { margin-bottom: 1rem; }
+    .friends-dashboard-nav a { color: #2c5f2d; }
+    .friends-dashboard-block { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem; }
+    @media (min-width: 768px) {
+      .friends-dashboard-block.friends-dashboard-block--two { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    }
+    .friends-dashboard-section { margin: 0; background: white; padding: 1.25rem 1.5rem; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .friends-dashboard-section h2 { font-size: 1.15rem; margin-bottom: 0.5rem; color: #333; }
+    .friends-section-desc { font-size: 0.9rem; color: #555; margin-bottom: 0.5rem; }
+    .friends-form label { display: block; font-size: 0.9rem; margin-bottom: 0.2rem; color: #444; }
+    .friends-form input[type="text"], .friends-form input[type="date"], .friends-form select, .friends-form textarea { width: 100%; max-width: 100%; padding: 0.45rem 0.6rem; margin-bottom: 0.5rem; border: 1px solid #ccc; border-radius: 6px; font-size: 0.95rem; }
+    .friends-form textarea { min-height: 60px; resize: vertical; }
+    .friends-form .primary { padding: 0.45rem 0.9rem; background: #2c5f2d; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; }
+    .friends-form .secondary { padding: 0.45rem 0.9rem; background: #fff; color: #2c5f2d; border: 2px solid #2c5f2d; border-radius: 8px; cursor: pointer; font-size: 0.85rem; margin-right: 0.5rem; }
+    .friends-form-row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: flex-end; margin-bottom: 0.5rem; }
+    .friends-form-row label { margin-bottom: 0; flex: 0 0 auto; }
+    .friends-form-row input, .friends-form-row select { flex: 1; min-width: 120px; margin-bottom: 0; }
+    .friends-form-row .primary { flex: 0 0 auto; }
+    #search-user-form { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+    #search-user-form input { flex: 1; min-width: 120px; margin-bottom: 0; }
+    #search-user-form .primary { flex: 0 0 auto; }
+    .friends-dashboard-side { display: flex; flex-direction: column; gap: 1rem; }
+    .top-four-section { margin-bottom: 1.5rem; }
+    .top-four-section .friends-dashboard-section { padding: 1.5rem; }
+    .top-four-section h2 { font-size: 1.25rem; margin-bottom: 0.25rem; }
+    .top-four-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1rem; }
+    @media (max-width: 640px) { .top-four-cards { grid-template-columns: repeat(2, 1fr); } }
+    .top-four-card { text-align: center; }
+    .top-four-thumb { width: 100%; aspect-ratio: 1; max-width: 140px; margin: 0 auto 0.5rem; border-radius: 8px; background: #e0e0e0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .top-four-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .top-four-thumb-placeholder { font-size: 0.7rem; color: #999; }
+    .top-four-card .top-four-slot { margin: 0; }
+    .top-four-card .top-four-slot select { font-size: 0.85rem; }
+    .profile-display.hidden { display: none; }
+    .profile-edit-form.hidden { display: none; }
+    .profile-picture-circle { width: 80px; height: 80px; border-radius: 50%; background: #e0e0e0; margin-bottom: 0.75rem; flex-shrink: 0; }
+    .profile-picture-circle img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+    .profile-picture-placeholder { font-size: 0.7rem; color: #999; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
+    .profile-display-header { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 0.5rem; }
+    .profile-display-body { flex: 1; min-width: 0; }
+    .profile-display-name { font-size: 1.1rem; font-weight: 600; color: #222; margin-bottom: 0.25rem; }
+    .profile-display-bio { font-size: 0.95rem; color: #555; white-space: pre-wrap; }
+    .profile-edit-actions { margin-top: 0.75rem; }
+    .trip-reports-list .trip-report-item, .friend-request-item, .friend-item, .favorite-item { padding: 0.4rem 0; font-size: 0.9rem; border-bottom: 1px solid #eee; }
+    .trip-reports-list .trip-report-item:last-child, .friend-request-item:last-child, .friend-item:last-child, .favorite-item:last-child { border-bottom: none; }
+    .trip-reports-list .trip-report-item a { color: #2c5f2d; }
+  </style>
+</head>
+<body>
+  <header class="banner banner--friends">
+    <a href="../dashboard.html" class="banner-logo-link" aria-label="Trail Feathers home">Trail Feathers</a>
+    <button type="button" id="logout-btn" class="banner-logout-btn">Logout</button>
+    <h1 id="banner-title">Social Center</h1>
+    <p class="banner-subtitle">Connect with friends</p>
+  </header>
+
+  <main class="content friends-dashboard">
+    <div class="friends-dashboard-layout">
+      <nav class="friends-dashboard-nav">
+        <a href="../dashboard.html" class="secondary nav-back">← Back to home</a>
+      </nav>
+
+      <div class="friends-dashboard-block friends-dashboard-block--two">
+        <section class="friends-dashboard-section friends-dashboard-section--primary profile-section">
+          <h2>My profile</h2>
+          <div class="profile-card">
+            <div id="profile-display" class="profile-display">
+              <div class="profile-display-header">
+                <div id="profile-picture-circle" class="profile-picture-circle" aria-label="Profile picture">
+                  <span class="profile-picture-placeholder">Photo</span>
+                </div>
+                <div class="profile-display-body">
+                  <p id="profile-display-name" class="profile-display-name"></p>
+                  <p id="profile-display-bio" class="profile-display-bio"></p>
+                </div>
+              </div>
+              <button type="button" id="profile-edit-btn" class="secondary">Edit profile</button>
+            </div>
+            <form id="profile-form" class="friends-form profile-edit-form hidden">
+              <label for="profile-display-name-input">Display name</label>
+              <input type="text" id="profile-display-name-input" name="display_name" placeholder="How you want to be seen" />
+              <label for="profile-bio-input">Bio</label>
+              <textarea id="profile-bio-input" name="bio" rows="2" placeholder="A bit about you and your hiking…"></textarea>
+              <div class="profile-edit-actions">
+                <button type="submit" class="primary">Save</button>
+                <button type="button" id="profile-edit-cancel" class="secondary">Cancel</button>
+              </div>
+            </form>
+            <p id="profile-error" class="error"></p>
+            <p id="profile-success" class="success"></p>
+          </div>
+        </section>
+        <section class="friends-dashboard-section">
+          <h2>Search for user</h2>
+          <form id="search-user-form" class="friends-form">
+            <input type="text" id="search-user-input" placeholder="Username" aria-label="Search by username" />
+            <button type="submit" class="primary">Search</button>
+          </form>
+          <p id="search-user-error" class="error"></p>
+        </section>
+      </div>
+
+      <section class="friends-dashboard-section top-four-section">
+        <h2>Top four hikes</h2>
+        <p class="friends-section-desc">Your four favorite hikes from the catalog. Pick a hike for each slot.</p>
+        <div id="top-four-slots" class="top-four-cards"></div>
+      </section>
+
+      <div class="friends-dashboard-block friends-dashboard-block--two">
+        <div class="friends-dashboard-side">
+          <section class="friends-dashboard-section">
+            <h2>Friend requests</h2>
+            <div id="friend-requests-list"><p class="friends-section-desc">No pending requests.</p></div>
+          </section>
+          <section class="friends-dashboard-section">
+            <h2>My friends</h2>
+            <div id="my-friends-list"><p class="friends-section-desc">No friends yet.</p></div>
+          </section>
+        </div>
+        <section class="friends-dashboard-section trip-reports-section">
+          <h2>My trip reports</h2>
+          <p class="friends-section-desc">Write about hikes you've done.</p>
+          <div class="trip-report-form-wrap">
+            <button type="button" id="toggle-trip-report-form" class="secondary">Write a trip report</button>
+            <form id="trip-report-form" class="friends-form trip-report-form" hidden>
+              <label for="trip-report-hike">Hike (from catalog)</label>
+              <select id="trip-report-hike">
+                <option value="">Choose a hike…</option>
+              </select>
+              <label for="trip-report-title">Title</label>
+              <input type="text" id="trip-report-title" name="title" placeholder="e.g. Winter summit in perfect conditions" required />
+              <label for="trip-report-body">Your report</label>
+              <textarea id="trip-report-body" name="body" rows="3" placeholder="How it went, conditions, highlights…"></textarea>
+              <div class="friends-form-row">
+                <label for="trip-report-date">Date hiked</label>
+                <input type="date" id="trip-report-date" name="date_hiked" />
+                <button type="submit" class="primary">Save report</button>
+                <button type="button" id="trip-report-cancel" class="secondary">Cancel</button>
+              </div>
+              <input type="hidden" id="trip-report-edit-id" name="report_id" value="" />
+            </form>
+          </div>
+          <p id="trip-report-form-error" class="error"></p>
+          <div id="my-trip-reports-list" class="trip-reports-list"><p class="friends-section-desc">No trip reports yet.</p></div>
+        </section>
+      </div>
+
+      <section class="friends-dashboard-section">
+        <h2>Hikes I want to try</h2>
+        <p class="friends-section-desc">Add trails from the catalog to your wishlist.</p>
+        <div class="favorites-add friends-form-row">
+          <label for="add-wishlist-select">Add from catalog</label>
+          <select id="add-wishlist-select">
+            <option value="">Choose a hike…</option>
+          </select>
+          <button type="button" id="add-wishlist-btn" class="primary">Add</button>
+        </div>
+        <p id="add-wishlist-error" class="error"></p>
+        <div id="my-wishlist-list"><p class="friends-section-desc">No hikes on your wishlist yet.</p></div>
+      </section>
+    </div>
+
+    <div id="dash-options">
+      <button type="button" id="home">Home</button>
+      <button type="button" id="inventory">My Gear Library</button>
+      <button type="button" id="plan-trip">Plan a Trip</button>
+    </div>
+  </main>
+
+  <script src="social_center_friends.js"></script>
+</body>
+</html>
