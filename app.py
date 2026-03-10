@@ -42,6 +42,8 @@ from database.database import (
     create_user_trip_report,
     update_user_trip_report,
     delete_user_trip_report,
+    set_trip_report_image_upload,
+    get_trip_report_image_payload,
     list_wishlist,
     add_wishlist_item,
     remove_wishlist_item,
@@ -148,7 +150,9 @@ def create_app():
     @app.route("/api/me/top-four-eligible", methods=["OPTIONS"])
     @app.route("/api/me/trip-reports", methods=["OPTIONS"])
     @app.route("/api/me/trip-reports/<int:report_id>", methods=["OPTIONS"])
+    @app.route("/api/me/trip-reports/<int:report_id>/image", methods=["OPTIONS"])
     @app.route("/api/trip-reports/<int:report_id>", methods=["OPTIONS"])
+    @app.route("/api/trip-reports/<int:report_id>/image", methods=["OPTIONS"])
     @app.route("/api/me/wishlist", methods=["OPTIONS"])
     @app.route("/api/me/wishlist/<int:trip_report_info_id>", methods=["OPTIONS"])
     @app.route("/api/users/<path:username>", methods=["OPTIONS"])
@@ -677,6 +681,7 @@ def create_app():
         if not report:
             return jsonify(error="Not found"), 404
         is_owner = report["user_id"] == user["id"]
+        image_uploaded = bool(report.get("image_uploaded"))
         out = {
             "id": report["id"],
             "title": report.get("title") or "",
@@ -686,6 +691,7 @@ def create_app():
             "date_hiked": report["date_hiked"].isoformat() if hasattr(report.get("date_hiked"), "isoformat") else report.get("date_hiked"),
             "created_at": report["created_at"].isoformat() if hasattr(report.get("created_at"), "isoformat") else report.get("created_at"),
             "is_owner": is_owner,
+            "image_uploaded": image_uploaded,
         }
         return jsonify(out)
 
@@ -716,6 +722,37 @@ def create_app():
             return jsonify(out)
         except ValueError as e:
             return jsonify(error=str(e)), 400
+
+    @app.post("/api/me/trip-reports/<int:report_id>/image")
+    def post_trip_report_image(report_id):
+        """Upload trip report image (multipart file). Owner only. Max 5MB."""
+        user = login.require_auth()
+        if not user:
+            return jsonify(error="Not logged in"), 401
+        if "file" not in request.files:
+            return jsonify(error="Missing file."), 400
+        f = request.files["file"]
+        if not f or not f.filename:
+            return jsonify(error="Missing file."), 400
+        data = f.read()
+        media_type = f.mimetype or "image/jpeg"
+        try:
+            set_trip_report_image_upload(report_id, user["id"], data, media_type)
+        except ValueError as e:
+            return jsonify(error=str(e)), 400
+        return jsonify({"ok": True})
+
+    @app.get("/api/trip-reports/<int:report_id>/image")
+    def get_trip_report_image(report_id):
+        """Serve trip report image. No auth so img src works from static pages."""
+        payload = get_trip_report_image_payload(report_id)
+        if not payload:
+            return "", 204
+        return Response(
+            payload["bytes"],
+            mimetype=payload["media_type"],
+            headers={"Cache-Control": "public, max-age=3600"},
+        )
 
     @app.delete("/api/me/trip-reports/<int:report_id>")
     def delete_my_trip_report(report_id):

@@ -797,12 +797,13 @@ def list_user_trip_reports(user_id):
 
 
 def get_user_trip_report(report_id, user_id=None):
-    """Return one trip report by id. If user_id given, only return if owner; else return any (for public view). Includes hike_name and trail info."""
+    """Return one trip report by id. If user_id given, only return if owner; else return any (for public view). Includes hike_name, image_uploaded."""
     with get_cursor() as cur:
         if user_id is not None:
             cur.execute(
                 """SELECT utr.id, utr.user_id, utr.trip_report_info_id, utr.title, utr.body, utr.date_hiked, utr.created_at, utr.updated_at,
-                          tri.hike_name
+                          tri.hike_name,
+                          (utr.image IS NOT NULL) AS image_uploaded
                    FROM user_trip_reports utr
                    JOIN trip_report_info tri ON tri.id = utr.trip_report_info_id
                    WHERE utr.id = %s AND utr.user_id = %s""",
@@ -811,13 +812,45 @@ def get_user_trip_report(report_id, user_id=None):
         else:
             cur.execute(
                 """SELECT utr.id, utr.user_id, utr.trip_report_info_id, utr.title, utr.body, utr.date_hiked, utr.created_at, utr.updated_at,
-                          tri.hike_name
+                          tri.hike_name,
+                          (utr.image IS NOT NULL) AS image_uploaded
                    FROM user_trip_reports utr
                    JOIN trip_report_info tri ON tri.id = utr.trip_report_info_id
                    WHERE utr.id = %s""",
                 (report_id,),
             )
         return cur.fetchone()
+
+
+def set_trip_report_image_upload(report_id, user_id, image_bytes, media_type):
+    """Store uploaded image for a trip report. Owner only. Max 5MB. Raises ValueError if not found or invalid."""
+    report = get_user_trip_report(report_id, user_id)
+    if not report:
+        raise ValueError("Trip report not found.")
+    if not image_bytes or len(image_bytes) > 5 * 1024 * 1024:
+        raise ValueError("Image required and must be under 5MB.")
+    mt = (media_type or "image/jpeg").strip().lower()
+    if mt not in ("image/jpeg", "image/png", "image/gif", "image/webp"):
+        raise ValueError("Allowed types: image/jpeg, image/png, image/gif, image/webp")
+    with get_cursor() as cur:
+        cur.execute(
+            """UPDATE user_trip_reports SET image = %s, image_media_type = %s, updated_at = NOW()
+               WHERE id = %s AND user_id = %s""",
+            (image_bytes, mt, report_id, user_id),
+        )
+
+
+def get_trip_report_image_payload(report_id):
+    """Return dict with keys bytes, media_type if report has image; else None."""
+    with get_cursor() as cur:
+        cur.execute(
+            """SELECT image, image_media_type FROM user_trip_reports WHERE id = %s AND image IS NOT NULL""",
+            (report_id,),
+        )
+        row = cur.fetchone()
+        if not row or not row.get("image"):
+            return None
+        return {"bytes": row["image"], "media_type": row.get("image_media_type") or "image/jpeg"}
 
 
 def create_user_trip_report(user_id, trip_report_info_id, title, body="", date_hiked=None):

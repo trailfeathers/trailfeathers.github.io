@@ -56,6 +56,20 @@
       var btnEdit = document.getElementById("btn-edit-report");
       if (data.is_owner && btnEdit) btnEdit.style.display = "inline-block";
 
+      var reportPhoto = document.getElementById("report-photo");
+      var reportPlaceholder = document.getElementById("report-image-placeholder");
+      if (data.image_uploaded && reportId) {
+        if (reportPhoto) {
+          reportPhoto.src = API_BASE + "/api/trip-reports/" + reportId + "/image";
+          reportPhoto.alt = data.title || "Trip report photo";
+          reportPhoto.classList.remove("hidden");
+        }
+        if (reportPlaceholder) reportPlaceholder.classList.add("hidden");
+      } else {
+        if (reportPhoto) { reportPhoto.src = ""; reportPhoto.classList.add("hidden"); }
+        if (reportPlaceholder) reportPlaceholder.classList.remove("hidden");
+      }
+
       var trailSelect = document.getElementById("edit-trail");
       if (trailSelect && locations.length) {
         trailSelect.innerHTML = '<option value="">Choose a hike…</option>' + locations.map(function (h) {
@@ -107,29 +121,62 @@
       var title = editTitle && editTitle.value ? editTitle.value.trim() : "";
       var body = editBody && editBody.value ? editBody.value.trim() : "";
       var dateHiked = editDate && editDate.value ? editDate.value : null;
+      var editImage = document.getElementById("edit-image");
+      var imageFile = editImage && editImage.files && editImage.files[0];
       if (!reportId) return;
-      apiFetch("/api/me/trip-reports/" + reportId, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          trip_report_info_id: tripReportInfoId,
-          title: title,
-          body: body,
-          date_hiked: dateHiked || null
-        })
-      }).then(function (res) {
-        if (res.status === 401) { redirectToLogin(); return; }
-        return res.json();
-      }).then(function (data) {
-        if (data) {
-          currentReport = data;
-          if (reportTitle) reportTitle.textContent = data.title || "";
-          if (reportTrail) reportTrail.textContent = data.hike_name || "";
-          if (displayDate) displayDate.textContent = data.date_hiked ? (data.date_hiked.slice ? data.date_hiked.slice(0, 10) : data.date_hiked) : "—";
-          if (reportBody) reportBody.textContent = data.body || "";
-          showDisplay();
-        }
-      });
+
+      function doPut() {
+        return apiFetch("/api/me/trip-reports/" + reportId, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            trip_report_info_id: tripReportInfoId,
+            title: title,
+            body: body,
+            date_hiked: dateHiked || null
+          })
+        }).then(function (res) {
+          if (res.status === 401) { redirectToLogin(); return; }
+          return res.json();
+        }).then(function (data) {
+          if (data) {
+            currentReport = data;
+            if (reportTitle) reportTitle.textContent = data.title || "";
+            if (reportTrail) reportTrail.textContent = data.hike_name || "";
+            if (displayDate) displayDate.textContent = data.date_hiked ? (data.date_hiked.slice ? data.date_hiked.slice(0, 10) : data.date_hiked) : "—";
+            if (reportBody) reportBody.textContent = data.body || "";
+            var reportPhoto = document.getElementById("report-photo");
+            var reportPlaceholder = document.getElementById("report-image-placeholder");
+            if (data.image_uploaded && reportId) {
+              if (reportPhoto) {
+                reportPhoto.src = API_BASE + "/api/trip-reports/" + reportId + "/image?t=" + Date.now();
+                reportPhoto.alt = data.title || "Trip report photo";
+                reportPhoto.classList.remove("hidden");
+              }
+              if (reportPlaceholder) reportPlaceholder.classList.add("hidden");
+            } else {
+              if (reportPhoto) { reportPhoto.src = ""; reportPhoto.classList.add("hidden"); }
+              if (reportPlaceholder) reportPlaceholder.classList.remove("hidden");
+            }
+            showDisplay();
+          }
+        });
+      }
+
+      if (imageFile) {
+        var fd = new FormData();
+        fd.append("file", imageFile);
+        apiFetch("/api/me/trip-reports/" + reportId + "/image", {
+          method: "POST",
+          body: fd
+        }).then(function (res) {
+          if (res.status === 401) { redirectToLogin(); return; }
+          if (!res.ok) return res.json().then(function (err) { alert(err.error || "Image upload failed"); });
+          return doPut();
+        });
+      } else {
+        doPut();
+      }
     }
 
     if (btnEdit) {
@@ -140,6 +187,15 @@
     }
     if (btnCancel) btnCancel.addEventListener("click", showDisplay);
     if (form) form.addEventListener("submit", function (e) { e.preventDefault(); saveReport(); });
+
+    var logoutBtn = document.getElementById("logout-btn");
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", function () {
+        apiFetch("/api/logout", { method: "POST" }).then(function () {
+          window.location.href = "../login.html";
+        });
+      });
+    }
 
     loadLocations().then(function () {
       return loadReport();
