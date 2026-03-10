@@ -32,15 +32,21 @@
     .top-four-section { margin-bottom: 1.5rem; overflow-x: hidden; }
     .top-four-section .friends-dashboard-section { padding: 1.5rem; max-width: 100%; }
     .top-four-section h2 { font-size: 1.25rem; margin-bottom: 0.25rem; }
-    /* Stacked rows so selects never force horizontal overflow off-screen */
+    /* Side-by-side grid: 4 columns on large screens, 2 on medium, 1 on small */
     .top-four-cards {
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
       gap: 1rem;
       margin-top: 1rem;
       width: 100%;
       max-width: 100%;
       box-sizing: border-box;
+    }
+    @media (max-width: 900px) {
+      .top-four-cards { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 480px) {
+      .top-four-cards { grid-template-columns: 1fr; }
     }
     .top-four-card {
       display: flex;
@@ -89,9 +95,27 @@
     .profile-display.hidden { display: none; }
     .profile-edit-form.hidden { display: none; }
     .profile-picture-circle img.hidden { display: none !important; }
-    .profile-picture-circle { width: 80px; height: 80px; border-radius: 50%; background: #e0e0e0; margin-bottom: 0.75rem; flex-shrink: 0; }
-    .profile-picture-circle img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
-    .profile-picture-placeholder { font-size: 0.7rem; color: #999; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
+    .profile-picture-circle {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: #e0e0e0;
+      margin-bottom: 0.75rem;
+      flex-shrink: 0;
+      overflow: hidden;
+      position: relative;
+    }
+    .profile-picture-circle .profile-picture-placeholder,
+    .profile-picture-circle .profile-picture-img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .profile-picture-circle .profile-picture-placeholder { font-size: 0.7rem; color: #999; display: flex; align-items: center; justify-content: center; }
+    .profile-picture-circle .profile-picture-placeholder.hidden { display: none !important; }
+    .profile-picture-circle img { display: block; border-radius: 50%; object-fit: cover; }
     .profile-display-header { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 0.5rem; }
     .profile-display-body { flex: 1; min-width: 0; }
     .profile-display-name { font-size: 1.1rem; font-weight: 600; color: #222; margin-bottom: 0.25rem; }

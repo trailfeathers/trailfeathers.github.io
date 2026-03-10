@@ -24,9 +24,11 @@
     .friends-section-desc { font-size: 0.9rem; color: #555; margin-bottom: 0.5rem; }
     .friends-form .primary { padding: 0.45rem 0.9rem; background: #2c5f2d; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; }
     .friends-form .secondary { padding: 0.45rem 0.9rem; background: #fff; color: #2c5f2d; border: 2px solid #2c5f2d; border-radius: 8px; cursor: pointer; font-size: 0.85rem; margin-right: 0.5rem; }
-    .profile-picture-circle { width: 80px; height: 80px; border-radius: 50%; background: #e0e0e0; flex-shrink: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-    .profile-picture-circle img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
-    .profile-picture-placeholder { font-size: 0.7rem; color: #999; }
+    .profile-picture-circle { width: 80px; height: 80px; border-radius: 50%; background: #e0e0e0; flex-shrink: 0; overflow: hidden; position: relative; }
+    .profile-picture-circle .profile-picture-placeholder,
+    .profile-picture-circle .profile-picture-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+    .profile-picture-circle .profile-picture-placeholder { font-size: 0.7rem; color: #999; display: flex; align-items: center; justify-content: center; }
+    .profile-picture-circle img { display: block; border-radius: 50%; object-fit: cover; }
     .profile-view-header { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 0; }
     .profile-display-name { font-size: 1.1rem; font-weight: 600; color: #222; margin-bottom: 0.25rem; }
     .profile-display-bio { font-size: 0.95rem; color: #555; white-space: pre-wrap; }
