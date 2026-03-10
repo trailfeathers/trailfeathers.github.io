@@ -611,19 +611,24 @@ body {
   flex-direction: column;
   gap: 2rem;
   align-items: stretch;
+  min-height: calc(100vh - 8rem);
+  box-sizing: border-box;
 }
 
 .trip-planner-layout {
   display: flex;
   flex-direction: row;
   gap: 2rem;
-  align-items: flex-start;
+  align-items: stretch;
   flex-wrap: wrap;
+  flex: 1;
+  min-height: 0;
 }
 
 .trip-planner-nav {
   margin-bottom: 0;
   width: 100%;
+  flex-shrink: 0;
 }
 
 .trip-planner-nav .nav-back {
@@ -676,6 +681,21 @@ body {
 
 .trip-overview {
   flex: 1 1 360px;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* Trip list scrolls inside the overview so it fits the viewport */
+#trip-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  overflow-y: auto;
+  min-height: 0;
+  flex: 1;
+  max-height: calc(100vh - 20rem);
 }
 
 /* Create trip form: stacked, left-aligned, bigger inputs */
