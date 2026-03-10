@@ -202,15 +202,16 @@ function getLocationsOptionsHtml(locations, excludeIds = []) {
     });
   }
 
-  /** Options for one slot: eligible hikes only; same hike can't be in two slots. If current selection isn't eligible anymore, keep it as single option so user can clear. */
+  /** Options for one slot: eligible hikes only; same hike can't be in two slots. If current selection is eligible but in another slot, show "(remove to clear)" so user can clear this slot. */
   function getTopFourOptionsHtml(slots, slotIndex) {
     const s = slots[slotIndex];
-    const currentId = s && s.trip_report_info_id ? s.trip_report_info_id : null;
-    const usedIds = slots.map(function (x) { return x.trip_report_info_id; }).filter(Boolean);
+    const currentId = s && s.trip_report_info_id != null ? Number(s.trip_report_info_id) : null;
+    const usedIds = slots.map(function (x) { return x.trip_report_info_id != null ? Number(x.trip_report_info_id) : null; }).filter(function (id) { return id != null; });
     const exclude = usedIds.filter(function (id, i) { return i !== slotIndex; });
-    const list = (topFourEligible || []).filter(function (loc) { return !exclude.includes(loc.id); });
-    if (currentId && !list.some(function (loc) { return loc.id === currentId; }) && s.hike_name) {
-      list.unshift({ id: currentId, hike_name: s.hike_name + " (remove to clear)" });
+    const eligibleIds = (topFourEligible || []).map(function (loc) { return Number(loc.id); });
+    const list = (topFourEligible || []).filter(function (loc) { return !exclude.includes(Number(loc.id)); });
+    if (currentId && eligibleIds.indexOf(currentId) !== -1 && !list.some(function (loc) { return Number(loc.id) === currentId; }) && s.hike_name) {
+      list.unshift({ id: currentId, hike_name: (s.hike_name || "").replace(/\s*\(remove to clear\)\s*$/, "") + " (remove to clear)" });
     }
     if (list.length === 0) {
       return '<option value="">' + (currentId ? "Clear slot above or write a report first" : "Write a trip report first") + '</option>';

@@ -616,7 +616,7 @@ def create_app():
         if not user:
             return jsonify(error="Not logged in"), 401
         rows = list_top_four_eligible_hikes(user["id"])
-        return jsonify([{"id": r["id"], "hike_name": r.get("hike_name") or ""} for r in rows])
+        return jsonify([{"id": int(r["id"]), "hike_name": r.get("hike_name") or ""} for r in rows])
 
     # ----------------------
     # Trip reports API
