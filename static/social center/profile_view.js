@@ -47,6 +47,24 @@ function escapeHtml(text) {
       document.getElementById("profile-display-name").textContent = data.display_name || data.username || "";
       document.getElementById("profile-display-bio").textContent = data.bio || "";
 
+      var img = document.getElementById("profile-picture-img");
+      var ph = document.getElementById("profile-picture-placeholder");
+      if (img && ph) {
+        if (data.avatar_uploaded) {
+          img.src = API_BASE + "/api/users/" + encodeURIComponent(profileUsername) + "/avatar?t=" + Date.now();
+          img.style.display = "block";
+          ph.style.display = "none";
+        } else if (data.avatar_path) {
+          img.src = "../" + data.avatar_path;
+          img.style.display = "block";
+          ph.style.display = "none";
+        } else {
+          img.removeAttribute("src");
+          img.style.display = "none";
+          ph.style.display = "flex";
+        }
+      }
+
       var topFour = document.getElementById("top-four-cards");
       var list = data.top_four || [];
       if (list.length === 0) {

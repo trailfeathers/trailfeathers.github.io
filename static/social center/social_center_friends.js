@@ -19,6 +19,8 @@ function getLocationsOptionsHtml(locations, excludeIds = []) {
 
 (function () {
   let locations = [];
+  /** Hikes user can put in top four (must have trip report). Same shape as locations: id, hike_name */
+  let topFourEligible = [];
 
   function apiFetch(path, options) {
     return fetch(API_BASE + path, Object.assign({ credentials: "include" }, options || {}));
@@ -45,6 +47,32 @@ function getLocationsOptionsHtml(locations, excludeIds = []) {
     if (planTrip) planTrip.addEventListener("click", function () { window.location.href = "../trip.html"; });
   }
 
+  function staticBaseForSocialPage() {
+    // friends.html lives in static/social center/ — static assets are ../ from here
+    return "../";
+  }
+
+  function setProfilePictureCircle(data) {
+    const img = document.getElementById("profile-picture-img");
+    const placeholder = document.getElementById("profile-picture-placeholder");
+    if (!img || !placeholder) return;
+    if (data && data.avatar_uploaded && data.avatar_url_upload) {
+      img.src = data.avatar_url_upload + "?t=" + Date.now();
+      img.classList.remove("hidden");
+      placeholder.classList.add("hidden");
+      return;
+    }
+    if (data && data.avatar_path) {
+      img.src = staticBaseForSocialPage() + data.avatar_path;
+      img.classList.remove("hidden");
+      placeholder.classList.add("hidden");
+      return;
+    }
+    img.removeAttribute("src");
+    img.classList.add("hidden");
+    placeholder.classList.remove("hidden");
+  }
+
   function loadProfile() {
     apiFetch("/api/me/profile").then(function (res) {
       if (res.status === 401) { redirectToLogin(); return; }
@@ -55,6 +83,7 @@ function getLocationsOptionsHtml(locations, excludeIds = []) {
       const bioEl = document.getElementById("profile-display-bio");
       if (nameEl) nameEl.textContent = data.display_name || data.username || "";
       if (bioEl) bioEl.textContent = data.bio || "";
+      setProfilePictureCircle(data);
     });
   }
 
@@ -74,6 +103,48 @@ function getLocationsOptionsHtml(locations, excludeIds = []) {
       if (profileDisplay) profileDisplay.classList.remove("hidden");
       if (profileForm) profileForm.classList.add("hidden");
     }
+    var selectedAvatarPath = null;
+
+    function loadAvatarGrid() {
+      const grid = document.getElementById("profile-avatar-grid");
+      if (!grid) return;
+      grid.innerHTML = "";
+      apiFetch("/api/profile-avatars").then(function (res) {
+        if (!res.ok) return res.json();
+        return res.json();
+      }).then(function (data) {
+        const paths = (data && data.paths) || [];
+        paths.forEach(function (path) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.setAttribute("aria-label", "Use avatar " + path);
+          const url = staticBaseForSocialPage() + path;
+          btn.innerHTML = "<img src=\"" + url + "\" alt=\"\">";
+          if (selectedAvatarPath === path) btn.classList.add("selected");
+          btn.addEventListener("click", function () {
+            grid.querySelectorAll("button").forEach(function (b) { b.classList.remove("selected"); });
+            btn.classList.add("selected");
+            selectedAvatarPath = path;
+            if (errEl) errEl.textContent = "";
+            apiFetch("/api/me/profile", {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ avatar_path: path })
+            }).then(function (res) {
+              if (res.status === 401) { redirectToLogin(); return; }
+              return res.json();
+            }).then(function (d) {
+              if (d) setProfilePictureCircle(d);
+              if (successEl) successEl.textContent = "Profile picture updated.";
+            }).catch(function () {
+              if (errEl) errEl.textContent = "Could not set picture.";
+            });
+          });
+          grid.appendChild(btn);
+        });
+      });
+    }
+
     function showEdit() {
       if (profileDisplay) profileDisplay.classList.add("hidden");
       if (profileForm) profileForm.classList.remove("hidden");
@@ -81,6 +152,39 @@ function getLocationsOptionsHtml(locations, excludeIds = []) {
       if (inputBio && displayBioEl) inputBio.value = displayBioEl.textContent;
       if (errEl) errEl.textContent = "";
       if (successEl) successEl.textContent = "";
+      apiFetch("/api/me/profile").then(function (r) { return r.json(); }).then(function (d) {
+        selectedAvatarPath = (d && d.avatar_path) || null;
+        loadAvatarGrid();
+      });
+    }
+    const avatarFileInput = document.getElementById("profile-avatar-file");
+    if (avatarFileInput) {
+      avatarFileInput.addEventListener("change", function () {
+        const file = avatarFileInput.files && avatarFileInput.files[0];
+        if (!file) return;
+        if (errEl) errEl.textContent = "";
+        const fd = new FormData();
+        fd.append("file", file);
+        fetch(API_BASE + "/api/me/profile/avatar", {
+          method: "POST",
+          credentials: "include",
+          body: fd
+        }).then(function (res) {
+          if (res.status === 401) { redirectToLogin(); return; }
+          return res.json();
+        }).then(function (d) {
+          if (d && d.error && errEl) errEl.textContent = d.error;
+          else if (d) {
+            setProfilePictureCircle(d);
+            selectedAvatarPath = null;
+            loadAvatarGrid();
+            if (successEl) successEl.textContent = "Photo uploaded.";
+          }
+        }).catch(function () {
+          if (errEl) errEl.textContent = "Upload failed.";
+        });
+        avatarFileInput.value = "";
+      });
     }
     if (profileEditBtn) profileEditBtn.addEventListener("click", showEdit);
     if (profileCancelBtn) profileCancelBtn.addEventListener("click", showDisplay);
@@ -103,6 +207,7 @@ function getLocationsOptionsHtml(locations, excludeIds = []) {
           if (!data) return;
           if (displayNameEl) displayNameEl.textContent = data.display_name || data.username || "";
           if (displayBioEl) displayBioEl.textContent = data.bio || "";
+          setProfilePictureCircle(data);
           showDisplay();
           if (successEl) successEl.textContent = "Profile saved.";
         }).catch(function () {
@@ -122,7 +227,35 @@ function getLocationsOptionsHtml(locations, excludeIds = []) {
     });
   }
 
+  function loadTopFourEligible() {
+    return apiFetch("/api/me/top-four-eligible").then(function (res) {
+      if (res.status === 401) { redirectToLogin(); return []; }
+      return res.json();
+    }).then(function (data) {
+      topFourEligible = data || [];
+      return topFourEligible;
+    });
+  }
+
+  /** Options for one slot: eligible hikes only; same hike can't be in two slots. If current selection isn't eligible anymore, keep it as single option so user can clear. */
+  function getTopFourOptionsHtml(slots, slotIndex) {
+    const s = slots[slotIndex];
+    const currentId = s && s.trip_report_info_id ? s.trip_report_info_id : null;
+    const usedIds = slots.map(function (x) { return x.trip_report_info_id; }).filter(Boolean);
+    const exclude = usedIds.filter(function (id, i) { return i !== slotIndex; });
+    const list = (topFourEligible || []).filter(function (loc) { return !exclude.includes(loc.id); });
+    if (currentId && !list.some(function (loc) { return loc.id === currentId; }) && s.hike_name) {
+      list.unshift({ id: currentId, hike_name: s.hike_name + " (remove to clear)" });
+    }
+    if (list.length === 0) {
+      return '<option value="">' + (currentId ? "Clear slot above or write a report first" : "Write a trip report first") + '</option>';
+    }
+    return getLocationsOptionsHtml(list, []);
+  }
+
   function loadTopFour() {
+    const errTopFour = document.getElementById("top-four-error");
+    if (errTopFour) errTopFour.textContent = "";
     apiFetch("/api/me/top-four").then(function (res) {
       if (res.status === 401) { redirectToLogin(); return; }
       return res.json();
@@ -130,13 +263,17 @@ function getLocationsOptionsHtml(locations, excludeIds = []) {
       if (!slots || !Array.isArray(slots)) return;
       const container = document.getElementById("top-four-slots");
       if (!container) return;
-      const usedIds = slots.map(function (s) { return s.trip_report_info_id; }).filter(Boolean);
+      if (!topFourEligible.length && !slots.some(function (s) { return s.trip_report_info_id; })) {
+        container.innerHTML = "<p class=\"friends-section-desc\">Write at least one trip report below, then you can choose your top four here.</p>";
+        return;
+      }
       container.innerHTML = slots.map(function (s, idx) {
         const pos = s.position || idx + 1;
-        const options = getLocationsOptionsHtml(locations, usedIds.filter(function (id, i) { return i !== idx; }));
+        const options = getTopFourOptionsHtml(slots, idx);
         return '<div class="top-four-card">' +
+          '<span class="top-four-slot-label">#' + pos + '</span>' +
           '<div class="top-four-thumb" aria-label="Hike photo slot ' + pos + '"><span class="top-four-thumb-placeholder">Photo</span></div>' +
-          '<div class="top-four-slot"><label>#' + pos + '</label><select data-slot="' + pos + '">' + options + '</select></div>' +
+          '<div class="top-four-slot"><label>Hike</label><select data-slot="' + pos + '">' + options + '</select></div>' +
           '</div>';
       }).join("");
       slots.forEach(function (s, idx) {
@@ -158,13 +295,21 @@ function getLocationsOptionsHtml(locations, excludeIds = []) {
       const val = sel.value ? parseInt(sel.value, 10) : null;
       if (val) slots.push({ position: pos, trip_report_info_id: val });
     });
+    const errTopFour = document.getElementById("top-four-error");
+    if (errTopFour) errTopFour.textContent = "";
     apiFetch("/api/me/top-four", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ slots: slots })
     }).then(function (res) {
       if (res.status === 401) { redirectToLogin(); return; }
-      if (res.ok) loadTopFour();
+      if (res.ok) {
+        loadTopFour();
+        return;
+      }
+      return res.json().then(function (data) {
+        if (errTopFour && data && data.error) errTopFour.textContent = data.error;
+      });
     });
   }
 
@@ -300,6 +445,7 @@ function getLocationsOptionsHtml(locations, excludeIds = []) {
             if (toggleBtn) toggleBtn.hidden = false;
             form.reset();
             loadTripReports();
+            loadTopFourEligible().then(function () { loadTopFour(); });
           }
         }).catch(function () {
           if (errEl) errEl.textContent = "Could not save report.";
@@ -410,6 +556,8 @@ function getLocationsOptionsHtml(locations, excludeIds = []) {
       return loadLocations();
     }).then(function (locs) {
       if (locs) locations = locs;
+      return loadTopFourEligible();
+    }).then(function () {
       loadProfile();
       loadTopFour();
       loadFriendRequests();

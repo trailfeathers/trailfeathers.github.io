@@ -29,26 +29,56 @@
     #search-user-form input { flex: 1; min-width: 120px; margin-bottom: 0; }
     #search-user-form .primary { flex: 0 0 auto; }
     .friends-dashboard-side { display: flex; flex-direction: column; gap: 1rem; }
-    .top-four-section { margin-bottom: 1.5rem; }
-    .top-four-section .friends-dashboard-section { padding: 1.5rem; }
+    .top-four-section { margin-bottom: 1.5rem; overflow-x: hidden; }
+    .top-four-section .friends-dashboard-section { padding: 1.5rem; max-width: 100%; }
     .top-four-section h2 { font-size: 1.25rem; margin-bottom: 0.25rem; }
-    /* min-width: 0 lets grid cells shrink below select intrinsic width so the row stays in the section */
+    /* Stacked rows so selects never force horizontal overflow off-screen */
     .top-four-cards {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      display: flex;
+      flex-direction: column;
       gap: 1rem;
       margin-top: 1rem;
       width: 100%;
       max-width: 100%;
+      box-sizing: border-box;
     }
-    /* 4 narrow columns + long option text overflows — switch to 2 cols below 900px */
-    @media (max-width: 900px) { .top-four-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-    @media (max-width: 400px) { .top-four-cards { grid-template-columns: 1fr; } }
-    .top-four-card { text-align: center; min-width: 0; }
-    .top-four-thumb { width: 100%; aspect-ratio: 1; max-width: 140px; margin: 0 auto 0.5rem; border-radius: 8px; background: #e0e0e0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .top-four-card {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      text-align: left;
+      min-width: 0;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+      padding: 0.75rem;
+      background: #f8f9f8;
+      border-radius: 8px;
+      border: 1px solid #e8ebe8;
+    }
+    .top-four-card .top-four-slot-label {
+      flex: 0 0 auto;
+      font-weight: 600;
+      color: #2c5f2d;
+      min-width: 1.5rem;
+    }
+    .top-four-thumb {
+      width: 64px;
+      height: 64px;
+      flex-shrink: 0;
+      aspect-ratio: 1;
+      margin: 0;
+      border-radius: 8px;
+      background: #e0e0e0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
     .top-four-thumb img { width: 100%; height: 100%; object-fit: cover; }
     .top-four-thumb-placeholder { font-size: 0.7rem; color: #999; }
-    .top-four-card .top-four-slot { margin: 0; min-width: 0; width: 100%; }
+    .top-four-card .top-four-slot { margin: 0; min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 0.25rem; }
+    .top-four-card .top-four-slot label { font-size: 0.8rem; color: #666; }
     .top-four-card .top-four-slot select {
       font-size: 0.85rem;
       width: 100%;
@@ -58,6 +88,7 @@
     }
     .profile-display.hidden { display: none; }
     .profile-edit-form.hidden { display: none; }
+    .profile-picture-circle img.hidden { display: none !important; }
     .profile-picture-circle { width: 80px; height: 80px; border-radius: 50%; background: #e0e0e0; margin-bottom: 0.75rem; flex-shrink: 0; }
     .profile-picture-circle img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
     .profile-picture-placeholder { font-size: 0.7rem; color: #999; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
@@ -66,6 +97,15 @@
     .profile-display-name { font-size: 1.1rem; font-weight: 600; color: #222; margin-bottom: 0.25rem; }
     .profile-display-bio { font-size: 0.95rem; color: #555; white-space: pre-wrap; }
     .profile-edit-actions { margin-top: 0.75rem; }
+    .profile-avatar-picker { margin-top: 0.75rem; }
+    .profile-avatar-picker label { display: block; margin-bottom: 0.35rem; font-weight: 600; }
+    .profile-avatar-grid { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem; max-height: 160px; overflow-y: auto; padding: 0.25rem; border: 1px solid #ddd; border-radius: 6px; background: #fafafa; }
+    .profile-avatar-grid button { padding: 0; border: 2px solid transparent; border-radius: 50%; width: 48px; height: 48px; overflow: hidden; cursor: pointer; background: #eee; }
+    .profile-avatar-grid button:hover { border-color: #2c5f2d; }
+    .profile-avatar-grid button.selected { border-color: #2c5f2d; box-shadow: 0 0 0 2px rgba(44, 95, 45, 0.3); }
+    .profile-avatar-grid button img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .profile-avatar-upload { margin-top: 0.5rem; font-size: 0.9rem; }
+    .profile-avatar-upload input[type=file] { margin-top: 0.35rem; }
     .trip-reports-list .trip-report-item, .friend-request-item, .friend-item, .favorite-item { padding: 0.4rem 0; font-size: 0.9rem; border-bottom: 1px solid #eee; }
     .trip-reports-list .trip-report-item:last-child, .friend-request-item:last-child, .friend-item:last-child, .favorite-item:last-child { border-bottom: none; }
     .trip-reports-list .trip-report-item a { color: #2c5f2d; }
@@ -92,7 +132,8 @@
             <div id="profile-display" class="profile-display">
               <div class="profile-display-header">
                 <div id="profile-picture-circle" class="profile-picture-circle" aria-label="Profile picture">
-                  <span class="profile-picture-placeholder">Photo</span>
+                  <span id="profile-picture-placeholder" class="profile-picture-placeholder">Photo</span>
+                  <img id="profile-picture-img" class="hidden" alt="" width="80" height="80" />
                 </div>
                 <div class="profile-display-body">
                   <p id="profile-display-name" class="profile-display-name"></p>
@@ -102,6 +143,15 @@
               <button type="button" id="profile-edit-btn" class="secondary">Edit profile</button>
             </div>
             <form id="profile-form" class="friends-form profile-edit-form hidden">
+              <div class="profile-avatar-picker">
+                <label>Profile picture</label>
+                <p class="friends-section-desc" style="margin-bottom:0.5rem;">Choose a duck below or upload your own (JPEG/PNG, max 2MB).</p>
+                <div id="profile-avatar-grid" class="profile-avatar-grid" role="group" aria-label="Preset avatars"></div>
+                <div class="profile-avatar-upload">
+                  <label for="profile-avatar-file">Upload image</label>
+                  <input type="file" id="profile-avatar-file" accept="image/jpeg,image/png,image/gif,image/webp" />
+                </div>
+              </div>
               <label for="profile-display-name-input">Display name</label>
               <input type="text" id="profile-display-name-input" name="display_name" placeholder="How you want to be seen" />
               <label for="profile-bio-input">Bio</label>
@@ -127,7 +177,8 @@
 
       <section class="friends-dashboard-section top-four-section">
         <h2>Top four hikes</h2>
-        <p class="friends-section-desc">Your four favorite hikes from the catalog. Pick a hike for each slot.</p>
+        <p class="friends-section-desc">Your four favorite hikes you’ve actually hiked—only hikes you’ve written a trip report for can be added here.</p>
+        <p id="top-four-error" class="error" role="alert"></p>
         <div id="top-four-slots" class="top-four-cards"></div>
       </section>
 
