@@ -258,8 +258,16 @@ function getLocationsOptionsHtml(locations, excludeIds = []) {
         const selectHtml = topFourEditMode
           ? '<div class="top-four-slot"><label>Hike</label><select data-slot="' + pos + '">' + options + '</select></div>'
           : "";
+        const reportId = s && (s.latest_report_id || s.image_report_id) ? (s.latest_report_id || s.image_report_id) : null;
+        const imgReportId = s && s.image_report_id ? s.image_report_id : null;
+        const thumbInner = imgReportId
+          ? '<img src="' + API_BASE + '/api/trip-reports/' + encodeURIComponent(imgReportId) + '/image" alt="' + escapeHtml(name) + ' photo" />'
+          : '<span class="top-four-thumb-placeholder">Photo</span>';
+        const thumb = reportId
+          ? '<a class="top-four-thumb" href="trip_report_view.html?id=' + encodeURIComponent(reportId) + '" aria-label="View trip report for ' + escapeHtml(name) + '">' + thumbInner + '</a>'
+          : '<div class="top-four-thumb" aria-label="Hike photo slot ' + pos + '">' + thumbInner + '</div>';
         return '<div class="top-four-card">' +
-          '<div class="top-four-thumb" aria-label="Hike photo slot ' + pos + '"><span class="top-four-thumb-placeholder">Photo</span></div>' +
+          thumb +
           '<p class="top-four-name">' + escapeHtml(name) + '</p>' +
           selectHtml +
           '</div>';

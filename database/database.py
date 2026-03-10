@@ -688,15 +688,42 @@ def get_profile_avatar_payload(user_id):
 
 # ---------- Top four hikes ----------
 def list_top_four_hikes(user_id):
-    """Return list of up to 4 items: position, trip_report_info_id, hike_name, etc. from trip_report_info. Positions 1-4; missing positions are not in list."""
+    """Return list of up to 4 items: position, trip_report_info_id, hike_name, etc. from trip_report_info.
+    Also includes latest_report_id and image_report_id (latest trip report with uploaded image) for thumbnails.
+    Positions 1-4; missing positions are not in list."""
     with get_cursor() as cur:
         cur.execute(
-            """SELECT ut.position, ut.trip_report_info_id, tri.hike_name, tri.distance, tri.elevation_gain, tri.difficulty, tri.source_url
+            """SELECT
+                 ut.position,
+                 ut.trip_report_info_id,
+                 tri.hike_name,
+                 tri.distance,
+                 tri.elevation_gain,
+                 tri.difficulty,
+                 tri.source_url,
+                 lr.latest_report_id,
+                 ir.image_report_id
                FROM user_top_four_hikes ut
                JOIN trip_report_info tri ON tri.id = ut.trip_report_info_id
+               LEFT JOIN LATERAL (
+                 SELECT utr.id AS latest_report_id
+                 FROM user_trip_reports utr
+                 WHERE utr.user_id = %s AND utr.trip_report_info_id = ut.trip_report_info_id
+                 ORDER BY utr.updated_at DESC NULLS LAST, utr.created_at DESC
+                 LIMIT 1
+               ) lr ON TRUE
+               LEFT JOIN LATERAL (
+                 SELECT utr.id AS image_report_id
+                 FROM user_trip_reports utr
+                 WHERE utr.user_id = %s
+                   AND utr.trip_report_info_id = ut.trip_report_info_id
+                   AND utr.image IS NOT NULL
+                 ORDER BY utr.updated_at DESC NULLS LAST, utr.created_at DESC
+                 LIMIT 1
+               ) ir ON TRUE
                WHERE ut.user_id = %s
                ORDER BY ut.position""",
-            (user_id,),
+            (user_id, user_id, user_id),
         )
         return cur.fetchall()
 

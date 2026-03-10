@@ -587,6 +587,8 @@ def create_app():
                     "position": pos,
                     "trip_report_info_id": r["trip_report_info_id"],
                     "hike_name": r.get("hike_name") or "",
+                    "latest_report_id": r.get("latest_report_id"),
+                    "image_report_id": r.get("image_report_id"),
                 }
         return jsonify(out)
 
@@ -604,7 +606,13 @@ def create_app():
             for r in rows:
                 pos = r["position"]
                 if 1 <= pos <= 4:
-                    out[pos - 1] = {"position": pos, "trip_report_info_id": r["trip_report_info_id"], "hike_name": r.get("hike_name") or ""}
+                    out[pos - 1] = {
+                        "position": pos,
+                        "trip_report_info_id": r["trip_report_info_id"],
+                        "hike_name": r.get("hike_name") or "",
+                        "latest_report_id": r.get("latest_report_id"),
+                        "image_report_id": r.get("image_report_id"),
+                    }
             return jsonify(out)
         except ValueError as e:
             return jsonify(error=str(e)), 400
