@@ -258,7 +258,6 @@ function getLocationsOptionsHtml(locations, excludeIds = []) {
           ? '<div class="top-four-slot"><label>Hike</label><select data-slot="' + pos + '">' + options + '</select></div>'
           : "";
         return '<div class="top-four-card">' +
-          '<span class="top-four-slot-label">#' + pos + '</span>' +
           '<div class="top-four-thumb" aria-label="Hike photo slot ' + pos + '"><span class="top-four-thumb-placeholder">Photo</span></div>' +
           '<p class="top-four-name">' + escapeHtml(name) + '</p>' +
           selectHtml +
