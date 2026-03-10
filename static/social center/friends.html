@@ -32,14 +32,30 @@
     .top-four-section { margin-bottom: 1.5rem; }
     .top-four-section .friends-dashboard-section { padding: 1.5rem; }
     .top-four-section h2 { font-size: 1.25rem; margin-bottom: 0.25rem; }
-    .top-four-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1rem; }
-    @media (max-width: 640px) { .top-four-cards { grid-template-columns: repeat(2, 1fr); } }
-    .top-four-card { text-align: center; }
+    /* min-width: 0 lets grid cells shrink below select intrinsic width so the row stays in the section */
+    .top-four-cards {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+      width: 100%;
+      max-width: 100%;
+    }
+    /* 4 narrow columns + long option text overflows — switch to 2 cols below 900px */
+    @media (max-width: 900px) { .top-four-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 400px) { .top-four-cards { grid-template-columns: 1fr; } }
+    .top-four-card { text-align: center; min-width: 0; }
     .top-four-thumb { width: 100%; aspect-ratio: 1; max-width: 140px; margin: 0 auto 0.5rem; border-radius: 8px; background: #e0e0e0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
     .top-four-thumb img { width: 100%; height: 100%; object-fit: cover; }
     .top-four-thumb-placeholder { font-size: 0.7rem; color: #999; }
-    .top-four-card .top-four-slot { margin: 0; }
-    .top-four-card .top-four-slot select { font-size: 0.85rem; }
+    .top-four-card .top-four-slot { margin: 0; min-width: 0; width: 100%; }
+    .top-four-card .top-four-slot select {
+      font-size: 0.85rem;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
+    }
     .profile-display.hidden { display: none; }
     .profile-edit-form.hidden { display: none; }
     .profile-picture-circle { width: 80px; height: 80px; border-radius: 50%; background: #e0e0e0; margin-bottom: 0.75rem; flex-shrink: 0; }
