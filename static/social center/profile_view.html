@@ -4,14 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TrailFeathers — Profile</title>
+  <link rel="stylesheet" href="../styles.css" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: system-ui, sans-serif; background: #f7f7f7; color: #222; line-height: 1.4; min-height: 100vh; }
     .content { max-width: 960px; margin: 0 auto; padding: 0 1rem 2rem; width: 100%; display: block; }
-    .banner { background: linear-gradient(135deg, #2c5f2d, #97bc62); color: white; padding: 2rem; text-align: center; }
-    .banner h1 { font-size: 2rem; margin-bottom: 0.25rem; }
-    .banner-subtitle { font-size: 1rem; opacity: 0.95; }
-    .banner a { color: white; }
     .profile-view-layout { display: block; }
     .profile-view-nav { margin-bottom: 1rem; }
     .profile-view-nav a { color: #2c5f2d; }
@@ -36,13 +33,46 @@
     .relationship-status-badge { font-size: 0.9rem; color: #555; padding: 0.35rem 0.6rem; background: #f0f0f0; border-radius: 6px; }
     .relationship-status-badge.friend { background: #e8f0e8; color: #2c5f2d; }
     .relationship-status-badge.pending { background: #fff8e0; color: #8a7000; }
-    .top-four-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 0.75rem; }
-    @media (max-width: 640px) { .top-four-cards { grid-template-columns: repeat(2, 1fr); } }
-    .top-four-card { text-align: center; }
-    .top-four-thumb { width: 100%; aspect-ratio: 1; max-width: 140px; margin: 0 auto 0.5rem; border-radius: 8px; background: #e0e0e0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    /* Top four layout matches Social Center */
+    .top-four-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.25rem;
+      margin-top: 1rem;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    @media (max-width: 900px) { .top-four-cards { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .top-four-cards { grid-template-columns: 1fr; } }
+    .top-four-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      min-width: 0;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+      padding: 0.75rem;
+    }
+    .top-four-thumb {
+      width: 100%;
+      aspect-ratio: 1;
+      max-width: 160px;
+      margin: 0 auto 0.5rem;
+      border-radius: 10px;
+      background: #e0e0e0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      text-decoration: none;
+    }
+    a.top-four-thumb { cursor: pointer; }
     .top-four-thumb img { width: 100%; height: 100%; object-fit: cover; }
     .top-four-thumb-placeholder { font-size: 0.7rem; color: #999; }
-    .top-four-name { font-size: 0.85rem; color: #333; }
+    .top-four-name { font-size: 0.95rem; font-weight: 500; color: #333; line-height: 1.3; margin-bottom: 0.5rem; min-height: 2.5em; }
     .trip-reports-list .trip-report-item { padding: 0.5rem 0; font-size: 0.9rem; border-bottom: 1px solid #eee; }
     .trip-reports-list .trip-report-item:last-child { border-bottom: none; }
     .trip-reports-list .trip-report-item a { color: #2c5f2d; }
@@ -50,9 +80,9 @@
   </style>
 </head>
 <body>
-  <p style="margin:0; padding:0.5rem 1rem; background:#2c5f2d; color:white; font-size:1rem;">TrailFeathers — Profile</p>
   <header class="banner banner--friends">
     <a href="../dashboard.html" class="banner-logo-link" aria-label="Trail Feathers home">Trail Feathers</a>
+    <button type="button" id="logout-btn" class="banner-logout-btn">Logout</button>
     <h1 id="banner-title">Profile</h1>
     <p class="banner-subtitle" id="banner-username"></p>
   </header>

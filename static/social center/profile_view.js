@@ -16,6 +16,18 @@ function escapeHtml(text) {
     window.location.href = "../login.html";
   }
 
+  function initLogout() {
+    var logoutBtn = document.getElementById("logout-btn");
+    if (!logoutBtn) return;
+    logoutBtn.addEventListener("click", function () {
+      apiFetch("/api/logout", { method: "POST" }).then(function () {
+        window.location.href = "../login.html";
+      }).catch(function () {
+        window.location.href = "../login.html";
+      });
+    });
+  }
+
   function getUsernameFromQuery() {
     var params = new URLSearchParams(window.location.search);
     return params.get("username") || params.get("user") || "";
@@ -44,8 +56,13 @@ function escapeHtml(text) {
     }).then(function (data) {
       if (!data) return;
       profileUserId = data.user_id;
-      document.getElementById("profile-display-name").textContent = data.display_name || data.username || "";
+      var displayName = data.display_name || data.username || profileUsername || "";
+      document.getElementById("profile-display-name").textContent = displayName;
       document.getElementById("profile-display-bio").textContent = data.bio || "";
+
+      var bannerTitleEl = document.getElementById("banner-title");
+      if (bannerTitleEl) bannerTitleEl.textContent = (displayName ? (displayName + "'s Profile") : "Profile");
+      if (displayName) document.title = "TrailFeathers — " + displayName + " — Profile";
 
       var img = document.getElementById("profile-picture-img");
       var ph = document.getElementById("profile-picture-placeholder");
@@ -66,10 +83,21 @@ function escapeHtml(text) {
       if (list.length === 0) {
         topFour.innerHTML = "<p class=\"friends-section-desc\">No hikes selected.</p>";
       } else {
-        topFour.innerHTML = list.map(function (h) {
+        topFour.innerHTML = list.map(function (h, idx) {
+          var pos = (h && h.position) ? h.position : (idx + 1);
+          var name = (h && h.hike_name) ? String(h.hike_name) : "—";
+          var reportId = (h && (h.latest_report_id || h.image_report_id)) ? (h.latest_report_id || h.image_report_id) : null;
+          var imgReportId = (h && h.image_report_id) ? h.image_report_id : null;
+          var thumbInner = imgReportId
+            ? '<img src="' + API_BASE + '/api/trip-reports/' + encodeURIComponent(imgReportId) + '/image" alt="' + escapeHtml(name) + ' photo" />'
+            : '<span class="top-four-thumb-placeholder">Photo</span>';
+          var thumb = reportId
+            ? '<a class="top-four-thumb" href="trip_report_view.html?id=' + encodeURIComponent(reportId) + '" aria-label="View trip report for ' + escapeHtml(name) + '">' + thumbInner + '</a>'
+            : '<div class="top-four-thumb" aria-label="Hike photo slot ' + pos + '">' + thumbInner + '</div>';
           return '<div class="top-four-card">' +
-            '<div class="top-four-thumb"><span class="top-four-thumb-placeholder">Photo</span></div>' +
-            '<p class="top-four-name">' + escapeHtml(h.hike_name || "") + '</p></div>';
+            thumb +
+            '<p class="top-four-name">' + escapeHtml(name) + '</p>' +
+            '</div>';
         }).join("");
       }
 
@@ -181,6 +209,7 @@ function escapeHtml(text) {
   }
 
   function init() {
+    initLogout();
     setupRelationshipActions();
     initNav();
     loadProfile();
