@@ -56,12 +56,6 @@ function getLocationsOptionsHtml(locations, excludeIds = []) {
     const img = document.getElementById("profile-picture-img");
     const placeholder = document.getElementById("profile-picture-placeholder");
     if (!img || !placeholder) return;
-    if (data && data.avatar_uploaded && data.avatar_url_upload) {
-      img.src = data.avatar_url_upload + "?t=" + Date.now();
-      img.classList.remove("hidden");
-      placeholder.classList.add("hidden");
-      return;
-    }
     if (data && data.avatar_path) {
       img.src = staticBaseForSocialPage() + data.avatar_path;
       img.classList.remove("hidden");
@@ -157,35 +151,6 @@ function getLocationsOptionsHtml(locations, excludeIds = []) {
         loadAvatarGrid();
       });
     }
-    const avatarFileInput = document.getElementById("profile-avatar-file");
-    if (avatarFileInput) {
-      avatarFileInput.addEventListener("change", function () {
-        const file = avatarFileInput.files && avatarFileInput.files[0];
-        if (!file) return;
-        if (errEl) errEl.textContent = "";
-        const fd = new FormData();
-        fd.append("file", file);
-        fetch(API_BASE + "/api/me/profile/avatar", {
-          method: "POST",
-          credentials: "include",
-          body: fd
-        }).then(function (res) {
-          if (res.status === 401) { redirectToLogin(); return; }
-          return res.json();
-        }).then(function (d) {
-          if (d && d.error && errEl) errEl.textContent = d.error;
-          else if (d) {
-            setProfilePictureCircle(d);
-            selectedAvatarPath = null;
-            loadAvatarGrid();
-            if (successEl) successEl.textContent = "Photo uploaded.";
-          }
-        }).catch(function () {
-          if (errEl) errEl.textContent = "Upload failed.";
-        });
-        avatarFileInput.value = "";
-      });
-    }
     if (profileEditBtn) profileEditBtn.addEventListener("click", showEdit);
     if (profileCancelBtn) profileCancelBtn.addEventListener("click", showDisplay);
     if (profileForm) {
@@ -253,6 +218,9 @@ function getLocationsOptionsHtml(locations, excludeIds = []) {
     return getLocationsOptionsHtml(list, []);
   }
 
+  /** When true, top four cards show dropdowns to pick hike; when false, just thumb + name. */
+  let topFourEditMode = false;
+
   function loadTopFour() {
     const errTopFour = document.getElementById("top-four-error");
     if (errTopFour) errTopFour.textContent = "";
@@ -265,24 +233,47 @@ function getLocationsOptionsHtml(locations, excludeIds = []) {
       if (!container) return;
       if (!topFourEligible.length && !slots.some(function (s) { return s.trip_report_info_id; })) {
         container.innerHTML = "<p class=\"friends-section-desc\">Write at least one trip report below, then you can choose your top four here.</p>";
+        const actions = document.querySelector(".top-four-actions");
+        if (actions) actions.classList.add("hidden");
         return;
+      }
+      const actions = document.querySelector(".top-four-actions");
+      if (actions) actions.classList.remove("hidden");
+      const editBtn = document.getElementById("top-four-edit-btn");
+      const editButtons = document.getElementById("top-four-edit-buttons");
+      if (editBtn && editButtons) {
+        if (topFourEditMode) {
+          editBtn.classList.add("hidden");
+          editButtons.classList.remove("hidden");
+        } else {
+          editBtn.classList.remove("hidden");
+          editButtons.classList.add("hidden");
+        }
       }
       container.innerHTML = slots.map(function (s, idx) {
         const pos = s.position || idx + 1;
+        const name = (s.hike_name && s.hike_name.replace(/\s*\(remove to clear\)\s*$/, "")) || "—";
         const options = getTopFourOptionsHtml(slots, idx);
+        const selectHtml = topFourEditMode
+          ? '<div class="top-four-slot"><label>Hike</label><select data-slot="' + pos + '">' + options + '</select></div>'
+          : "";
         return '<div class="top-four-card">' +
           '<span class="top-four-slot-label">#' + pos + '</span>' +
           '<div class="top-four-thumb" aria-label="Hike photo slot ' + pos + '"><span class="top-four-thumb-placeholder">Photo</span></div>' +
-          '<div class="top-four-slot"><label>Hike</label><select data-slot="' + pos + '">' + options + '</select></div>' +
+          '<p class="top-four-name">' + escapeHtml(name) + '</p>' +
+          selectHtml +
           '</div>';
       }).join("");
       slots.forEach(function (s, idx) {
-        const sel = container.querySelector('select[data-slot="' + (s.position || idx + 1) + '"]');
+        const pos = s.position || idx + 1;
+        const sel = container.querySelector('select[data-slot="' + pos + '"]');
         if (sel && s.trip_report_info_id) sel.value = String(s.trip_report_info_id);
       });
-      container.querySelectorAll("select").forEach(function (sel) {
-        sel.addEventListener("change", saveTopFour);
-      });
+      if (topFourEditMode) {
+        container.querySelectorAll("select[data-slot]").forEach(function (sel) {
+          sel.addEventListener("change", saveTopFour);
+        });
+      }
     });
   }
 
@@ -304,6 +295,7 @@ function getLocationsOptionsHtml(locations, excludeIds = []) {
     }).then(function (res) {
       if (res.status === 401) { redirectToLogin(); return; }
       if (res.ok) {
+        topFourEditMode = false;
         loadTopFour();
         return;
       }
@@ -311,6 +303,29 @@ function getLocationsOptionsHtml(locations, excludeIds = []) {
         if (errTopFour && data && data.error) errTopFour.textContent = data.error;
       });
     });
+  }
+
+  function setupTopFourEdit() {
+    const editBtn = document.getElementById("top-four-edit-btn");
+    const saveBtn = document.getElementById("top-four-save-btn");
+    const cancelBtn = document.getElementById("top-four-cancel-btn");
+    if (editBtn) {
+      editBtn.addEventListener("click", function () {
+        topFourEditMode = true;
+        loadTopFour();
+      });
+    }
+    if (saveBtn) {
+      saveBtn.addEventListener("click", function () {
+        saveTopFour();
+      });
+    }
+    if (cancelBtn) {
+      cancelBtn.addEventListener("click", function () {
+        topFourEditMode = false;
+        loadTopFour();
+      });
+    }
   }
 
   function loadFriendRequests() {
@@ -560,6 +575,7 @@ function getLocationsOptionsHtml(locations, excludeIds = []) {
     }).then(function () {
       loadProfile();
       loadTopFour();
+      setupTopFourEdit();
       loadFriendRequests();
       loadFriends();
       loadTripReports();

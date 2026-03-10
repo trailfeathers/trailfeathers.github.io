@@ -50,11 +50,7 @@ function escapeHtml(text) {
       var img = document.getElementById("profile-picture-img");
       var ph = document.getElementById("profile-picture-placeholder");
       if (img && ph) {
-        if (data.avatar_uploaded) {
-          img.src = API_BASE + "/api/users/" + encodeURIComponent(profileUsername) + "/avatar?t=" + Date.now();
-          img.style.display = "block";
-          ph.style.display = "none";
-        } else if (data.avatar_path) {
+        if (data.avatar_path) {
           img.src = "../" + data.avatar_path;
           img.style.display = "block";
           ph.style.display = "none";

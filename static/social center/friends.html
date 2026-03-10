@@ -32,11 +32,14 @@
     .top-four-section { margin-bottom: 1.5rem; overflow-x: hidden; }
     .top-four-section .friends-dashboard-section { padding: 1.5rem; max-width: 100%; }
     .top-four-section h2 { font-size: 1.25rem; margin-bottom: 0.25rem; }
-    /* Side-by-side grid: 4 columns on large screens, 2 on medium, 1 on small */
+    .top-four-actions { margin-top: 0.75rem; margin-bottom: 0.5rem; }
+    .top-four-actions.hidden { display: none !important; }
+    .top-four-actions .hidden { display: none !important; }
+    /* Large cards: thumb on top, trail name below; 4 across */
     .top-four-cards {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 1rem;
+      gap: 1.25rem;
       margin-top: 1rem;
       width: 100%;
       max-width: 100%;
@@ -50,31 +53,30 @@
     }
     .top-four-card {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 1rem;
-      text-align: left;
+      text-align: center;
       min-width: 0;
       width: 100%;
       max-width: 100%;
       box-sizing: border-box;
       padding: 0.75rem;
       background: #f8f9f8;
-      border-radius: 8px;
+      border-radius: 10px;
       border: 1px solid #e8ebe8;
     }
     .top-four-card .top-four-slot-label {
-      flex: 0 0 auto;
       font-weight: 600;
       color: #2c5f2d;
-      min-width: 1.5rem;
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
     }
     .top-four-thumb {
-      width: 64px;
-      height: 64px;
-      flex-shrink: 0;
+      width: 100%;
       aspect-ratio: 1;
-      margin: 0;
-      border-radius: 8px;
+      max-width: 160px;
+      margin: 0 auto 0.5rem;
+      border-radius: 10px;
       background: #e0e0e0;
       display: flex;
       align-items: center;
@@ -83,8 +85,9 @@
     }
     .top-four-thumb img { width: 100%; height: 100%; object-fit: cover; }
     .top-four-thumb-placeholder { font-size: 0.7rem; color: #999; }
-    .top-four-card .top-four-slot { margin: 0; min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 0.25rem; }
-    .top-four-card .top-four-slot label { font-size: 0.8rem; color: #666; }
+    .top-four-name { font-size: 0.95rem; font-weight: 500; color: #333; line-height: 1.3; margin-bottom: 0.5rem; min-height: 2.5em; }
+    .top-four-card .top-four-slot { width: 100%; margin-top: 0.25rem; }
+    .top-four-card .top-four-slot label { display: block; font-size: 0.8rem; color: #666; margin-bottom: 0.2rem; text-align: left; }
     .top-four-card .top-four-slot select {
       font-size: 0.85rem;
       width: 100%;
@@ -128,8 +131,6 @@
     .profile-avatar-grid button:hover { border-color: #2c5f2d; }
     .profile-avatar-grid button.selected { border-color: #2c5f2d; box-shadow: 0 0 0 2px rgba(44, 95, 45, 0.3); }
     .profile-avatar-grid button img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .profile-avatar-upload { margin-top: 0.5rem; font-size: 0.9rem; }
-    .profile-avatar-upload input[type=file] { margin-top: 0.35rem; }
     .trip-reports-list .trip-report-item, .friend-request-item, .friend-item, .favorite-item { padding: 0.4rem 0; font-size: 0.9rem; border-bottom: 1px solid #eee; }
     .trip-reports-list .trip-report-item:last-child, .friend-request-item:last-child, .friend-item:last-child, .favorite-item:last-child { border-bottom: none; }
     .trip-reports-list .trip-report-item a { color: #2c5f2d; }
@@ -169,12 +170,8 @@
             <form id="profile-form" class="friends-form profile-edit-form hidden">
               <div class="profile-avatar-picker">
                 <label>Profile picture</label>
-                <p class="friends-section-desc" style="margin-bottom:0.5rem;">Choose a duck below or upload your own (JPEG/PNG, max 2MB).</p>
+                <p class="friends-section-desc" style="margin-bottom:0.5rem;">Choose a duck below.</p>
                 <div id="profile-avatar-grid" class="profile-avatar-grid" role="group" aria-label="Preset avatars"></div>
-                <div class="profile-avatar-upload">
-                  <label for="profile-avatar-file">Upload image</label>
-                  <input type="file" id="profile-avatar-file" accept="image/jpeg,image/png,image/gif,image/webp" />
-                </div>
               </div>
               <label for="profile-display-name-input">Display name</label>
               <input type="text" id="profile-display-name-input" name="display_name" placeholder="How you want to be seen" />
@@ -203,6 +200,13 @@
         <h2>Top four hikes</h2>
         <p class="friends-section-desc">Your four favorite hikes you’ve actually hiked—only hikes you’ve written a trip report for can be added here.</p>
         <p id="top-four-error" class="error" role="alert"></p>
+        <div class="top-four-actions">
+          <button type="button" id="top-four-edit-btn" class="secondary">Edit top four</button>
+          <span id="top-four-edit-buttons" class="hidden">
+            <button type="button" id="top-four-save-btn" class="primary">Save</button>
+            <button type="button" id="top-four-cancel-btn" class="secondary">Cancel</button>
+          </span>
+        </div>
         <div id="top-four-slots" class="top-four-cards"></div>
       </section>
 
