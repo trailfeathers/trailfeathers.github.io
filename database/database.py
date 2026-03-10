@@ -587,29 +587,103 @@ def remove_favorite_hike(user_id, trip_report_info_id):
 
 
 # ---------- User profiles ----------
+# Allowed prefix for avatar_path (under static/) — profile duck presets
+PROFILE_AVATAR_DIR_PREFIX = "images_for_site/profile_ducks/"
+
+
 def get_user_profile(user_id):
-    """Return profile row for user_id: display_name, bio, updated_at. None if no row."""
+    """Return profile row for user_id. None if no row.
+    Includes avatar_path (static-relative path) and whether an uploaded BYTEA avatar exists."""
     with get_cursor() as cur:
         cur.execute(
-            """SELECT user_id, display_name, bio, updated_at
+            """SELECT user_id, display_name, bio, updated_at,
+                      avatar_path,
+                      (avatar IS NOT NULL) AS avatar_uploaded,
+                      avatar_media_type
                FROM user_profiles WHERE user_id = %s""",
             (user_id,),
         )
         return cur.fetchone()
 
 
-def upsert_user_profile(user_id, display_name=None, bio=None):
-    """Insert or update user profile. display_name and bio can be None to clear."""
+def upsert_user_profile(user_id, display_name=None, bio=None, avatar_path=None):
+    """Insert or update user profile. display_name and bio can be None to clear.
+    If avatar_path is str, set preset path and clear uploaded BYTEA avatar.
+    If avatar_path is False, clear avatar_path only (keep upload if any)."""
+    with get_cursor() as cur:
+        if avatar_path is not None and avatar_path is not False:
+            # Set path and clear BYTEA so preset takes effect
+            cur.execute(
+                """INSERT INTO user_profiles (user_id, display_name, bio, avatar_path, avatar, avatar_media_type, updated_at)
+                   VALUES (%s, %s, %s, %s, NULL, NULL, NOW())
+                   ON CONFLICT (user_id) DO UPDATE SET
+                     display_name = COALESCE(EXCLUDED.display_name, user_profiles.display_name),
+                     bio = COALESCE(EXCLUDED.bio, user_profiles.bio),
+                     avatar_path = EXCLUDED.avatar_path,
+                     avatar = NULL,
+                     avatar_media_type = NULL,
+                     updated_at = NOW()""",
+                (user_id, display_name, bio, avatar_path),
+            )
+        elif avatar_path is False:
+            # Clear preset path only
+            cur.execute(
+                """INSERT INTO user_profiles (user_id, display_name, bio, updated_at)
+                   VALUES (%s, %s, %s, NOW())
+                   ON CONFLICT (user_id) DO UPDATE SET
+                     display_name = COALESCE(EXCLUDED.display_name, user_profiles.display_name),
+                     bio = COALESCE(EXCLUDED.bio, user_profiles.bio),
+                     avatar_path = NULL,
+                     updated_at = NOW()""",
+                (user_id, display_name, bio),
+            )
+        else:
+            cur.execute(
+                """INSERT INTO user_profiles (user_id, display_name, bio, updated_at)
+                   VALUES (%s, %s, %s, NOW())
+                   ON CONFLICT (user_id) DO UPDATE SET
+                     display_name = COALESCE(EXCLUDED.display_name, user_profiles.display_name),
+                     bio = COALESCE(EXCLUDED.bio, user_profiles.bio),
+                     updated_at = NOW()""",
+                (user_id, display_name, bio),
+            )
+
+
+def set_profile_avatar_upload(user_id, image_bytes, media_type):
+    """Store uploaded avatar bytes; clears avatar_path so upload is shown."""
+    if not image_bytes or len(image_bytes) > 2 * 1024 * 1024:
+        raise ValueError("Image missing or too large (max 2MB).")
+    mt = (media_type or "image/jpeg").strip().lower()
+    if mt not in ("image/jpeg", "image/png", "image/gif", "image/webp"):
+        raise ValueError("Use JPEG, PNG, GIF, or WebP.")
     with get_cursor() as cur:
         cur.execute(
-            """INSERT INTO user_profiles (user_id, display_name, bio, updated_at)
-               VALUES (%s, %s, %s, NOW())
+            """INSERT INTO user_profiles (user_id, avatar, avatar_media_type, avatar_path, updated_at)
+               VALUES (%s, %s, %s, NULL, NOW())
                ON CONFLICT (user_id) DO UPDATE SET
-                 display_name = COALESCE(EXCLUDED.display_name, user_profiles.display_name),
-                 bio = COALESCE(EXCLUDED.bio, user_profiles.bio),
+                 avatar = EXCLUDED.avatar,
+                 avatar_media_type = EXCLUDED.avatar_media_type,
+                 avatar_path = NULL,
                  updated_at = NOW()""",
-            (user_id, display_name, bio),
+            (user_id, image_bytes, mt),
         )
+
+
+def get_profile_avatar_payload(user_id):
+    """Return dict with keys bytes, media_type if user has BYTEA avatar; else None."""
+    with get_cursor() as cur:
+        cur.execute(
+            """SELECT avatar, avatar_media_type FROM user_profiles
+               WHERE user_id = %s AND avatar IS NOT NULL""",
+            (user_id,),
+        )
+        row = cur.fetchone()
+        if not row or not row.get("avatar"):
+            return None
+        b = row["avatar"]
+        if isinstance(b, memoryview):
+            b = b.tobytes()
+        return {"bytes": b, "media_type": row.get("avatar_media_type") or "image/jpeg"}
 
 
 # ---------- Top four hikes ----------
@@ -628,12 +702,16 @@ def list_top_four_hikes(user_id):
 
 
 def set_top_four_slot(user_id, position, trip_report_info_id):
-    """Set one slot (1-4) to a trip_report_info_id. Validates position and that location exists."""
+    """Set one slot (1-4) to a trip_report_info_id. User must have a trip report for that hike."""
     if position not in (1, 2, 3, 4):
         raise ValueError("Position must be 1, 2, 3, or 4")
     loc = get_trip_report_info_by_id(trip_report_info_id)
     if not loc:
         raise ValueError("Location not found in catalog.")
+    if not user_has_trip_report_for_info(user_id, trip_report_info_id):
+        raise ValueError(
+            "You can only add hikes you've written a trip report for. Write a report first."
+        )
     with get_cursor() as cur:
         cur.execute(
             """INSERT INTO user_top_four_hikes (user_id, position, trip_report_info_id)
@@ -654,8 +732,33 @@ def clear_top_four_slot(user_id, position):
         )
 
 
+def user_has_trip_report_for_info(user_id, trip_report_info_id):
+    """True if the user has written at least one trip report for this catalog hike."""
+    with get_cursor() as cur:
+        cur.execute(
+            """SELECT 1 FROM user_trip_reports WHERE user_id = %s AND trip_report_info_id = %s LIMIT 1""",
+            (user_id, trip_report_info_id),
+        )
+        return cur.fetchone() is not None
+
+
+def list_top_four_eligible_hikes(user_id):
+    """Distinct catalog hikes the user has at least one trip report for (for top-four picker)."""
+    with get_cursor() as cur:
+        cur.execute(
+            """SELECT DISTINCT utr.trip_report_info_id AS id, tri.hike_name
+               FROM user_trip_reports utr
+               JOIN trip_report_info tri ON tri.id = utr.trip_report_info_id
+               WHERE utr.user_id = %s
+               ORDER BY tri.hike_name""",
+            (user_id,),
+        )
+        return cur.fetchall()
+
+
 def replace_top_four(user_id, slots):
-    """Replace user's top four. slots: list of dicts with position (1-4) and trip_report_info_id. Clears any position not in list."""
+    """Replace user's top four. slots: list of dicts with position (1-4) and trip_report_info_id.
+    Each trip_report_info_id must be a hike the user has written a trip report for."""
     with get_cursor() as cur:
         cur.execute("""DELETE FROM user_top_four_hikes WHERE user_id = %s""", (user_id,))
         for s in slots:
@@ -663,8 +766,13 @@ def replace_top_four(user_id, slots):
             info_id = s.get("trip_report_info_id")
             if pos in (1, 2, 3, 4) and info_id is not None:
                 loc = get_trip_report_info_by_id(info_id)
-                if loc:
-                    cur.execute(
+                if not loc:
+                    continue
+                if not user_has_trip_report_for_info(user_id, info_id):
+                    raise ValueError(
+                        "You can only add hikes you've written a trip report for. Write a report first, then add it to your top four."
+                    )
+                cur.execute(
                         """INSERT INTO user_top_four_hikes (user_id, position, trip_report_info_id)
                            VALUES (%s, %s, %s)
                            ON CONFLICT (user_id, position) DO UPDATE SET trip_report_info_id = EXCLUDED.trip_report_info_id""",
