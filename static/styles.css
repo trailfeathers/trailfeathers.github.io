@@ -1132,6 +1132,48 @@ button:hover {
   background-color: #f0f5eb;
 }
 
+.trip-dashboard-view-toggle {
+  display: inline-flex;
+  gap: 0;
+  margin: 0 0 1rem 0;
+  padding: 4px;
+  border-radius: 999px;
+  background: #eef4ea;
+  border: 1px solid rgba(44, 95, 45, 0.25);
+  align-self: flex-start;
+}
+
+.trip-dashboard-view-toggle .trip-view-toggle-btn {
+  background: transparent;
+  color: #1a3d1a;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.trip-dashboard-view-toggle .trip-view-toggle-btn:hover {
+  background: rgba(44, 95, 45, 0.08);
+}
+
+.trip-dashboard-view-toggle .trip-view-toggle-btn.is-active {
+  background: #2c5f2d;
+  color: white;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+}
+
+.trip-dashboard-view-toggle .trip-view-toggle-btn:focus-visible {
+  outline: 3px solid rgba(44, 95, 45, 0.35);
+  outline-offset: 2px;
+}
+
+.trip-dashboard-view-toggle .trip-view-toggle-btn:active {
+  transform: translateY(1px);
+}
+
 .trip-dashboard-summary {
   background: white;
   padding: 1.5rem 1.75rem;

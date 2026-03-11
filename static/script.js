@@ -1134,9 +1134,65 @@ document.addEventListener("DOMContentLoaded", () => {
   // ---------- Trip dashboard (trip_dashboard.html?id=...) ----------
   const tripDashboardContent = document.querySelector("#trip-dashboard-content");
   const tripDashboardLoading = document.querySelector("#trip-dashboard-loading");
+  const tripViewToggleButtons = Array.from(document.querySelectorAll(".trip-view-toggle-btn"));
+  const tripDashboardToggleWrap = document.querySelector(".trip-dashboard-view-toggle");
+  const tripDashboardSummarySection = document.querySelector(".trip-dashboard-summary");
+  const tripDashboardGearBlock = document.querySelector(".trip-dashboard-block.trip-dashboard-gear");
+  const tripDashboardTeamBlock = document.querySelector(".trip-dashboard-block.trip-dashboard-team");
+  const tripDashboardInvitedSection = document.querySelector("#trip-dashboard-invited");
   const params = new URLSearchParams(window.location.search);
   const tripIdParam = params.get("id");
   let tripWeatherResult = null;
+
+  const TRIP_DASHBOARD_VIEW_STORAGE_KEY = "tf_trip_dashboard_view";
+
+  function getStoredTripDashboardView() {
+    try {
+      const v = window.localStorage.getItem(TRIP_DASHBOARD_VIEW_STORAGE_KEY);
+      return v === "pack" || v === "trip" ? v : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function storeTripDashboardView(view) {
+    try {
+      window.localStorage.setItem(TRIP_DASHBOARD_VIEW_STORAGE_KEY, view);
+    } catch (_) {}
+  }
+
+  function setTripDashboardView(view, opts = {}) {
+    const persist = opts.persist !== false;
+    const next = view === "pack" ? "pack" : "trip";
+
+    if (persist) storeTripDashboardView(next);
+
+    if (tripViewToggleButtons.length) {
+      tripViewToggleButtons.forEach((btn) => {
+        const isActive = btn.getAttribute("data-view") === next;
+        btn.classList.toggle("is-active", isActive);
+        btn.setAttribute("aria-pressed", isActive ? "true" : "false");
+      });
+    }
+
+    // Pack view: show only gear pool / assigned gear / checklist block.
+    if (tripDashboardGearBlock) tripDashboardGearBlock.hidden = next !== "pack";
+    if (tripDashboardSummarySection) tripDashboardSummarySection.hidden = next === "pack";
+    if (tripDashboardTeamBlock) tripDashboardTeamBlock.hidden = next === "pack";
+    if (tripDashboardInvitedSection) tripDashboardInvitedSection.hidden = next === "pack";
+  }
+
+  if (tripDashboardToggleWrap && tripViewToggleButtons.length) {
+    tripViewToggleButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const v = btn.getAttribute("data-view") || "trip";
+        setTripDashboardView(v);
+      });
+    });
+
+    const initialView = getStoredTripDashboardView() || "trip";
+    setTripDashboardView(initialView, { persist: false });
+  }
 
   function applyTripWeather(body) {
     const loadingEl = document.getElementById("trip-weather-loading");
