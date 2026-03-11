@@ -157,7 +157,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const planTrip = document.querySelector("#plan-trip");
   if (planTrip) planTrip.addEventListener("click", () => (window.location.href = "trip.html"));
   const addFriend = document.querySelector("#add-friend");
-  if (addFriend) addFriend.addEventListener("click", () => (window.location.href = "social center/friends.html"));
+  if (addFriend) addFriend.addEventListener("click", () => (window.location.href = "social_center/friends.html"));
   const home = document.querySelector("#home");
   if (home) home.addEventListener("click", () => (window.location.href = "dashboard.html"));
 

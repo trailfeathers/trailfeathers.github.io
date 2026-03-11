@@ -48,7 +48,7 @@ function getLocationsOptionsHtml(locations, excludeIds = []) {
   }
 
   function staticBaseForSocialPage() {
-    // friends.html lives in static/social center/ — static assets are ../ from here
+    // friends.html lives in static/social_center/ — static assets are ../ from here
     return "../";
   }
 
