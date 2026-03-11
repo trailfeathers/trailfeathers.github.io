@@ -500,7 +500,13 @@ def create_app():
             "avatar_path": avatar_path,
             "avatar_uploaded": avatar_uploaded,
             "top_four": [
-                {"position": r["position"], "trip_report_info_id": r["trip_report_info_id"], "hike_name": r.get("hike_name") or ""}
+                {
+                    "position": r["position"],
+                    "trip_report_info_id": r["trip_report_info_id"],
+                    "hike_name": r.get("hike_name") or "",
+                    "latest_report_id": r.get("latest_report_id"),
+                    "image_report_id": r.get("image_report_id"),
+                }
                 for r in top_four
             ],
             "trip_reports": [
