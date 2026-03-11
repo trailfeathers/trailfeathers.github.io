@@ -1182,6 +1182,32 @@ button:hover {
   margin-bottom: 1.5rem;
 }
 
+.trip-dashboard-notes-panel textarea {
+  display: block;
+  width: 100%;
+  max-width: 60rem;
+  min-height: 10rem;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: #fbfbfb;
+  color: #222;
+  font-size: 1rem;
+  line-height: 1.5;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.trip-dashboard-notes-panel textarea:focus-visible {
+  outline: 3px solid rgba(44, 95, 45, 0.35);
+  outline-offset: 2px;
+  background: white;
+}
+
+.trip-dashboard-notes-panel button {
+  margin-top: 0.75rem;
+}
+
 .trip-dashboard-summary {
   background: white;
   padding: 1.5rem 1.75rem;

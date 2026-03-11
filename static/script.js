@@ -1145,6 +1145,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const tripIdParam = params.get("id");
   let tripWeatherResult = null;
 
+  function showBlock(el) {
+    if (!el) return;
+    el.style.display = "";
+  }
+
+  function hideBlock(el) {
+    if (!el) return;
+    el.style.display = "none";
+  }
+
   function setTripDashboardView(view) {
     const next = view === "pack" ? "pack" : "trip";
 
@@ -1156,12 +1166,20 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // Pack view: show only gear pool / assigned gear / checklist block.
-    if (tripDashboardGearBlock) tripDashboardGearBlock.hidden = next !== "pack";
-    if (tripDashboardSummarySection) tripDashboardSummarySection.hidden = next === "pack";
-    if (tripDashboardNotesPanel) tripDashboardNotesPanel.hidden = next === "pack";
-    if (tripDashboardTeamBlock) tripDashboardTeamBlock.hidden = next === "pack";
-    if (tripDashboardInvitedSection) tripDashboardInvitedSection.hidden = next === "pack";
+    // Pack view: show only gear pool / assigned gear / checklist.
+    if (next === "pack") {
+      hideBlock(tripDashboardSummarySection);
+      hideBlock(tripDashboardNotesPanel);
+      hideBlock(tripDashboardTeamBlock);
+      hideBlock(tripDashboardInvitedSection);
+      showBlock(tripDashboardGearBlock);
+    } else {
+      showBlock(tripDashboardSummarySection);
+      showBlock(tripDashboardNotesPanel);
+      showBlock(tripDashboardTeamBlock);
+      showBlock(tripDashboardInvitedSection);
+      hideBlock(tripDashboardGearBlock);
+    }
   }
 
   if (tripDashboardToggleWrap && tripViewToggleButtons.length) {
