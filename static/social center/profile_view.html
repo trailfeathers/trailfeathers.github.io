@@ -77,6 +77,12 @@
     .trip-reports-list .trip-report-item:last-child { border-bottom: none; }
     .trip-reports-list .trip-report-item a { color: #2c5f2d; }
     .friends-preview-notice { text-align: center; color: #555; padding: 0.75rem; background: #e8f0e8; border-radius: 8px; margin-bottom: 1rem; font-size: 0.9rem; }
+    /* Match social center banner (photo instead of green) when CSS is loaded from subfolder */
+    .banner.banner--friends {
+      background: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)), url('../images_for_site/banners/mount_adams.jpg');
+      background-size: cover;
+      background-position: center 62%;
+    }
   </style>
 </head>
 <body>

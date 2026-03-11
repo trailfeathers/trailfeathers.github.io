@@ -84,6 +84,20 @@ body {
   min-height: 200px;
 }
 
+/* Login/index: show Trail Feathers name only, no logo image */
+.banner--login .banner-logo-link {
+  background: none;
+  text-indent: 0;
+  width: auto;
+  height: auto;
+  position: static;
+  display: inline-block;
+  color: inherit;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
 .banner--friends {
   background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
     url('images_for_site/banners/mount_adams.jpg');
