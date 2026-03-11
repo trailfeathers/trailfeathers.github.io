@@ -576,22 +576,21 @@ function getLocationsOptionsHtml(locations, excludeIds = []) {
         redirectToLogin();
         return;
       }
-      return loadLocations();
-    }).then(function (locs) {
-      if (locs) locations = locs;
-      return loadTopFourEligible();
-    }).then(function () {
       loadProfile();
-      loadTopFour();
-      setupTopFourEdit();
       loadFriendRequests();
       loadFriends();
       loadTripReports();
       loadWishlist();
+      loadLocations().then(function () {
+        setupTripReportForm();
+        refreshWishlistDropdown();
+      });
+      loadTopFourEligible().then(function () {
+        loadTopFour();
+      });
+      setupTopFourEdit();
       setupProfileForm();
-      setupTripReportForm();
       setupSearchUser();
-      refreshWishlistDropdown();
       setupAddWishlist();
       initNav();
     });
