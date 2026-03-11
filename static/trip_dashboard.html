@@ -19,17 +19,22 @@
     <div class="trip-dashboard-layout">
       <nav class="trip-dashboard-nav">
         <button type="button" id="back-to-trips" class="secondary">← Back to Trips</button>
+        <div class="trip-dashboard-view-toggle" role="tablist" aria-label="Trip dashboard views">
+          <button type="button" class="trip-view-toggle-btn" data-view="trip" aria-pressed="true">Trip view</button>
+          <button type="button" class="trip-view-toggle-btn" data-view="pack" aria-pressed="false">Pack view</button>
+        </div>
       </nav>
-
-      <div class="trip-dashboard-view-toggle" role="tablist" aria-label="Trip dashboard views">
-        <button type="button" class="trip-view-toggle-btn" data-view="trip" aria-pressed="true">Trip view</button>
-        <button type="button" class="trip-view-toggle-btn" data-view="pack" aria-pressed="false">Pack view</button>
-      </div>
 
       <section class="trip-dashboard-summary">
         <div id="trip-dashboard-content">
           <p id="trip-dashboard-loading">Loading…</p>
         </div>
+      </section>
+
+      <section id="trip-dashboard-notes-panel" class="trip-dashboard-section trip-dashboard-notes-panel" style="display: none;">
+        <h2>Notes</h2>
+        <textarea id="trip-notes-textarea" placeholder="e.g. Can you buy meals? I don't have a filter." rows="4"></textarea>
+        <button type="button" id="trip-notes-save" class="secondary">Save notes</button>
       </section>
 
       <div class="trip-dashboard-block trip-dashboard-gear">

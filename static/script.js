@@ -1137,6 +1137,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const tripViewToggleButtons = Array.from(document.querySelectorAll(".trip-view-toggle-btn"));
   const tripDashboardToggleWrap = document.querySelector(".trip-dashboard-view-toggle");
   const tripDashboardSummarySection = document.querySelector(".trip-dashboard-summary");
+  const tripDashboardNotesPanel = document.querySelector("#trip-dashboard-notes-panel");
   const tripDashboardGearBlock = document.querySelector(".trip-dashboard-block.trip-dashboard-gear");
   const tripDashboardTeamBlock = document.querySelector(".trip-dashboard-block.trip-dashboard-team");
   const tripDashboardInvitedSection = document.querySelector("#trip-dashboard-invited");
@@ -1144,28 +1145,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const tripIdParam = params.get("id");
   let tripWeatherResult = null;
 
-  const TRIP_DASHBOARD_VIEW_STORAGE_KEY = "tf_trip_dashboard_view";
-
-  function getStoredTripDashboardView() {
-    try {
-      const v = window.localStorage.getItem(TRIP_DASHBOARD_VIEW_STORAGE_KEY);
-      return v === "pack" || v === "trip" ? v : null;
-    } catch (_) {
-      return null;
-    }
-  }
-
-  function storeTripDashboardView(view) {
-    try {
-      window.localStorage.setItem(TRIP_DASHBOARD_VIEW_STORAGE_KEY, view);
-    } catch (_) {}
-  }
-
-  function setTripDashboardView(view, opts = {}) {
-    const persist = opts.persist !== false;
+  function setTripDashboardView(view) {
     const next = view === "pack" ? "pack" : "trip";
-
-    if (persist) storeTripDashboardView(next);
 
     if (tripViewToggleButtons.length) {
       tripViewToggleButtons.forEach((btn) => {
@@ -1178,6 +1159,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Pack view: show only gear pool / assigned gear / checklist block.
     if (tripDashboardGearBlock) tripDashboardGearBlock.hidden = next !== "pack";
     if (tripDashboardSummarySection) tripDashboardSummarySection.hidden = next === "pack";
+    if (tripDashboardNotesPanel) tripDashboardNotesPanel.hidden = next === "pack";
     if (tripDashboardTeamBlock) tripDashboardTeamBlock.hidden = next === "pack";
     if (tripDashboardInvitedSection) tripDashboardInvitedSection.hidden = next === "pack";
   }
@@ -1190,8 +1172,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-    const initialView = getStoredTripDashboardView() || "trip";
-    setTripDashboardView(initialView, { persist: false });
+    setTripDashboardView("trip");
   }
 
   function applyTripWeather(body) {
@@ -1312,19 +1293,15 @@ document.addEventListener("DOMContentLoaded", () => {
          ${locationSummary.source_url ? `<p><a href="${escapeHtml(locationSummary.source_url)}" target="_blank" rel="noopener">View source</a></p>` : ""}
        </section>`;
     }
-    summaryHtml += `<section class="trip-dashboard-notes" aria-label="Trip notes">
-        <h3>Notes</h3>
-        <textarea id="trip-notes-textarea" placeholder="e.g. Can you buy meals? I don't have a filter." rows="4"></textarea>
-        <button type="button" id="trip-notes-save" class="secondary">Save notes</button>
-      </section>`;
     tripDashboardContent.innerHTML = summaryHtml;
     if (tripWeatherResult) applyTripWeather(tripWeatherResult);
 
     const notesTextarea = document.getElementById("trip-notes-textarea");
     const notesSaveBtn = document.getElementById("trip-notes-save");
+    if (tripDashboardNotesPanel) tripDashboardNotesPanel.style.display = "block";
     if (notesTextarea) notesTextarea.value = trip.notes || "";
     if (notesSaveBtn && tripIdParam) {
-      notesSaveBtn.addEventListener("click", async () => {
+      notesSaveBtn.onclick = async () => {
         const notesVal = notesTextarea ? notesTextarea.value : "";
         const payload = {
           trip_name: trip.trip_name || "",
@@ -1351,7 +1328,7 @@ document.addEventListener("DOMContentLoaded", () => {
         } catch (_) {
           alert("Could not save notes. Try again.");
         }
-      });
+      };
     }
 
     if (locationSummary) {

@@ -1114,6 +1114,11 @@ button:hover {
 
 .trip-dashboard-nav {
   margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
 .trip-dashboard-nav #back-to-trips {
@@ -1135,12 +1140,11 @@ button:hover {
 .trip-dashboard-view-toggle {
   display: inline-flex;
   gap: 0;
-  margin: 0 0 1rem 0;
+  margin: 0;
   padding: 4px;
   border-radius: 999px;
   background: #eef4ea;
   border: 1px solid rgba(44, 95, 45, 0.25);
-  align-self: flex-start;
 }
 
 .trip-dashboard-view-toggle .trip-view-toggle-btn {
@@ -1172,6 +1176,10 @@ button:hover {
 
 .trip-dashboard-view-toggle .trip-view-toggle-btn:active {
   transform: translateY(1px);
+}
+
+.trip-dashboard-notes-panel {
+  margin-bottom: 1.5rem;
 }
 
 .trip-dashboard-summary {
