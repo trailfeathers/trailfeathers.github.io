@@ -1136,6 +1136,44 @@ document.addEventListener("DOMContentLoaded", () => {
   const tripDashboardLoading = document.querySelector("#trip-dashboard-loading");
   const params = new URLSearchParams(window.location.search);
   const tripIdParam = params.get("id");
+  let tripWeatherResult = null;
+
+  function applyTripWeather(body) {
+    const loadingEl = document.getElementById("trip-weather-loading");
+    const bodyEl = document.getElementById("trip-weather-body");
+    if (!loadingEl && !bodyEl) return;
+    if (loadingEl) loadingEl.remove();
+    if (!bodyEl) return;
+    if (!body) {
+      bodyEl.innerHTML = "<p>Forecast unavailable. Try again later.</p>";
+      return;
+    }
+    if (body.error === "no_coordinates") {
+      bodyEl.innerHTML = "<p>No coordinates available for weather.</p>";
+      return;
+    }
+    if (body.error === "forecast_unavailable") {
+      bodyEl.innerHTML = "<p>Forecast unavailable. Try again later.</p>";
+      return;
+    }
+    const label = body.is_trip_date
+      ? "Weather for " + (body.for_date || "").slice(0, 10)
+      : "Current weather";
+    const iconName = shortForecastToIcon(body.shortForecast);
+    const iconAlt = iconName.replace(/_/g, " ");
+    let html = "<div class=\"trip-weather-header\"><img class=\"trip-weather-icon\" src=\"images_for_site/weather_icons/" + iconName + ".png\" alt=\"" + escapeHtml(iconAlt) + "\" /><p><strong>" + escapeHtml(label) + "</strong>";
+    if (body.temperature != null) {
+      html += " — " + escapeHtml(String(body.temperature)) + "°" + (body.temperatureUnit || "F");
+    }
+    html += "</p></div>";
+    if (body.shortForecast) {
+      html += "<p>" + escapeHtml(body.shortForecast) + "</p>";
+    }
+    if (body.detailedForecast) {
+      html += "<p class=\"trip-weather-detailed\">" + escapeHtml(body.detailedForecast).replace(/\n/g, "<br>") + "</p>";
+    }
+    bodyEl.innerHTML = html;
+  }
 
   function renderTripDashboard(data) {
     const trip = data.trip;
@@ -1171,11 +1209,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const mapQuery = hasCoords ? encodeURIComponent(`${mapLat},${mapLng}`) : "";
 
     let weatherBlockHtml = `<section class="trip-dashboard-weather" aria-label="Weather"><h3>Weather</h3>`;
-    if (hasCoords) {
-      weatherBlockHtml += `<p id="trip-weather-loading">Loading weather…</p><div id="trip-weather-body" class="trip-weather-body"></div>`;
-    } else {
-      weatherBlockHtml += `<p>No coordinates available for weather.</p>`;
-    }
+    weatherBlockHtml += `<p id="trip-weather-loading">Loading weather…</p><div id="trip-weather-body" class="trip-weather-body"></div>`;
     weatherBlockHtml += `</section>`;
 
     let summaryHtml =
@@ -1228,6 +1262,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <button type="button" id="trip-notes-save" class="secondary">Save notes</button>
       </section>`;
     tripDashboardContent.innerHTML = summaryHtml;
+    if (tripWeatherResult) applyTripWeather(tripWeatherResult);
 
     const notesTextarea = document.getElementById("trip-notes-textarea");
     const notesSaveBtn = document.getElementById("trip-notes-save");
@@ -1261,46 +1296,6 @@ document.addEventListener("DOMContentLoaded", () => {
           alert("Could not save notes. Try again.");
         }
       });
-    }
-
-    if (hasCoords && tripIdParam) {
-      const loadingEl = document.getElementById("trip-weather-loading");
-      const bodyEl = document.getElementById("trip-weather-body");
-      fetch(API_BASE + "/api/trips/" + tripIdParam + "/weather", { credentials: "include" })
-        .then((r) => r.json())
-        .then((body) => {
-          if (loadingEl) loadingEl.remove();
-          if (!bodyEl) return;
-          if (body.error === "no_coordinates") {
-            bodyEl.innerHTML = "<p>No coordinates available for weather.</p>";
-            return;
-          }
-          if (body.error === "forecast_unavailable") {
-            bodyEl.innerHTML = "<p>Forecast unavailable. Try again later.</p>";
-            return;
-          }
-          const label = body.is_trip_date
-            ? "Weather for " + (body.for_date || "").slice(0, 10)
-            : "Current weather";
-          const iconName = shortForecastToIcon(body.shortForecast);
-          const iconAlt = iconName.replace(/_/g, " ");
-          let html = "<div class=\"trip-weather-header\"><img class=\"trip-weather-icon\" src=\"images_for_site/weather_icons/" + iconName + ".png\" alt=\"" + escapeHtml(iconAlt) + "\" /><p><strong>" + escapeHtml(label) + "</strong>";
-          if (body.temperature != null) {
-            html += " — " + escapeHtml(String(body.temperature)) + "°" + (body.temperatureUnit || "F");
-          }
-          html += "</p></div>";
-          if (body.shortForecast) {
-            html += "<p>" + escapeHtml(body.shortForecast) + "</p>";
-          }
-          if (body.detailedForecast) {
-            html += "<p class=\"trip-weather-detailed\">" + escapeHtml(body.detailedForecast).replace(/\n/g, "<br>") + "</p>";
-          }
-          bodyEl.innerHTML = html;
-        })
-        .catch(() => {
-          if (loadingEl) loadingEl.remove();
-          if (bodyEl) bodyEl.innerHTML = "<p>Forecast unavailable. Try again later.</p>";
-        });
     }
 
     if (locationSummary) {
@@ -1575,6 +1570,13 @@ document.addEventListener("DOMContentLoaded", () => {
   async function loadTripDashboard() {
     if (!tripDashboardContent || !tripIdParam) return;
     try {
+      const weatherPromise = fetch(API_BASE + "/api/trips/" + encodeURIComponent(tripIdParam) + "/weather", { credentials: "include" })
+        .then((r) => r.json())
+        .catch(() => ({ error: "forecast_unavailable" }));
+      weatherPromise.then((body) => {
+        tripWeatherResult = body;
+        applyTripWeather(body);
+      });
       const res = await fetch(API_BASE + "/api/trips/" + tripIdParam + "/dashboard", { credentials: "include" });
       if (res.status === 401) {
         window.location.href = "login.html";
