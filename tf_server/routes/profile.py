@@ -54,7 +54,9 @@ def register(app, login):
         rest = path[len(PROFILE_AVATAR_DIR_PREFIX) :]
         if not rest or "/" in rest or ".." in rest:
             return None
-        static_dir = os.path.join(app.root_path, "static", PROFILE_AVATAR_DIR_PREFIX)
+        static_dir = os.path.normpath(
+            os.path.join(app.root_path, "..", "static", PROFILE_AVATAR_DIR_PREFIX)
+        )
         full = os.path.normpath(os.path.join(static_dir, rest))
         if not full.startswith(os.path.normpath(static_dir)):
             return None
@@ -125,7 +127,10 @@ def register(app, login):
         user = login.require_auth()
         if not user:
             return jsonify(error="Not logged in"), 401
-        static_dir = os.path.join(app.root_path, "static", PROFILE_AVATAR_DIR_PREFIX)
+        # static/ is at project root; app.root_path is typically tf_server/
+        static_dir = os.path.normpath(
+            os.path.join(app.root_path, "..", "static", PROFILE_AVATAR_DIR_PREFIX)
+        )
         if not os.path.isdir(static_dir):
             return jsonify(paths=[])
         paths = []

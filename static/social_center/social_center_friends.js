@@ -52,6 +52,26 @@ function getLocationsOptionsHtml(locations, excludeIds = []) {
     return "../";
   }
 
+  /** Fallback avatar paths when API returns none (e.g. static dir not on server). Must match files in static/images_for_site/profile_ducks/ */
+  var PROFILE_AVATAR_PATHS_FALLBACK = [
+    "images_for_site/profile_ducks/aura.png",
+    "images_for_site/profile_ducks/chillguy.png",
+    "images_for_site/profile_ducks/flyingmallard.png",
+    "images_for_site/profile_ducks/gooseland.png",
+    "images_for_site/profile_ducks/goosewater.png",
+    "images_for_site/profile_ducks/mallard.png",
+    "images_for_site/profile_ducks/owl.png",
+    "images_for_site/profile_ducks/pufferbrowt.png",
+    "images_for_site/profile_ducks/quetzal.png",
+    "images_for_site/profile_ducks/seahawk.png",
+    "images_for_site/profile_ducks/shoebill.png",
+    "images_for_site/profile_ducks/stork.png",
+    "images_for_site/profile_ducks/toucan.png",
+    "images_for_site/profile_ducks/waterchick.png",
+    "images_for_site/profile_ducks/woodduck1.png",
+    "images_for_site/profile_ducks/woodduck2.png"
+  ];
+
   function setProfilePictureCircle(data) {
     const img = document.getElementById("profile-picture-img");
     const placeholder = document.getElementById("profile-picture-placeholder");
@@ -108,8 +128,9 @@ function getLocationsOptionsHtml(locations, excludeIds = []) {
       apiFetch("/api/profile-avatars").then(function (res) {
         if (!res.ok) return res.json();
         return res.json();
-      }).then(function (data) {
-        const paths = (data && data.paths) || [];
+      }).catch(function () { return { paths: [] }; }).then(function (data) {
+        var paths = (data && data.paths) || [];
+        if (paths.length === 0) paths = PROFILE_AVATAR_PATHS_FALLBACK;
         paths.forEach(function (path) {
           const btn = document.createElement("button");
           btn.type = "button";
