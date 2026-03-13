@@ -1,5 +1,4 @@
 -- Migration: user wishlist ("Hikes I want to try").
--- Run after 005_profiles_and_user_trip_reports.sql (trip_report_info exists).
 
 CREATE TABLE IF NOT EXISTS user_wishlist (
   user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,

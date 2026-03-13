@@ -82,6 +82,7 @@ function getLocationsOptionsHtml(locations, excludeIds = []) {
   }
 
   function setupProfileForm() {
+    const profileSection = document.getElementById("profile-section");
     const profileDisplay = document.getElementById("profile-display");
     const profileForm = document.getElementById("profile-form");
     const profileEditBtn = document.getElementById("profile-edit-btn");
@@ -96,6 +97,7 @@ function getLocationsOptionsHtml(locations, excludeIds = []) {
     function showDisplay() {
       if (profileDisplay) profileDisplay.classList.remove("hidden");
       if (profileForm) profileForm.classList.add("hidden");
+      if (profileSection) profileSection.classList.remove("profile-section--editing");
     }
     var selectedAvatarPath = null;
 
@@ -140,6 +142,7 @@ function getLocationsOptionsHtml(locations, excludeIds = []) {
     }
 
     function showEdit() {
+      if (profileSection) profileSection.classList.add("profile-section--editing");
       if (profileDisplay) profileDisplay.classList.add("hidden");
       if (profileForm) profileForm.classList.remove("hidden");
       if (inputName && displayNameEl) inputName.value = displayNameEl.textContent;
@@ -576,6 +579,15 @@ function getLocationsOptionsHtml(locations, excludeIds = []) {
       if (res.status === 401) {
         redirectToLogin();
         return;
+      }
+      return res.json();
+    }).then(function (data) {
+      if (!data) return;
+      if (data.username) {
+        const viewProfileLink = document.getElementById("banner-view-profile") || document.querySelector(".banner-view-profile");
+        if (viewProfileLink) {
+          viewProfileLink.setAttribute("href", "profile_view.html?username=" + encodeURIComponent(data.username));
+        }
       }
       loadProfile();
       loadFriendRequests();

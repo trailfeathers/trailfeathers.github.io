@@ -1,6 +1,4 @@
 -- Migration: enforce at most 4 favorite hikes per user (backward compatibility).
--- Application layer (add_favorite_hike) will also check count before insert.
--- This trigger prevents exceeding 4 rows per user at the DB level.
 
 CREATE OR REPLACE FUNCTION check_user_favorite_hikes_limit()
 RETURNS TRIGGER AS $$
