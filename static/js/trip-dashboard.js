@@ -43,13 +43,11 @@ document.addEventListener("DOMContentLoaded", () => {
       hideBlock(tripDashboardSummarySection);
       hideBlock(tripDashboardNotesPanel);
       hideBlock(tripDashboardTeamBlock);
-      hideBlock(tripDashboardInvitedSection);
       showBlock(tripDashboardGearBlock);
     } else {
       showBlock(tripDashboardSummarySection);
       showBlock(tripDashboardNotesPanel);
       showBlock(tripDashboardTeamBlock);
-      showBlock(tripDashboardInvitedSection);
       hideBlock(tripDashboardGearBlock);
     }
   }
