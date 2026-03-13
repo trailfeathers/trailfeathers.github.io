@@ -92,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
       lastGearItems = items;
       if (gearLoadingEl) gearLoadingEl.remove();
       if (items.length === 0) {
-        gearCategoriesEl.innerHTML = "<p class=\"gear-loading\">No gear yet. Add some in the form on the right.</p>";
+        gearCategoriesEl.innerHTML = "<p class=\"gear-loading\">No gear yet. Add some in the form on the left.</p>";
         return;
       }
       renderGearList(items);
