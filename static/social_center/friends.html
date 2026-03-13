@@ -127,11 +127,32 @@
     .trip-reports-list .trip-report-item, .friend-request-item, .friend-item, .favorite-item { padding: 0.4rem 0; font-size: 0.9rem; border-bottom: 1px solid #eee; }
     .trip-reports-list .trip-report-item:last-child, .friend-request-item:last-child, .friend-item:last-child, .favorite-item:last-child { border-bottom: none; }
     .trip-reports-list .trip-report-item a { color: #2c5f2d; }
+    .banner-view-profile {
+      position: absolute;
+      top: 1rem;
+      right: 6.5rem;
+      padding: 0.5rem 1rem;
+      background-color: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: 2px solid white;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+    .banner-view-profile:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+      color: white;
+      transform: translateY(-1px);
+    }
   </style>
 </head>
 <body>
   <header class="banner banner--friends">
     <a href="../dashboard.html" class="banner-logo-link" aria-label="Trail Feathers home">Trail Feathers</a>
+    <a href="profile_view.html" class="banner-view-profile" aria-label="View your profile">View profile</a>
     <button type="button" id="logout-btn" class="banner-logout-btn">Logout</button>
     <h1 id="banner-title">Social Center</h1>
     <p class="banner-subtitle">Connect with Friends</p>

@@ -149,6 +149,7 @@ function getLocationsOptionsHtml(locations, excludeIds = []) {
       apiFetch("/api/me/profile").then(function (r) { return r.json(); }).then(function (d) {
         selectedAvatarPath = (d && d.avatar_path) || null;
         loadAvatarGrid();
+        if (profileForm) profileForm.scrollIntoView({ block: "start", behavior: "smooth" });
       });
     }
     if (profileEditBtn) profileEditBtn.addEventListener("click", showEdit);
