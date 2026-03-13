@@ -93,7 +93,7 @@ from .wishlist import (
 )
 
 # Relationships
-from .relationships import get_relationship_status, cancel_friend_request, remove_friend
+from .relationships import get_relationship_status, get_relationship, cancel_friend_request, remove_friend
 
 # Trips
 from .trips import (
@@ -163,7 +163,7 @@ __all__ = [
     # Wishlist
     'list_wishlist', 'add_wishlist_item', 'remove_wishlist_item',
     # Relationships
-    'get_relationship_status', 'cancel_friend_request', 'remove_friend',
+    'get_relationship_status', 'get_relationship', 'cancel_friend_request', 'remove_friend',
     # Trips
     'create_trip', 'get_trip', 'list_trips_for_user',
     'update_trip', 'delete_trip', 'user_has_trip_access', 'leave_trip', 'add_trip_collaborator',

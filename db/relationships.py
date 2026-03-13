@@ -1,4 +1,4 @@
-"""User relationship status."""
+"""User relationship status and helpers."""
 from .connection import get_cursor
 
 
@@ -21,6 +21,11 @@ def get_relationship_status(viewer_id, target_user_id):
     if row["sender_id"] == viewer_id:
         return {"status": "pending_out", "request_id": row["id"]}
     return {"status": "pending_in", "request_id": row["id"]}
+
+
+def get_relationship(viewer_id, target_user_id):
+    """Backwards-compatible wrapper returning the same dict as get_relationship_status."""
+    return get_relationship_status(viewer_id, target_user_id)
 
 
 def remove_friend(viewer_id, target_user_id):
