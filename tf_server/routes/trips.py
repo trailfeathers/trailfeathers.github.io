@@ -250,6 +250,7 @@ def register(app, login):
             "assigned_gear": assigned_gear,
             "checklist": checklist,
             "location_summary": location_summary,
+            "current_username": user.get("username"),
         }
 
     @app.get("/api/trips/<int:trip_id>/dashboard")

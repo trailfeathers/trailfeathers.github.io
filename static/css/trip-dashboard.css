@@ -364,23 +364,28 @@
   color: #c62828;
 }
 
-.trip-dashboard-pack-add-gear {
-  margin: 0 0 1rem 0;
+.gear-owner-heading {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
-.trip-dashboard-pack-add-gear a {
+.gear-owner-edit-link {
   display: inline-block;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  border: 2px solid #2c5f2d;
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+  border: 1px solid #2c5f2d;
   background: white;
   color: #2c5f2d;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
+  font-weight: normal;
   text-decoration: none;
   cursor: pointer;
 }
 
-.trip-dashboard-pack-add-gear a:hover {
+.gear-owner-edit-link:hover {
   background: #f0f5eb;
 }
 
@@ -392,25 +397,19 @@
     gap: 1rem;
   }
 
-  .trip-dashboard-block.trip-dashboard-gear .trip-dashboard-pack-add-gear {
-    grid-column: 1 / -1;
-    grid-row: 1;
-    margin-bottom: 0;
-  }
-
   .trip-dashboard-block.trip-dashboard-gear #trip-dashboard-gear-pool {
     grid-column: 1;
-    grid-row: 2;
+    grid-row: 1;
   }
 
   .trip-dashboard-block.trip-dashboard-gear #trip-dashboard-assigned-gear {
     grid-column: 2;
-    grid-row: 2;
+    grid-row: 1;
   }
 
   .trip-dashboard-block.trip-dashboard-gear #trip-dashboard-checklist {
     grid-column: 1 / -1;
-    grid-row: 3;
+    grid-row: 2;
   }
 
   .trip-dashboard-block.trip-dashboard-team {

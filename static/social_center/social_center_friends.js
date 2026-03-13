@@ -233,7 +233,7 @@ function getLocationsOptionsHtml(locations, excludeIds = []) {
       const container = document.getElementById("top-four-slots");
       if (!container) return;
       if (!topFourEligible.length && !slots.some(function (s) { return s.trip_report_info_id; })) {
-        container.innerHTML = "<p class=\"friends-section-desc friends-section-desc-one-line\">Write at least one trip report below, then you can choose your top four here.</p>";
+        container.innerHTML = "<p class=\"friends-section-desc\">Write at least one trip report below, then you can choose your top four here.</p>";
         const actions = document.querySelector(".top-four-actions");
         if (actions) actions.classList.add("hidden");
         return;

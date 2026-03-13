@@ -97,35 +97,51 @@
   margin-top: 0.25rem;
 }
 
-.trip-report-form .friends-form-row label {
+.trip-report-form-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.trip-report-form-row label {
+  flex: 0 0 auto;
+  margin-bottom: 0;
   display: inline-flex;
   align-items: center;
-  margin-bottom: 0;
-  padding: 0.65rem 0.85rem;
+  height: 40px;
+  padding: 0 0.85rem;
   font-size: 0.95rem;
-  min-height: 40px;
   box-sizing: border-box;
 }
 
-.trip-report-form .friends-form-row input[type="date"] {
-  min-height: 40px;
-  padding: 0.65rem 0.85rem;
+.trip-report-form-row input[type="date"] {
+  flex: 1;
+  min-width: 120px;
+  height: 40px;
+  padding: 0 0.85rem;
+  margin: 0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.95rem;
   box-sizing: border-box;
 }
 
-.trip-report-form .friends-form-row button {
+.trip-report-form-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.trip-report-form-row button {
   min-height: 40px;
   padding: 0.65rem 1rem;
   box-sizing: border-box;
+  margin: 0;
 }
 
-.top-four-section h2 {
-  margin-bottom: 1.75rem;
-}
-
-.friends-section-desc-one-line {
-  white-space: nowrap;
-}
 
 .friend-item .view-profile-btn {
   display: inline-block;

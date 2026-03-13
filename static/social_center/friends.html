@@ -228,11 +228,13 @@
               <input type="text" id="trip-report-title" name="title" placeholder="e.g. Winter summit in perfect conditions" required />
               <label for="trip-report-body">Your Report</label>
               <textarea id="trip-report-body" name="body" rows="3" placeholder="How it went, conditions, highlights…"></textarea>
-              <div class="friends-form-row">
+              <div class="friends-form-row trip-report-form-row">
                 <label for="trip-report-date">Date Hiked</label>
                 <input type="date" id="trip-report-date" name="date_hiked" />
-                <button type="submit" class="primary">Save Report</button>
-                <button type="button" id="trip-report-cancel" class="secondary">Cancel</button>
+                <span class="trip-report-form-actions">
+                  <button type="submit" class="primary">Save Report</button>
+                  <button type="button" id="trip-report-cancel" class="secondary">Cancel</button>
+                </span>
               </div>
               <input type="hidden" id="trip-report-edit-id" name="report_id" value="" />
             </form>

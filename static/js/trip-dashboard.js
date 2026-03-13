@@ -404,10 +404,15 @@ document.addEventListener("DOMContentLoaded", () => {
           if (!byOwner[item.owner_username]) byOwner[item.owner_username] = [];
           byOwner[item.owner_username].push(item);
         });
+        const currentUsername = (data.current_username || "").trim();
         poolList.innerHTML = Object.keys(byOwner).sort().map((owner) => {
           const items = byOwner[owner];
+          const isCurrentUser = owner === currentUsername;
+          const editLink = isCurrentUser
+            ? `<a href="inventory.html" class="gear-owner-edit-link">Edit My Gear</a>`
+            : "";
           return `<div class="gear-owner-section">
-            <h4>${escapeHtml(owner)}'s Gear</h4>
+            <h4 class="gear-owner-heading"><span>${escapeHtml(owner)}'s Gear</span>${editLink}</h4>
             <ul class="gear-pool-items">
               ${items.map((item) => {
                 const isAssigned = item.is_assigned;
