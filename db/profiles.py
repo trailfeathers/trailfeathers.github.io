@@ -1,6 +1,9 @@
 """Module docstring."""
 from .connection import get_cursor, get_db_connection
 
+# Allowed prefix for avatar_path (under static/) — profile duck presets
+PROFILE_AVATAR_DIR_PREFIX = "images_for_site/profile_ducks/"
+
 
 def get_user_profile(user_id):
     """Return profile row for user_id. None if no row.

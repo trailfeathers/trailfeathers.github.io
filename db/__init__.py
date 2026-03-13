@@ -57,6 +57,7 @@ from .favorites import (
 
 # Profiles
 from .profiles import (
+    PROFILE_AVATAR_DIR_PREFIX,
     get_user_profile,
     upsert_user_profile,
     set_profile_avatar_upload,
@@ -150,7 +151,7 @@ __all__ = [
     # Favorites
     'list_favorite_hikes', 'add_favorite_hike', 'remove_favorite_hike',
     # Profiles
-    'get_user_profile', 'upsert_user_profile',
+    'PROFILE_AVATAR_DIR_PREFIX', 'get_user_profile', 'upsert_user_profile',
     'set_profile_avatar_upload', 'get_profile_avatar_payload',
     # Top Four
     'list_top_four_hikes', 'set_top_four_slot', 'clear_top_four_slot',
