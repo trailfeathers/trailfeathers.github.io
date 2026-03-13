@@ -1,6 +1,10 @@
-"""Module docstring."""
-from .connection import get_cursor, get_db_connection
+"""User wishlist."""
+from .connection import get_cursor
+from .trip_reports import get_trip_report_info_by_id
 
+
+def list_wishlist(user_id):
+    """Return list of wishlist items: id (trip_report_info_id), hike_name, distance, elevation_gain, difficulty, source_url."""
     with get_cursor() as cur:
         cur.execute(
             """SELECT tri.id, tri.hike_name, tri.distance, tri.elevation_gain, tri.difficulty, tri.source_url

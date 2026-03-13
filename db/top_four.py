@@ -1,6 +1,10 @@
-"""Module docstring."""
-from .connection import get_cursor, get_db_connection
+"""Top four hikes."""
+from .connection import get_cursor
+from .trip_reports import get_trip_report_info_by_id
 
+
+def list_top_four_hikes(user_id):
+    """Return list of up to 4 items: position, trip_report_info_id, hike_name, etc. from trip_report_info.
     Also includes latest_report_id and image_report_id (latest trip report with uploaded image) for thumbnails.
     Positions 1-4; missing positions are not in list."""
     with get_cursor() as cur:

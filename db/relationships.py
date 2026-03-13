@@ -1,6 +1,9 @@
-"""Module docstring."""
-from .connection import get_cursor, get_db_connection
+"""User relationship status."""
+from .connection import get_cursor
 
+
+def get_relationship_status(viewer_id, target_user_id):
+    """Return {status, request_id}. status: 'self'|'none'|'friend'|'pending_out'|'pending_in'."""
     if viewer_id == target_user_id:
         return {"status": "self", "request_id": None}
     with get_cursor() as cur:

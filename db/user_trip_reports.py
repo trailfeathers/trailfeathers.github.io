@@ -1,6 +1,10 @@
-"""Module docstring."""
-from .connection import get_cursor, get_db_connection
+"""User trip reports."""
+from .connection import get_cursor
+from .trip_reports import get_trip_report_info_by_id
 
+
+def list_user_trip_reports(user_id):
+    """Return list of trip reports for user: id, title, trip_report_info_id, hike_name, date_hiked, created_at, updated_at."""
     with get_cursor() as cur:
         cur.execute(
             """SELECT utr.id, utr.title, utr.trip_report_info_id, utr.body, utr.date_hiked, utr.created_at, utr.updated_at,
