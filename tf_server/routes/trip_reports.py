@@ -1,6 +1,6 @@
 from flask import Response, jsonify, request
 
-from database.database import (
+from db import (
     create_user_trip_report,
     delete_user_trip_report,
     get_trip_report_image_payload,

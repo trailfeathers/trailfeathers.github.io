@@ -1,6 +1,6 @@
 from flask import jsonify
 
-from database.database import list_trip_report_info_for_selection
+from db import list_trip_report_info_for_selection
 
 
 def register(app, login):

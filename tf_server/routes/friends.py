@@ -1,6 +1,6 @@
 from flask import jsonify, request, session
 
-from database.database import (
+from db import (
     accept_friend_request,
     add_favorite_hike,
     cancel_friend_request,

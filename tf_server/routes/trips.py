@@ -5,7 +5,7 @@ from datetime import datetime
 
 from flask import jsonify, request, session
 
-from database.database import (
+from db import (
     accept_trip_invite,
     assign_gear_to_trip,
     cancel_trip_invite,

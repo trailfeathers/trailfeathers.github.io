@@ -14,7 +14,7 @@ DATABASE_URL = os.environ.get("DATABASE_URL")
 # Allow importing from project root (database module)
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from database.database import get_cursor, insert_trip_report_info
+from db import get_cursor, insert_trip_report_info
 
 client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 

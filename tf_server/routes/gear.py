@@ -1,6 +1,6 @@
 from flask import jsonify, request, session
 
-from database.database import (
+from db import (
     add_gear_item,
     delete_gear_item,
     get_gear_item,

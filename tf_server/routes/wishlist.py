@@ -1,6 +1,6 @@
 from flask import jsonify, request
 
-from database.database import add_wishlist_item, list_wishlist, remove_wishlist_item
+from db import add_wishlist_item, list_wishlist, remove_wishlist_item
 
 
 def register(app, login):

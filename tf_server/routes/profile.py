@@ -3,7 +3,7 @@ import urllib.parse
 
 from flask import Response, jsonify, request
 
-from database.database import (
+from db import (
     PROFILE_AVATAR_DIR_PREFIX,
     get_profile_avatar_payload,
     get_relationship,

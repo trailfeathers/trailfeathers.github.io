@@ -1,6 +1,6 @@
 from flask import jsonify, request
 
-from database.database import (
+from db import (
     list_top_four_eligible_hikes,
     list_top_four_hikes,
     replace_top_four,

@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify, session
 from flask_bcrypt import Bcrypt
 from datetime import timedelta
 
-from database.database import (
+from db import (
     get_user_by_id,
     get_user_by_username,
     create_user,
