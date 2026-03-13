@@ -97,8 +97,34 @@
   margin-top: 0.25rem;
 }
 
+.trip-report-form .friends-form-row label {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 0;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.95rem;
+  min-height: 40px;
+  box-sizing: border-box;
+}
+
+.trip-report-form .friends-form-row input[type="date"] {
+  min-height: 40px;
+  padding: 0.65rem 0.85rem;
+  box-sizing: border-box;
+}
+
+.trip-report-form .friends-form-row button {
+  min-height: 40px;
+  padding: 0.65rem 1rem;
+  box-sizing: border-box;
+}
+
 .top-four-section h2 {
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.75rem;
+}
+
+.friends-section-desc-one-line {
+  white-space: nowrap;
 }
 
 .friend-item .view-profile-btn {

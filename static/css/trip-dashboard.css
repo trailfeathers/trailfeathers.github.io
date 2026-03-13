@@ -364,6 +364,26 @@
   color: #c62828;
 }
 
+.trip-dashboard-pack-add-gear {
+  margin: 0 0 1rem 0;
+}
+
+.trip-dashboard-pack-add-gear a {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 2px solid #2c5f2d;
+  background: white;
+  color: #2c5f2d;
+  font-size: 0.95rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.trip-dashboard-pack-add-gear a:hover {
+  background: #f0f5eb;
+}
+
 @media (min-width: 768px) {
   .trip-dashboard-block.trip-dashboard-gear {
     display: grid;
@@ -372,19 +392,25 @@
     gap: 1rem;
   }
 
+  .trip-dashboard-block.trip-dashboard-gear .trip-dashboard-pack-add-gear {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    margin-bottom: 0;
+  }
+
   .trip-dashboard-block.trip-dashboard-gear #trip-dashboard-gear-pool {
     grid-column: 1;
-    grid-row: 1;
+    grid-row: 2;
   }
 
   .trip-dashboard-block.trip-dashboard-gear #trip-dashboard-assigned-gear {
     grid-column: 2;
-    grid-row: 1;
+    grid-row: 2;
   }
 
   .trip-dashboard-block.trip-dashboard-gear #trip-dashboard-checklist {
     grid-column: 1 / -1;
-    grid-row: 2;
+    grid-row: 3;
   }
 
   .trip-dashboard-block.trip-dashboard-team {
