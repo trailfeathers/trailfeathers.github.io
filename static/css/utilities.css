@@ -1,0 +1,12 @@
+/* Utility classes – error/success messages used across forms and friends */
+.error {
+  color: #c00;
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+}
+
+.success {
+  color: #080;
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+}

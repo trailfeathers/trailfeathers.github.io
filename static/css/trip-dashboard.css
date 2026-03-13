@@ -1,0 +1,496 @@
+/* Trip dashboard – layout, view toggle, summary, weather, map, gear pool, team */
+.trip-dashboard.content {
+  align-items: stretch;
+  margin-top: 1.5rem;
+}
+
+.trip-dashboard-layout {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 1rem 2rem;
+  width: 100%;
+}
+
+.trip-dashboard-nav {
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.trip-dashboard-nav #back-to-trips {
+  width: auto;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 2px solid #2c5f2d;
+  background-color: white;
+  color: #2c5f2d;
+  font-size: 0.95rem;
+  cursor: pointer;
+  margin: 0;
+}
+
+.trip-dashboard-nav #back-to-trips:hover {
+  background-color: #f0f5eb;
+}
+
+.trip-dashboard-view-toggle {
+  display: inline-flex;
+  gap: 0;
+  margin: 0;
+  padding: 4px;
+  border-radius: 999px;
+  background: #eef4ea;
+  border: 1px solid rgba(44, 95, 45, 0.25);
+}
+
+.trip-dashboard-view-toggle .trip-view-toggle-btn {
+  background: transparent;
+  color: #1a3d1a;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.trip-dashboard-view-toggle .trip-view-toggle-btn:hover {
+  background: rgba(44, 95, 45, 0.08);
+}
+
+.trip-dashboard-view-toggle .trip-view-toggle-btn.is-active {
+  background: #2c5f2d;
+  color: white;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+}
+
+.trip-dashboard-view-toggle .trip-view-toggle-btn:focus-visible {
+  outline: 3px solid rgba(44, 95, 45, 0.35);
+  outline-offset: 2px;
+}
+
+.trip-dashboard-view-toggle .trip-view-toggle-btn:active {
+  transform: translateY(1px);
+}
+
+.trip-dashboard-notes-panel {
+  margin-bottom: 1.5rem;
+}
+
+.trip-dashboard-notes-panel textarea {
+  display: block;
+  width: 100%;
+  max-width: 60rem;
+  min-height: 10rem;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: #fbfbfb;
+  color: #222;
+  font-size: 1rem;
+  line-height: 1.5;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.trip-dashboard-notes-panel textarea:focus-visible {
+  outline: 3px solid rgba(44, 95, 45, 0.35);
+  outline-offset: 2px;
+  background: white;
+}
+
+.trip-dashboard-notes-panel button {
+  margin-top: 0.75rem;
+}
+
+.trip-dashboard-summary {
+  background: white;
+  padding: 1.5rem 1.75rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  border-left: 4px solid #2c5f2d;
+  margin-bottom: 1.5rem;
+}
+
+.trip-dashboard-summary #trip-dashboard-content h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: #1a3d1a;
+}
+
+.trip-dashboard-summary #trip-dashboard-content p {
+  margin-bottom: 0.35rem;
+  font-size: 1rem;
+}
+
+.trip-dashboard-top {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 0;
+}
+
+@media (max-width: 640px) {
+  .trip-dashboard-top {
+    grid-template-columns: 1fr;
+  }
+}
+
+.trip-dashboard-weather-top .trip-dashboard-weather {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+.trip-dashboard-weather-top {
+  min-width: 0;
+}
+
+.trip-weather-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.trip-weather-header p {
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+}
+
+.trip-weather-icon {
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+.trip-dashboard-location-summary {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.trip-dashboard-map {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.trip-dashboard-map h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+  color: #1a3d1a;
+}
+
+.trip-dashboard-map-frame {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  border-radius: 12px;
+}
+
+.trip-dashboard-map-links {
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.trip-dashboard-map-placeholder {
+  color: #444;
+  font-size: 0.95rem;
+}
+
+.trip-dashboard-weather {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.trip-dashboard-weather h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+  color: #1a3d1a;
+}
+
+.trip-dashboard-weather p {
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.trip-weather-body p:last-child {
+  margin-bottom: 0;
+}
+
+.trip-weather-detailed {
+  font-size: 0.9rem;
+  color: #444;
+}
+
+.trip-dashboard-location-summary h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  color: #1a3d1a;
+}
+
+.trip-dashboard-trail-stats {
+  font-size: 0.95rem;
+  color: #444;
+}
+
+.trip-dashboard-report-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.trip-dashboard-report-controls label {
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.trip-dashboard-report-select {
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+  background: white;
+}
+
+.trip-dashboard-ai-summary {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #444;
+  white-space: pre-wrap;
+}
+
+.trip-dashboard-notes {
+  margin-top: 1rem;
+}
+
+.trip-dashboard-notes h3 {
+  font-size: 1.15rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.trip-dashboard-notes textarea {
+  display: block;
+  width: 100%;
+  max-width: 40rem;
+  min-height: 5rem;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+
+.trip-dashboard-notes button {
+  margin-top: 0;
+}
+
+.location-no-results {
+  color: #666;
+  cursor: default;
+  pointer-events: none;
+}
+
+.trip-dashboard-block {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.trip-dashboard-section {
+  margin-top: 0;
+  margin-bottom: 0;
+  background: white;
+  padding: 1.25rem 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.trip-dashboard-section h2 {
+  font-size: 1.15rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.trip-dashboard-section p {
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.trip-dashboard-section ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.trip-dashboard-section ul li {
+  margin-bottom: 0.35rem;
+}
+
+@media (min-width: 768px) {
+  .trip-dashboard-block.trip-dashboard-gear {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 1rem;
+  }
+
+  .trip-dashboard-block.trip-dashboard-gear #trip-dashboard-gear-pool {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .trip-dashboard-block.trip-dashboard-gear #trip-dashboard-assigned-gear {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .trip-dashboard-block.trip-dashboard-gear #trip-dashboard-checklist {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .trip-dashboard-block.trip-dashboard-team {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .trip-dashboard-block.trip-dashboard-team #trip-dashboard-members {
+    grid-column: 1;
+  }
+
+  .trip-dashboard-block.trip-dashboard-team #trip-dashboard-pending-invites,
+  .trip-dashboard-block.trip-dashboard-team #trip-dashboard-invite-friend {
+    grid-column: 2;
+  }
+}
+
+.role-badge {
+  font-size: 0.85rem;
+  color: #555;
+  margin-left: 0.25rem;
+}
+
+#trip-dashboard-invited button {
+  margin-right: 0.5rem;
+}
+
+#trip-dashboard-invite-friend select {
+  margin-right: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.trip-invite-item {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: #f8f8f8;
+  border-radius: 6px;
+}
+.trip-invite-item button {
+  margin-right: 0.5rem;
+  margin-top: 0.25rem;
+}
+.trip-invite-item a {
+  margin-right: 0.75rem;
+}
+
+.gear-owner-section {
+  margin-bottom: 1.5rem;
+  padding: 0.75rem;
+  background: #f9f9f9;
+  border-radius: 6px;
+}
+
+.gear-owner-section h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+.gear-pool-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.gear-pool-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  margin-bottom: 0.25rem;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+}
+
+.gear-pool-item.assigned {
+  background: #e8f5e9;
+  border-color: #4caf50;
+}
+
+.gear-info {
+  flex: 1;
+  font-size: 0.9rem;
+}
+
+.btn-small {
+  padding: 0.3rem 0.75rem;
+  font-size: 0.85rem;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-add-gear {
+  background: #2c5f2d;
+  color: white;
+}
+
+.btn-add-gear:hover {
+  background: #1f4420;
+}
+
+.btn-remove-gear {
+  background: #d32f2f;
+  color: white;
+}
+
+.btn-remove-gear:hover {
+  background: #b71c1c;
+}
+
+.assigned-gear-list {
+  list-style: none;
+  padding: 0;
+}
+
+.assigned-gear-list li {
+  padding: 0.5rem;
+  margin-bottom: 0.25rem;
+  background: #f0f5eb;
+  border-left: 3px solid #2c5f2d;
+  border-radius: 4px;
+}
+
+.assigned-gear-list em {
+  color: #555;
+  font-size: 0.9rem;
+}

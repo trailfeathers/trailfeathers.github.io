@@ -1,0 +1,308 @@
+/* Trip planner – layout, create form, location combobox, trip cards, edit modal, base buttons */
+.trip-planner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  align-items: stretch;
+  min-height: calc(100vh - 8rem);
+  box-sizing: border-box;
+}
+
+.trip-planner-layout {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  align-items: stretch;
+  flex-wrap: wrap;
+  flex: 1;
+  min-height: 0;
+}
+
+.trip-planner-nav {
+  margin-bottom: 0;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.trip-planner-nav .nav-back {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 2px solid #2c5f2d;
+  background-color: white;
+  color: #2c5f2d;
+  font-size: 0.95rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.trip-planner-nav .nav-back:hover {
+  background-color: #f0f5eb;
+}
+
+.trip-setup,
+.trip-overview {
+  background: white;
+  padding: 1.75rem 2rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+}
+
+.trip-setup h2,
+.trip-overview-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.trip-overview-toolbar h2 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.trip-overview h2 {
+  margin-bottom: 1rem;
+  font-size: 1.4rem;
+}
+
+.trip-setup {
+  flex: 0 1 420px;
+}
+
+.trip-overview {
+  flex: 1 1 360px;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+#trip-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  overflow-y: auto;
+  min-height: 0;
+  flex: 1;
+  max-height: calc(100vh - 20rem);
+}
+
+#create-trip-form,
+#trip-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  align-items: flex-start;
+  width: 100%;
+}
+
+#create-trip-form input,
+#create-trip-form select,
+#create-trip-form button,
+#trip-form input,
+#trip-form textarea {
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+  min-height: 40px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+#create-trip-form textarea,
+#trip-form textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+#create-trip-form label,
+#trip-form label {
+  font-size: 0.95rem;
+  margin-bottom: -0.5rem;
+}
+
+#create-trip-form button,
+#trip-form button {
+  min-height: 40px;
+  padding: 0.65rem 1rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  width: auto;
+}
+
+.location-combobox {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.location-combobox input[type="text"] {
+  width: 100%;
+}
+
+.location-listbox {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-height: 280px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  display: none;
+}
+
+.location-combobox[aria-expanded="true"] .location-listbox {
+  display: block;
+}
+
+.location-listbox [role="option"] {
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  font-size: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.location-listbox [role="option"]:last-child {
+  border-bottom: none;
+}
+
+.location-listbox [role="option"]:hover,
+.location-listbox [role="option"][aria-selected="true"] {
+  background: #e8f4e8;
+}
+
+.location-listbox .location-option-meta {
+  font-size: 0.85rem;
+  color: #555;
+  margin-top: 0.2rem;
+}
+
+#trip-form input,
+#trip-form textarea {
+  padding: 0.6rem;
+  font-size: 1rem;
+}
+
+#trip-form textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.trip-card {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.trip-card-clickable {
+  cursor: pointer;
+}
+
+.trip-card-clickable:hover {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+}
+
+.trip-actions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.trip-dashboard-actions {
+  margin-top: 0.75rem;
+}
+.trip-dashboard-actions button {
+  margin-right: 0.5rem;
+}
+
+.edit-trip-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.edit-trip-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+}
+.edit-trip-modal-content {
+  position: relative;
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  max-width: 420px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+.edit-trip-modal-content h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+.edit-trip-modal-content label {
+  display: block;
+  margin-top: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+.edit-trip-modal-content input,
+.edit-trip-modal-content select {
+  width: 100%;
+  padding: 0.5rem;
+  box-sizing: border-box;
+}
+.edit-trip-modal-actions {
+  margin-top: 1.25rem;
+  display: flex;
+  gap: 0.5rem;
+}
+.edit-trip-combobox {
+  position: relative;
+}
+.edit-trip-combobox .location-listbox {
+  max-height: 200px;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background-color: #2f6b2f;
+  color: white;
+}
+
+button.small {
+  padding: 0.4rem 0.7rem;
+  font-size: 0.85rem;
+}
+
+button.danger {
+  background-color: #a33;
+}
+
+button:hover {
+  opacity: 0.9;
+}

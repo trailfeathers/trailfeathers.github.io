@@ -1,0 +1,10 @@
+/* Main CSS – imports all modules (Part 3 refactor) */
+@import url('global.css');
+@import url('banner.css');
+@import url('forms.css');
+@import url('dashboard.css');
+@import url('inventory.css');
+@import url('trips.css');
+@import url('friends.css');
+@import url('trip-dashboard.css');
+@import url('utilities.css');

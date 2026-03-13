@@ -1,0 +1,261 @@
+/* Gear library dashboard – layout, categories, edit, inventory sections */
+.gear-dashboard.content {
+  align-items: stretch;
+  margin-top: 1.5rem;
+}
+
+.gear-dashboard-layout {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1rem 2rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.gear-dashboard-nav {
+  margin-bottom: 0;
+  grid-column: 1 / -1;
+}
+
+.gear-dashboard-nav .nav-back {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 2px solid #2c5f2d;
+  background-color: white;
+  color: #2c5f2d;
+  font-size: 0.95rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.gear-dashboard-nav .nav-back:hover {
+  background-color: #f0f5eb;
+}
+
+@media (min-width: 1024px) {
+  .gear-dashboard-layout {
+    display: grid;
+    grid-template-columns: minmax(280px, 320px) 1fr minmax(280px, 320px);
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  .gear-dashboard-sidebar-left {
+    grid-column: 1;
+  }
+
+  .gear-dashboard-main {
+    grid-column: 2;
+  }
+
+  .gear-dashboard-sidebar-right {
+    grid-column: 3;
+  }
+}
+
+.gear-dashboard-main {
+  min-width: 0;
+}
+
+.gear-dashboard-sidebar-left {
+  min-width: 0;
+}
+
+.gear-dashboard-sidebar-right {
+  min-width: 0;
+}
+
+.gear-dashboard-categories {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.gear-dashboard-categories .gear-loading {
+  color: #555;
+  margin: 0;
+}
+
+.gear-category-section {
+  background: white;
+  padding: 1.25rem 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.gear-category-section h3 {
+  font-size: 1.15rem;
+  margin: 0 0 0.75rem 0;
+  color: #1a3d1a;
+  border-bottom: 1px solid #e5e5e5;
+  padding-bottom: 0.5rem;
+}
+
+.gear-category-section ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.gear-category-item {
+  padding: 0.6rem 0;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 0.95rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.gear-category-item:last-child {
+  border-bottom: none;
+}
+
+.gear-category-item strong {
+  color: #333;
+}
+
+.gear-category-item .gear-meta {
+  color: #555;
+  font-size: 0.9rem;
+  margin-top: 0.2rem;
+}
+
+.gear-item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.btn-delete-gear {
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.2s;
+}
+
+.btn-delete-gear:hover {
+  background: #c82333;
+}
+
+.gear-item-editable {
+  cursor: pointer;
+}
+.gear-item-editable:hover {
+  background: #f5f5f5;
+  border-radius: 4px;
+}
+
+.gear-library-toolbar {
+  margin-bottom: 0.75rem;
+}
+
+.edit-gear-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.gear-dashboard-section {
+  background: white;
+  padding: 1.25rem 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.gear-dashboard-section h2 {
+  font-size: 1.15rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.gear-dashboard-section .gear-form {
+  margin-top: 0;
+}
+
+/* Inventory sections */
+.inventory-add,
+.inventory-list {
+  background: white;
+  padding: 1.75rem 2rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+}
+
+.inventory-add h2,
+.inventory-list h2 {
+  margin-bottom: 1rem;
+  font-size: 1.4rem;
+}
+
+#add-item-form {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+#add-item-form input {
+  padding: 0.6rem 0.75rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+#item-name {
+  flex: 2;
+}
+
+#item-quantity {
+  width: 90px;
+}
+
+#add-item-form button {
+  padding: 0.6rem 1.25rem;
+  border-radius: 999px;
+  border: none;
+  background-color: #2c5f2d;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+#add-item-form button:hover {
+  background-color: #244d24;
+}
+
+.inventory-list table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.inventory-list th,
+.inventory-list td {
+  text-align: left;
+  padding: 0.75rem 0.5rem;
+}
+
+.inventory-list thead {
+  border-bottom: 2px solid #e5e5e5;
+}
+
+.inventory-list tbody tr {
+  border-bottom: 1px solid #eee;
+}
+
+.inventory-list tbody tr:last-child {
+  border-bottom: none;
+}

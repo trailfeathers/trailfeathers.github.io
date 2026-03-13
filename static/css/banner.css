@@ -1,0 +1,117 @@
+/* Banner styles – shared and page-specific */
+.banner {
+  position: relative;
+  background: linear-gradient(135deg, #2c5f2d, #97bc62);
+  color: white;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.banner-logout-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid white;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.banner-logout-btn:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.banner-logo-link {
+  position: absolute;
+  left: 0.75rem;
+  top: 0.75rem;
+  display: block;
+  width: 440px;
+  height: 192px;
+  background: transparent url('../images_for_site/banners/logo_transparent.png') left top / auto 192px no-repeat;
+  text-indent: -9999px;
+  overflow: hidden;
+}
+
+.banner-logo-link:hover,
+.banner-logo-link:focus {
+  background-color: transparent;
+}
+
+.banner h1 {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.banner p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+.banner-subtitle {
+  font-size: 0.95rem;
+  opacity: 0.85;
+  margin-top: 0.25rem;
+}
+
+/* page-specific banner photos */
+.banner--login {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
+    url('../images_for_site/banners/crystal.jpg');
+  background-size: cover;
+  background-position: center 82%;
+  min-height: 200px;
+}
+
+/* Login/index: show Trail Feathers name only, no logo image */
+.banner--login .banner-logo-link {
+  background: none;
+  text-indent: 0;
+  width: auto;
+  height: auto;
+  position: static;
+  display: inline-block;
+  color: inherit;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.banner--friends {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
+    url('../images_for_site/banners/mount_adams.jpg');
+  background-size: cover;
+  background-position: center 62%;
+  min-height: 200px;
+}
+
+.banner--inventory {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
+    url('../images_for_site/banners/mount_daniel.jpeg');
+  background-size: cover;
+  background-position: center 67%;
+  min-height: 200px;
+}
+
+.banner--dashboard {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
+    url('../images_for_site/banners/gothic.jpg');
+  background-size: cover;
+  background-position: center 67%;
+  min-height: 200px;
+}
+
+.banner--trip {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
+    url('../images_for_site/banners/daniel_panarama.jpeg');
+  background-size: cover;
+  background-position: center 67%;
+  min-height: 200px;
+}
