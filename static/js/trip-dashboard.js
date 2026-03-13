@@ -17,6 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
   const tripIdParam = params.get("id");
   let tripWeatherResult = null;
+  let currentTripDashboardView = "trip";
 
   if (!tripDashboardContent) return;
 
@@ -32,6 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function setTripDashboardView(view) {
     const next = view === "pack" ? "pack" : "trip";
+    currentTripDashboardView = next;
     if (tripViewToggleButtons.length) {
       tripViewToggleButtons.forEach((btn) => {
         const isActive = btn.getAttribute("data-view") === next;
@@ -46,7 +48,9 @@ document.addEventListener("DOMContentLoaded", () => {
       showBlock(tripDashboardGearBlock);
     } else {
       showBlock(tripDashboardSummarySection);
-      showBlock(tripDashboardNotesPanel);
+      if (tripDashboardNotesPanel) {
+        tripDashboardNotesPanel.style.display = document.getElementById("trip-dashboard-loading") ? "none" : "";
+      }
       showBlock(tripDashboardTeamBlock);
       hideBlock(tripDashboardGearBlock);
     }
@@ -185,7 +189,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const notesTextarea = document.getElementById("trip-notes-textarea");
     const notesSaveBtn = document.getElementById("trip-notes-save");
-    if (tripDashboardNotesPanel) tripDashboardNotesPanel.style.display = "block";
+    if (tripDashboardNotesPanel) {
+      tripDashboardNotesPanel.style.display = currentTripDashboardView === "trip" ? "" : "none";
+    }
     if (notesTextarea) notesTextarea.value = trip.notes || "";
     if (notesSaveBtn && tripIdParam) {
       notesSaveBtn.onclick = async () => {
@@ -493,6 +499,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }).join("");
       checklistSection.style.display = "block";
     }
+    setTripDashboardView(currentTripDashboardView);
   }
 
   async function loadTripDashboard() {
