@@ -340,6 +340,30 @@
   margin-bottom: 0.35rem;
 }
 
+#trip-checklist-list .checklist-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  list-style: none;
+  margin-left: -1.25rem;
+  padding-left: 1.25rem;
+}
+
+#trip-checklist-list .checklist-icon {
+  flex-shrink: 0;
+  font-size: 1.1rem;
+  font-weight: bold;
+  line-height: 1.4;
+}
+
+#trip-checklist-list .checklist-icon--met {
+  color: #2e7d32;
+}
+
+#trip-checklist-list .checklist-icon--short {
+  color: #c62828;
+}
+
 @media (min-width: 768px) {
   .trip-dashboard-block.trip-dashboard-gear {
     display: grid;

@@ -387,7 +387,7 @@ function getLocationsOptionsHtml(locations, excludeIds = []) {
       el.innerHTML = data.map(function (f) {
         const username = encodeURIComponent(f.username || "");
         return '<div class="friend-item">' +
-          escapeHtml(f.username) + ' <a href="profile_view.html?username=' + username + '" class="secondary">View profile</a>' +
+          escapeHtml(f.username) + ' <a href="profile_view.html?username=' + username + '" class="view-profile-btn">View Profile</a>' +
           '</div>';
       }).join("");
     });

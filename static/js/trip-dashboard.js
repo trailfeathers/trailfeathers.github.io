@@ -481,7 +481,10 @@ document.addEventListener("DOMContentLoaded", () => {
         else if (item.rule === "per_person") ruleText = "1 per person";
         else if (item.rule === "per_N_persons" && item.n_persons) ruleText = `1 per ${item.n_persons} people`;
         const statusClass = item.status === "met" ? "checklist-met" : "checklist-short";
+        const iconClass = item.status === "met" ? "checklist-icon--met" : "checklist-icon--short";
+        const iconChar = item.status === "met" ? "\u2713" : "\u2717";
         return `<li class="checklist-item ${statusClass}">
+          <span class="checklist-icon ${iconClass}" aria-hidden="true">${iconChar}</span>
           <strong>${name}</strong>: ${item.required_count} needed${ruleText ? ` (${ruleText})` : ""} — ${item.covered_count} covered <span class="checklist-status">(${item.status})</span>
         </li>`;
       }).join("");
