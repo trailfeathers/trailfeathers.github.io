@@ -1,5 +1,8 @@
 /**
- * API and client-side config for TrailFeathers.
+ * TrailFeathers - API and client-side config (API_BASE, REQUIREMENT_KEY_TO_CATEGORY, GEAR_CATEGORY_ORDER).
+ * Group: TrailFeathers
+ * Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+ * Last updated: 3/13/26
  *
  * API_BASE is the backend root (e.g. for fetch(API_BASE + "/api/gear")).
  * REQUIREMENT_KEY_TO_CATEGORY and GEAR_CATEGORY_ORDER are used only on the client

@@ -1,7 +1,10 @@
 /**
- * Trip dashboard page (trip_dashboard.html?id=...).
+ * TrailFeathers - Trip dashboard page (trip_dashboard.html?id=...): summary, weather, map, team, gear, checklist.
+ * Group: TrailFeathers
+ * Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+ * Last updated: 3/13/26
  *
- * Loads trip by ?id=; fetches /api/trips/<id>/dashboard for trip, location summary, pending invite.
+ * Loads trip by ?id=; fetches /api/trips/<id>/dashboard. Renders trip info, weather, map, notes, team, gear pool.
  * Renders: trip info, weather (via /api/locations/weather), map (Google embed if coords), trail report
  * summary (AI summary / report 1 / report 2), notes (editable), team (members + invite), gear pool
  * and assigned gear, requirement checklist. View toggle: "Trip" vs "Pack" (shows gear block, hides

@@ -1,5 +1,5 @@
 /*
- * Gear library (inventory) page – layout, category sections, edit panel, add form.
+ * TrailFeathers - Gear library (inventory) page styles. Group: TrailFeathers. Authors (alphabetically by last name): Kim, Smith, Domst, and Snider. Last updated: 3/13/26.
  * .gear-dashboard-*: page wrapper, nav, and grid (two sidebars + main on large screens).
  * .gear-category-section: white card per category (e.g. Sleep Systems). .gear-category-item:
  * each gear row; in edit mode .gear-item-editable is clickable, .btn-delete-gear appears.

@@ -1,7 +1,10 @@
 /**
- * First page and dashboard navigation (buttons, banner welcome).
+ * TrailFeathers - First page and dashboard navigation (Login/Register, inventory, plan trip, banner welcome).
+ * Group: TrailFeathers
+ * Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+ * Last updated: 3/13/26
  *
- * Runs on index.html (first page) and dashboard.html. Wires: first-page Login/Register buttons,
+ * Runs on index.html and dashboard.html. Wires: first-page Login/Register buttons,
  * dashboard buttons (inventory, plan trip, add friend, home), and banner "Welcome, {username}"
  * on the dashboard only (via /api/me).
  */

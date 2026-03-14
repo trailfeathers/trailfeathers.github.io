@@ -1,6 +1,8 @@
 """
-User management: lookup by id or username, create user, check existence, get first user.
-Used by auth (login, signup), profile routes (user lookup), and trip_invites (invitee lookup).
+TrailFeathers - User management: lookup by id/username, create user, check existence, get first user.
+Group: TrailFeathers
+Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Last updated: 3/13/26
 """
 from .connection import get_cursor
 

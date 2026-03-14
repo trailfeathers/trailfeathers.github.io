@@ -1,6 +1,8 @@
 """
-User wishlist (user_wishlist). Catalog hikes the user wants to try. list returns
-joined trip_report_info; add/remove by trip_report_info_id. Used by wishlist routes.
+TrailFeathers - User wishlist: list, add, remove by trip_report_info_id; used by wishlist routes.
+Group: TrailFeathers
+Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Last updated: 3/13/26
 """
 from .connection import get_cursor
 from .trip_reports import get_trip_report_info_by_id

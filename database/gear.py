@@ -1,7 +1,8 @@
 """
-Gear (inventory) management. Per-user gear items with optional requirement_type_id
-and capacity_persons for trip checklist coverage. add_gear_item / update_gear_item
-use _parse_gear_payload for validation. Used by gear routes and trip_gear (pool/assign).
+TrailFeathers - Gear (inventory) management: CRUD, _parse_gear_payload; used by gear and trip_gear routes.
+Group: TrailFeathers
+Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Last updated: 3/13/26
 """
 from .connection import get_cursor
 

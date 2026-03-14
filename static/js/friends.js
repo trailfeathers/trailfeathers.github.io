@@ -1,7 +1,10 @@
 /**
- * Friends page: requests, friends list, add friend form, and favorites section.
+ * TrailFeathers - Friends page: requests, friends list, add friend form, favorites section.
+ * Group: TrailFeathers
+ * Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+ * Last updated: 3/13/26
  *
- * Runs on the friends page loaded from dashboard (e.g. social_center/friends.html if using main.js).
+ * Runs on friends page (e.g. social_center/friends.html if using main.js).
  * Loads incoming friend requests (/api/friends/requests), friends list (/api/friends), and
  * favorites; supports accept/decline, add-friend search, and favorite-hike display. Note: the
  * Social Center friends.html may use social_center_friends.js instead of this module.

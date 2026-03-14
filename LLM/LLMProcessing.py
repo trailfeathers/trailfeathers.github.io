@@ -1,10 +1,10 @@
 """
-Process trailData.csv with OpenAI to produce summarized descriptions and cleaned
-trip reports, then insert rows into trip_report_info. Reads CSV from script directory;
-uses OPENAI_API_KEY and DATABASE_URL. TRIP_REPORT_START_TRIP_ID can set starting
-trip_id; otherwise continues from MAX(trip_id)+1. Each row is sent to the LLM once;
-output is JSON (summarized_description, trip_report_1, trip_report_2). Latitude/longitude
-are derived from the row (including malformed CSVs where coords appear in headers).
+TrailFeathers - Process trailData.csv with OpenAI; insert summarized descriptions and trip reports into trip_report_info.
+Group: TrailFeathers
+Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Last updated: 3/13/26
+
+Uses OPENAI_API_KEY, DATABASE_URL; TRIP_REPORT_START_TRIP_ID or MAX(trip_id)+1. Output JSON per row.
 """
 from dotenv import load_dotenv
 load_dotenv()  # ← THIS MUST COME FIRST

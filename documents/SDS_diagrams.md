@@ -1,5 +1,10 @@
 # TrailFeathers SDS Diagrams
 
+**Purpose:** Software Design Specification diagrams (ER, architecture). Export via mermaid.live or SDS_diagrams.html.  
+**Group:** TrailFeathers  
+**Authors (alphabetically by last name):** Kim, Smith, Domst, and Snider  
+**Last updated:** 3/13/26
+
 Use this doc to export diagrams for the NewSDS (Figure 6 + architecture). Options: paste Mermaid into [mermaid.live](https://mermaid.live) to export PNG/SVG, open `SDS_diagrams.html` in a browser to view and screenshot, or use the text descriptions with an image-generation LLM.
 
 ---

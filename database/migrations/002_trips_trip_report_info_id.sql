@@ -1,6 +1,7 @@
--- Migration: link trips to location catalog (trip_report_info).
--- Run after schema.sql so trip_report_info exists.
--- Allows trip creation to select from catalog and dashboard to show AI summary.
+-- TrailFeathers - Migration 002: link trips to trip_report_info (location catalog).
+-- Group: TrailFeathers
+-- Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+-- Last updated: 3/13/26
 
 DO $$
 BEGIN

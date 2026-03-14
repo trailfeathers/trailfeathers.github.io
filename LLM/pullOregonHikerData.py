@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """
-pullOregonHikerData.py
+TrailFeathers - Scrape Oregon Hikers Field Guide to oregonHikerData.csv for LLMProcessing.
+Group: TrailFeathers
+Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Last updated: 3/13/26
 
-Scrapes hike data from the Oregon Hikers Field Guide (oregonhikers.org) and
-writes it to oregonHikerData.csv, which can be fed into LLMProcessing.py.
+Scrapes hike data from oregonhikers.org; writes oregonHikerData.csv.
 
 Column names are chosen to match what LLMProcessing.py's find_csv_column()
 will detect (case-insensitive substring matching):

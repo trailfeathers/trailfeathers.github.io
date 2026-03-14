@@ -1,9 +1,8 @@
 """
-Trip invitations (trip_invites). create_trip_invite by invitee_id. accept adds
-to trip_collaborators; decline/cancel update or delete invite. list_trip_invites_pending
-(for trip), list_incoming_trip_invites (for user), has_pending_invite_to_trip,
-get_trip_id_for_invite, cancel_trip_invite. list_trip_collaborators and remove_trip_collaborator
-live in trips.py. Used by trip routes.
+TrailFeathers - Trip invitations: create, accept, decline, cancel, list pending/incoming; used by trip routes.
+Group: TrailFeathers
+Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Last updated: 3/13/26
 """
 from .connection import get_cursor
 

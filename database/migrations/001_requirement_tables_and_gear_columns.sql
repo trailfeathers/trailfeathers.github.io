@@ -1,6 +1,8 @@
--- Migration for existing databases: add requirement tables and gear columns.
--- Run this if your database was created before requirement_types/activity_requirements existed.
--- Then run seed_requirements.sql to populate data.
+-- TrailFeathers - Migration 001: add requirement tables and gear columns.
+-- Group: TrailFeathers
+-- Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+-- Last updated: 3/13/26
+-- Run if DB was created before requirement_types/activity_requirements. Then run seed_requirements.sql.
 
 -- 1. Create requirement tables (must exist before gear can reference them)
 CREATE TABLE IF NOT EXISTS requirement_types (

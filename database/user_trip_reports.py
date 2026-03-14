@@ -1,8 +1,8 @@
 """
-User-created trip reports (user_trip_reports). Each report links to a catalog hike
-(trip_report_info_id) and has title, body, date_hiked, optional image. list/get for
-current user or public view; create/update/delete for owner; set/get image for owner.
-Used by trip_reports routes and top_four eligibility.
+TrailFeathers - User-created trip reports: list, get, create, update, delete, set/get image; used by trip_reports and top_four.
+Group: TrailFeathers
+Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Last updated: 3/13/26
 """
 from .connection import get_cursor
 from .trip_report_info import get_trip_report_info_by_id

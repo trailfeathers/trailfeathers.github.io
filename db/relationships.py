@@ -1,8 +1,8 @@
 """
-User relationship status and actions. get_relationship_status / get_relationship
-return status (self|none|friend|pending_out|pending_in) and request_id for profile
-view. remove_friend deletes accepted pair; cancel_friend_request deletes pending
-request (sender only). Used by profile and friends routes.
+TrailFeathers - User relationship status: get_relationship, remove_friend, cancel_friend_request; used by profile and friends routes.
+Group: TrailFeathers
+Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Last updated: 3/13/26
 """
 from .connection import get_cursor
 

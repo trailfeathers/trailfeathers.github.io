@@ -1,9 +1,8 @@
 """
-Scrape WTA (Washington Trails Association) hike listing and individual hike pages
-to build a CSV of trail data. Uses requests + BeautifulSoup for the search listing
-(paginated by offset); uses Selenium (Chrome headless) per hike URL to get full
-description and lazy-loaded trip reports. Writes all_hikes to test.csv. Intended
-as a one-off or manual run; column names match what LLMProcessing.py expects.
+TrailFeathers - Scrape WTA hike listing and pages to build trail CSV; writes test.csv for LLMProcessing.
+Group: TrailFeathers
+Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Last updated: 3/13/26
 """
 import requests
 import time

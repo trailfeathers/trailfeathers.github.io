@@ -1,6 +1,6 @@
 /*
- * Trip dashboard (trip_dashboard.html?id=...). Layout, Trip/Pack view toggle, and all
- * dashboard blocks. Summary card, notes panel, weather, map, trail summary, members,
+ * TrailFeathers - Trip dashboard (trip_dashboard.html) styles. Group: TrailFeathers. Authors (alphabetically by last name): Kim, Smith, Domst, and Snider. Last updated: 3/13/26.
+ * Layout, Trip/Pack view toggle, summary card, notes, weather, map, members, gear pool, checklist.
  * gear pool (Equipment Pool / Assigned / What to Bring), invite section. Checklist
  * items use .checklist-icon--met (green) and .checklist-icon--short (red). Gear pool
  * has .gear-owner-section ("X's Gear"), .gear-owner-edit-link ("Edit My Gear"), and

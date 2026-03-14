@@ -1,7 +1,10 @@
 /**
- * Trip planner page: trip list, create trip, edit modal, trip invites, location catalog.
+ * TrailFeathers - Trip planner page: trip list, create trip, edit modal, trip invites, location catalog.
+ * Group: TrailFeathers
+ * Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+ * Last updated: 3/13/26
  *
- * Runs on trip.html. Loads /api/trips and /api/me (for current user). Renders trip cards;
+ * Runs on trip.html. Loads /api/trips and /api/me. Renders trip cards;
  * in edit mode, creator sees Edit/Delete, non-creator sees Disband (leave). Clicking a card
  * goes to trip_dashboard.html?id=<id>. Create form and edit modal call API; openEditTripModal
  * and loadTripDashboard are exposed for the trip dashboard. Location combobox uses catalog API.

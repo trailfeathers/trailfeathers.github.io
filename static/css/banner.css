@@ -1,5 +1,5 @@
 /*
- * Banner styles – shared header used across authenticated and auth pages.
+ * TrailFeathers - Banner styles (shared header). Group: TrailFeathers. Authors (alphabetically by last name): Kim, Smith, Domst, and Snider. Last updated: 3/13/26.
  * Base .banner: green gradient, padding, centered text. .banner-logout-btn and
  * .banner-logo-link are positioned (top-right, top-left). Modifiers .banner--*
  * overlay a photo per page (login, friends, inventory, dashboard, trip); image

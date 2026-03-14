@@ -1,7 +1,8 @@
 """
-Trip report catalog (trip_report_info). Hike/location records used for the location
-dropdown, trip creation, user trip reports, top four, and wishlist. insert_trip_report_info
-adds a row (e.g. from LLM pipeline); list/get functions used by routes and other db modules.
+TrailFeathers - Trip report catalog (trip_report_info): insert, list, get by id or trip; used by routes and LLM.
+Group: TrailFeathers
+Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Last updated: 3/13/26
 """
 from .connection import get_cursor
 

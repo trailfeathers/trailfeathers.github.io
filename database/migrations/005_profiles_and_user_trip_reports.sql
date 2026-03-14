@@ -1,5 +1,7 @@
--- Migration: user profiles, top four hikes, and user-authored trip reports.
--- Run after schema.sql and migrations 001–004.
+-- TrailFeathers - Migration 005: user_profiles, user_top_four_hikes, user_trip_reports tables.
+-- Group: TrailFeathers
+-- Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+-- Last updated: 3/13/26
 
 -- User profiles (1:1 with users): display_name, bio
 CREATE TABLE IF NOT EXISTS user_profiles (

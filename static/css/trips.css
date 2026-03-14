@@ -1,5 +1,5 @@
 /*
- * Trip planner page (trip.html) – layout, create-trip form, trip cards, edit modal.
+ * TrailFeathers - Trip planner page (trip.html) styles. Group: TrailFeathers. Authors (alphabetically by last name): Kim, Smith, Domst, and Snider. Last updated: 3/13/26.
  * .trip-planner: page wrapper. .trip-planner-layout: flex row for .trip-setup (create form)
  * and .trip-overview (trip list). .location-combobox / .location-listbox: catalog search
  * dropdown. .trip-card: each trip in the list; .trip-card-clickable for navigation.

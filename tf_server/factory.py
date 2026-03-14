@@ -1,3 +1,9 @@
+"""
+TrailFeathers - Flask application factory: creates app, config (CORS, session), registers auth and feature routes.
+Group: TrailFeathers
+Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Last updated: 3/13/26
+"""
 import os
 from datetime import timedelta
 

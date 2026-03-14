@@ -1,5 +1,8 @@
 /**
- * Shared utility functions for TrailFeathers.
+ * TrailFeathers - Shared utility functions (escapeHtml, getWeatherIcon, loadUserSession, loadUserInfo).
+ * Group: TrailFeathers
+ * Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+ * Last updated: 3/13/26
  */
 
 /**

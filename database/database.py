@@ -1,8 +1,8 @@
 """
-Single database module for TrailFeathers. Re-exports all public API from domain
-submodules so consumers can use: from database import ... or from database.database import ...
-Submodules: connection, users, trip_report_info, requirements, gear, friends,
-favorites, profiles, top_four, user_trip_reports, wishlist, trips, trip_invites, trip_gear.
+TrailFeathers - Database module; re-exports all public API from domain submodules.
+Group: TrailFeathers
+Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Last updated: 3/13/26
 """
 from .connection import get_cursor, get_db_connection
 from .users import (

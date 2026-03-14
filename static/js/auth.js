@@ -1,7 +1,10 @@
 /**
- * Login, register, and logout handlers.
+ * TrailFeathers - Login, register, and logout handlers for login.html and register.html.
+ * Group: TrailFeathers
+ * Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+ * Last updated: 3/13/26
  *
- * Runs on login.html and register.html. Handles: login form (POST /api/login, redirect to dashboard),
+ * Handles: login form (POST /api/login, redirect to dashboard),
  * register form (confirm password, POST /api/signup, 409 → "Username already exists"), back buttons,
  * and logout button (POST /api/logout, then redirect to login) on any page that includes it.
  */

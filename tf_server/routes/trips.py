@@ -1,8 +1,10 @@
 """
-Trips API. CRUD for trips; dashboard (trip + collaborators + gear pool + checklist + pending invite);
-weather (NWS); checklist; requirement types; collaborators; invites (create, list, accept, decline,
-cancel); trip gear (pool, assigned, assign, unassign). Session cache used for trips list and
-dashboard; login.refresh_session_cache / invalidate_trip_dashboard_cache keep it in sync.
+TrailFeathers - Trips API: CRUD, dashboard, weather, checklist, collaborators, invites, trip gear.
+Group: TrailFeathers
+Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Last updated: 3/13/26
+
+Session cache used for trips list and dashboard; login.refresh_session_cache / invalidate_trip_dashboard_cache.
 """
 import json
 import urllib.error

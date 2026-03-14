@@ -1,6 +1,8 @@
 """
-Locations (hike catalog) API. Single endpoint: GET /api/locations returns
-trip_report_info rows for dropdowns (trip creation, trip reports, wishlist).
+TrailFeathers - Locations (hike catalog) API: GET /api/locations returns trip_report_info for dropdowns.
+Group: TrailFeathers
+Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Last updated: 3/13/26
 """
 from flask import jsonify
 

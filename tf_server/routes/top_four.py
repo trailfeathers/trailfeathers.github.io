@@ -1,8 +1,11 @@
 """
-Top Four hikes API. User chooses up to four favorite hikes (from those they have
-a trip report for). Endpoints: GET /api/me/top-four (slots 1–4 with hike info),
-PUT /api/me/top-four (replace slots from payload), GET /api/me/top-four-eligible
-(hikes that can be chosen).
+TrailFeathers - Top Four hikes API: user chooses up to four favorite hikes (from those with a trip report).
+Group: TrailFeathers
+Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Last updated: 3/13/26
+
+Endpoints: GET /api/me/top-four (slots 1–4 with hike info), PUT /api/me/top-four (replace slots),
+GET /api/me/top-four-eligible (hikes that can be chosen).
 """
 from flask import jsonify, request
 

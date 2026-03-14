@@ -1,5 +1,8 @@
 /**
- * Gear library (inventory) page: load gear by category, add form, edit panel.
+ * TrailFeathers - Gear library (inventory) page: load gear by category, add form, edit panel.
+ * Group: TrailFeathers
+ * Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+ * Last updated: 3/13/26
  *
  * Runs on inventory.html. Fetches gear from /api/gear, groups items by requirement type
  * into categories (Sleep Systems, Food & Water, etc.), and renders them. Supports add-item

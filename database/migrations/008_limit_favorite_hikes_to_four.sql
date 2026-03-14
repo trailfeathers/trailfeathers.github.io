@@ -1,4 +1,7 @@
--- Migration: enforce at most 4 favorite hikes per user (backward compatibility).
+-- TrailFeathers - Migration 008: enforce at most 4 favorite hikes per user.
+-- Group: TrailFeathers
+-- Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+-- Last updated: 3/13/26
 
 CREATE OR REPLACE FUNCTION check_user_favorite_hikes_limit()
 RETURNS TRIGGER AS $$

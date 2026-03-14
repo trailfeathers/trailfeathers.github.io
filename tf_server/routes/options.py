@@ -1,7 +1,8 @@
 """
-CORS preflight OPTIONS handlers. Registers OPTIONS for all API routes so
-browser preflight requests get 200; no auth. Called from factory after other
-route modules.
+TrailFeathers - CORS preflight OPTIONS handlers for all API routes (return 200); no auth.
+Group: TrailFeathers
+Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Last updated: 3/13/26
 """
 def register(app):
     """Register OPTIONS handlers for CORS preflight (return 200)."""

@@ -1,5 +1,12 @@
 # TrailFeathers
 
+**Purpose:** Project README—overview, core features, code structure, and live site link for the TrailFeathers backpacking trip planner.
+**Group:** TrailFeathers
+**Authors (alphabetically by last name):** Kim, Smith, Domst, and Snider
+**Last updated:** 3/13/26
+
+---
+
 TrailFeathers is a web-based backpacking trip planner designed to help outdoor recreationists organize gear and plan collaborative trips.
 
 **Live site:** [https://trailfeathers.github.io]

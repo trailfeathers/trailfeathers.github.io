@@ -1,8 +1,8 @@
 /**
- * Profile view page (profile_view.html?username=...). Displays another user's public profile:
- * display name, bio, avatar, Top Four hikes, and trip reports. Fetches /api/users/<username>/profile
- * and /api/users/<username>/relationship. Renders relationship badge and actions (Add friend,
- * Accept/Decline, Cancel request, Remove friend). Does not use main.js; loads this script only.
+ * TrailFeathers - Profile view page (profile_view.html?username=...): public profile, relationship actions.
+ * Group: TrailFeathers
+ * Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+ * Last updated: 3/13/26
  */
 const API_BASE = "https://trailfeathers-github-io-real.onrender.com";
 

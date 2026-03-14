@@ -1,3 +1,8 @@
+# TrailFeathers - Python dependency list for the web application (Flask, auth, DB, CORS, WSGI).
+# Group: TrailFeathers
+# Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+# Last updated: 3/13/26
+
 Flask==3.0.2
 Flask-Bcrypt==1.0.1
 Flask-Session==0.6.0

@@ -1,6 +1,6 @@
 /*
- * Utility classes used across forms and pages. .error: red validation/API error text.
- * .success: green confirmation text. Add these classes to a container (e.g. <p>) next to
+ * TrailFeathers - Utility classes (.error, .success). Group: TrailFeathers. Authors (alphabetically by last name): Kim, Smith, Domst, and Snider. Last updated: 3/13/26.
+ * .error: red validation/API error text. .success: green confirmation text. Add to a container next to
  * forms or buttons; content is typically set by JavaScript.
  */
 .error {

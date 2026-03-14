@@ -1,6 +1,7 @@
--- Migration: store images in Postgres (BYTEA) for profile avatars and trip report photos.
--- Run after 005_profiles_and_user_trip_reports.sql.
--- PostgreSQL BYTEA supports binary data up to ~1GB per value; suitable for avatars and moderate-sized photos.
+-- TrailFeathers - Migration 006: BYTEA columns for profile avatar and trip report images.
+-- Group: TrailFeathers
+-- Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+-- Last updated: 3/13/26
 
 -- Profile avatar (optional): small image (e.g. JPEG/PNG) for user profile.
 DO $$

@@ -1,6 +1,10 @@
 """
-Wishlist API. User's "hikes I want to try" (trip_report_info ids). Endpoints:
-GET /api/me/wishlist, POST /api/me/wishlist (trip_report_info_id), DELETE /api/me/wishlist/<id>.
+TrailFeathers - Wishlist API: user's "hikes I want to try" (trip_report_info ids).
+Group: TrailFeathers
+Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Last updated: 3/13/26
+
+Endpoints: GET /api/me/wishlist, POST /api/me/wishlist (trip_report_info_id), DELETE /api/me/wishlist/<id>.
 """
 from flask import jsonify, request
 

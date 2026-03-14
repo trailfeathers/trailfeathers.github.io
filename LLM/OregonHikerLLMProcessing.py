@@ -1,9 +1,8 @@
 """
-Process oregonHikerData.csv with OpenAI (same prompt as LLMProcessing) and insert
-into trip_report_info. Skips rows whose source_url is already in the DB so the run
-can be resumed. Uses MAX(trip_id)+1 so Oregon hikes append after existing data.
-Expects columns matching find_csv_column (Hike Name, URL, Length, Elevation Gain, etc.);
-latitude/longitude from dedicated columns.
+TrailFeathers - Process oregonHikerData.csv with OpenAI; insert into trip_report_info (resumable by source_url).
+Group: TrailFeathers
+Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Last updated: 3/13/26
 """
 from dotenv import load_dotenv
 load_dotenv()  # ← THIS MUST COME FIRST

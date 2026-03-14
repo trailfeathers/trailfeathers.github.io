@@ -1,9 +1,8 @@
 /**
- * Trip report view page (trip_report_view.html?id=...). Loads a single trip report via
- * GET /api/trip-reports/<id>, and locations for the edit trail dropdown. Displays title,
- * trail, date, body, and optional image. Owner sees "Edit report"; edit form allows
- * updating title, trail, date, body, and uploading a photo (POST image then PUT report).
- * Uses social_styles.css for layout. Does not use main.js.
+ * TrailFeathers - Trip report view page (trip_report_view.html?id=...): load report, display, edit, image upload.
+ * Group: TrailFeathers
+ * Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+ * Last updated: 3/13/26
  */
 (function () {
   var API_BASE = "https://trailfeathers-github-io-real.onrender.com";

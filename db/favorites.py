@@ -1,7 +1,8 @@
 """
-User favorite hikes (user_favorite_hikes). Up to 4 catalog hikes per user. list returns
-joined trip_report_info; add validates catalog id and limit; remove is idempotent.
-Used by friends routes (favorites API). Depends on trip_reports for get_trip_report_info_by_id.
+TrailFeathers - User favorite hikes (up to 4 per user): list, add, remove; used by friends routes.
+Group: TrailFeathers
+Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Last updated: 3/13/26
 """
 from .connection import get_cursor
 from .trip_reports import get_trip_report_info_by_id

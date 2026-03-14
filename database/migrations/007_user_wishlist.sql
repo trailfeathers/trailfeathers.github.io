@@ -1,4 +1,7 @@
--- Migration: user wishlist ("Hikes I want to try").
+-- TrailFeathers - Migration 007: user_wishlist table ("Hikes I want to try").
+-- Group: TrailFeathers
+-- Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+-- Last updated: 3/13/26
 
 CREATE TABLE IF NOT EXISTS user_wishlist (
   user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,

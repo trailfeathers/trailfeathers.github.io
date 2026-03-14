@@ -1,7 +1,11 @@
 """
-Friends and favorites API. Friend requests: send, list incoming, accept, decline,
-cancel; friends list (from session cache); remove friend. Favorites: list, add,
-remove (by trip_report_info_id). Endpoints under /api/friends and /api/me/favorites.
+TrailFeathers - Friends and favorites API: friend requests, friends list, favorites (by trip_report_info_id).
+Group: TrailFeathers
+Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Last updated: 3/13/26
+
+Friend requests: send, list incoming, accept, decline, cancel; friends list (from session cache);
+remove friend. Favorites: list, add, remove. Endpoints under /api/friends and /api/me/favorites.
 """
 from flask import jsonify, request, session
 

@@ -1,6 +1,10 @@
 """
-Gear (inventory) API. CRUD for the current user's gear items. Endpoints:
-POST /api/gear, GET /api/gear (from session cache), GET/PUT/DELETE /api/gear/<id>.
+TrailFeathers - Gear (inventory) API: CRUD for the current user's gear items.
+Group: TrailFeathers
+Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Last updated: 3/13/26
+
+Endpoints: POST /api/gear, GET /api/gear (from session cache), GET/PUT/DELETE /api/gear/<id>.
 Session gear cache refreshed on create/update/delete.
 """
 from flask import jsonify, request, session

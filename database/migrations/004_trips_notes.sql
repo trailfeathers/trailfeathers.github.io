@@ -1,5 +1,7 @@
--- Migration: add notes to trips for shared trip coordination (e.g. "can you buy meals?", "I don't have a filter").
--- Run after schema.sql and migrations 001–003.
+-- TrailFeathers - Migration 004: add notes column to trips.
+-- Group: TrailFeathers
+-- Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+-- Last updated: 3/13/26
 
 DO $$
 BEGIN

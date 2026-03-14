@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """
-Split weather_ducks.png into 7 individual icon files.
-Layout: 3 columns x 3 rows, with 7 ducks (bottom row has 1 centered).
+TrailFeathers - Split weather_ducks.png into 7 individual icon files (static/images_for_site/weather_icons/).
+Group: TrailFeathers
+Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Last updated: 3/13/26
 """
 from pathlib import Path
 

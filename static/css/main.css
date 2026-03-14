@@ -1,6 +1,10 @@
 /*
- * Main CSS – single entry for TrailFeathers styles.
- * Import this as css/main.css from HTML. It pulls in all modules in order:
+ * TrailFeathers - Main CSS entry; imports all style modules (global, banner, forms, dashboard, etc.).
+ * Group: TrailFeathers
+ * Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+ * Last updated: 3/13/26
+ *
+ * Import as css/main.css from HTML. It pulls in all modules in order:
  * global (resets, body), banner, forms, dashboard, inventory, trips, friends,
  * trip-dashboard, utilities (error/success). Page-specific classes live in the
  * module that owns that page (e.g. .trip-dashboard-* in trip-dashboard.css).

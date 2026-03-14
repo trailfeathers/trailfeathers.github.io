@@ -1,8 +1,11 @@
 """
-Trip reports API. Registers routes for the current user's trip reports and for
-viewing/serving a single report (including image). Endpoints: GET/POST /api/me/trip-reports,
-GET/PUT/DELETE /api/me/trip-reports/<id>, POST /api/me/trip-reports/<id>/image,
-GET /api/trip-reports/<id> (read), GET /api/trip-reports/<id>/image (no auth, for img src).
+TrailFeathers - Trip reports API: current user's trip reports CRUD and image upload; public read/image by id.
+Group: TrailFeathers
+Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Last updated: 3/13/26
+
+Endpoints: GET/POST /api/me/trip-reports, GET/PUT/DELETE /api/me/trip-reports/<id>, POST image,
+GET /api/trip-reports/<id> and /image (no auth for img src).
 """
 from flask import Response, jsonify, request
 

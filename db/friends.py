@@ -1,7 +1,8 @@
 """
-Friends: friend_requests (pending/accepted/declined). create_friend_request sends a
-request; accept/decline by receiver; list_incoming_requests for current user;
-list_friends returns accepted pairs. Used by friends routes and profile relationship.
+TrailFeathers - Friends: friend requests, accept/decline, list_friends; used by friends and profile routes.
+Group: TrailFeathers
+Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Last updated: 3/13/26
 """
 from .connection import get_cursor
 
