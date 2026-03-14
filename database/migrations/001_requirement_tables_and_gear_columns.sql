@@ -1,6 +1,6 @@
 -- TrailFeathers - Migration 001: add requirement tables and gear columns.
 -- Group: TrailFeathers
--- Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+-- Authors: Kim, Smith, Domst, and Snider
 -- Last updated: 3/13/26
 -- Run if DB was created before requirement_types/activity_requirements. Then run seed_requirements.sql.
 

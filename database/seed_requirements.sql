@@ -1,6 +1,6 @@
 -- TrailFeathers - Seed requirement_types and activity_requirements. Run after schema or migrations.
 -- Group: TrailFeathers
--- Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+-- Authors: Kim, Smith, Domst, and Snider
 -- Last updated: 3/13/26
 -- Safe to run multiple times: uses INSERT ... ON CONFLICT for requirement_types.
 

@@ -1,7 +1,7 @@
 """
 TrailFeathers - Database connection: get_db_connection(), get_cursor(); uses DATABASE_URL (PostgreSQL).
 Group: TrailFeathers
-Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Authors: Kim, Smith, Domst, and Snider
 Last updated: 3/13/26
 """
 import os

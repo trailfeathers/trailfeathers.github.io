@@ -1,7 +1,7 @@
 """
 TrailFeathers - DB module; single import surface for all database access (db.get_cursor, create_user, etc.).
 Group: TrailFeathers
-Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Authors: Kim, Smith, Domst, and Snider
 Last updated: 3/13/26
 """
 

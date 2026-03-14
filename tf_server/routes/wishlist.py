@@ -1,7 +1,7 @@
 """
 TrailFeathers - Wishlist API: user's "hikes I want to try" (trip_report_info ids).
 Group: TrailFeathers
-Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Authors: Kim, Smith, Domst, and Snider
 Last updated: 3/13/26
 
 Endpoints: GET /api/me/wishlist, POST /api/me/wishlist (trip_report_info_id), DELETE /api/me/wishlist/<id>.

@@ -1,7 +1,7 @@
 """
 TrailFeathers - Activity requirements and requirement types; get_trip_requirement_summary for dashboard checklist.
 Group: TrailFeathers
-Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Authors: Kim, Smith, Domst, and Snider
 Last updated: 3/13/26
 """
 import math

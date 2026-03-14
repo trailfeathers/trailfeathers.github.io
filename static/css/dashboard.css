@@ -1,5 +1,5 @@
 /*
- * TrailFeathers - Dashboard page (dashboard.html) styles. Group: TrailFeathers. Authors (alphabetically by last name): Kim, Smith, Domst, and Snider. Last updated: 3/13/26.
+ * TrailFeathers - Dashboard page (dashboard.html) styles. Group: TrailFeathers. Authors: Kim, Smith, Domst, and Snider. Last updated: 3/13/26.
  * Dashboard: main hub with three large action buttons.
  * #dash-options: flex row of .dash-btn cards. Each button’s background image
  * is set via inline --dash-btn-bg (e.g. url('...')) in the HTML; this file

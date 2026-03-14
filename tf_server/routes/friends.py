@@ -1,7 +1,7 @@
 """
 TrailFeathers - Friends and favorites API: friend requests, friends list, favorites (by trip_report_info_id).
 Group: TrailFeathers
-Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Authors: Kim, Smith, Domst, and Snider
 Last updated: 3/13/26
 
 Friend requests: send, list incoming, accept, decline, cancel; friends list (from session cache);

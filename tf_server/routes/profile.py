@@ -1,7 +1,7 @@
 """
 TrailFeathers - Profile API routes: current-user profile and avatar, public profile by username.
 Group: TrailFeathers
-Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Authors: Kim, Smith, Domst, and Snider
 Last updated: 3/13/26
 
 Endpoints: GET/PUT /api/me/profile (display_name, bio, avatar_path); GET /api/profile-avatars

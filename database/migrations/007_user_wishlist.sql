@@ -1,6 +1,6 @@
 -- TrailFeathers - Migration 007: user_wishlist table ("Hikes I want to try").
 -- Group: TrailFeathers
--- Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+-- Authors: Kim, Smith, Domst, and Snider
 -- Last updated: 3/13/26
 
 CREATE TABLE IF NOT EXISTS user_wishlist (

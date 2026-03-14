@@ -1,7 +1,7 @@
 """
 TrailFeathers - Top four hikes (up to 4 slots per user): list_top_four_hikes, replace_top_four, list_top_four_eligible_hikes.
 Group: TrailFeathers
-Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Authors: Kim, Smith, Domst, and Snider
 Last updated: 3/13/26
 """
 from .connection import get_cursor

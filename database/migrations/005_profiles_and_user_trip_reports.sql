@@ -1,6 +1,6 @@
 -- TrailFeathers - Migration 005: user_profiles, user_top_four_hikes, user_trip_reports tables.
 -- Group: TrailFeathers
--- Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+-- Authors: Kim, Smith, Domst, and Snider
 -- Last updated: 3/13/26
 
 -- User profiles (1:1 with users): display_name, bio

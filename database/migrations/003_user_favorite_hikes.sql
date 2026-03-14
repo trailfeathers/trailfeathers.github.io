@@ -1,6 +1,6 @@
 -- TrailFeathers - Migration 003: user_favorite_hikes table (from location catalog).
 -- Group: TrailFeathers
--- Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+-- Authors: Kim, Smith, Domst, and Snider
 -- Last updated: 3/13/26
 
 CREATE TABLE IF NOT EXISTS user_favorite_hikes (

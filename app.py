@@ -1,7 +1,7 @@
 """
 TrailFeathers - WSGI entry point; creates the Flask app via tf_server.create_app (e.g. for Gunicorn).
 Group: TrailFeathers
-Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Authors: Kim, Smith, Domst, and Snider
 Last updated: 3/13/26
 """
 import os

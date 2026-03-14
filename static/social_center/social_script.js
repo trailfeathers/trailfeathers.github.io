@@ -1,7 +1,7 @@
 /**
  * TrailFeathers - Trip report view page (trip_report_view.html?id=...): load report, display, edit, image upload.
  * Group: TrailFeathers
- * Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+ * Authors: Kim, Smith, Domst, and Snider
  * Last updated: 3/13/26
  */
 (function () {

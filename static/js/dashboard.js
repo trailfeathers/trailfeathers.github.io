@@ -1,7 +1,7 @@
 /**
  * TrailFeathers - First page and dashboard navigation (Login/Register, inventory, plan trip, banner welcome).
  * Group: TrailFeathers
- * Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+ * Authors: Kim, Smith, Domst, and Snider
  * Last updated: 3/13/26
  *
  * Runs on index.html and dashboard.html. Wires: first-page Login/Register buttons,

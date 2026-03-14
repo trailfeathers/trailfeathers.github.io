@@ -1,6 +1,6 @@
 -- TrailFeathers - Migration 002: link trips to trip_report_info (location catalog).
 -- Group: TrailFeathers
--- Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+-- Authors: Kim, Smith, Domst, and Snider
 -- Last updated: 3/13/26
 
 DO $$

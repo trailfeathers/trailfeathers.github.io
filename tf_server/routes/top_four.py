@@ -1,7 +1,7 @@
 """
 TrailFeathers - Top Four hikes API: user chooses up to four favorite hikes (from those with a trip report).
 Group: TrailFeathers
-Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Authors: Kim, Smith, Domst, and Snider
 Last updated: 3/13/26
 
 Endpoints: GET /api/me/top-four (slots 1–4 with hike info), PUT /api/me/top-four (replace slots),

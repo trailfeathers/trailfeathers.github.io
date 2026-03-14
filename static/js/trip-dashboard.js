@@ -1,7 +1,7 @@
 /**
  * TrailFeathers - Trip dashboard page (trip_dashboard.html?id=...): summary, weather, map, team, gear, checklist.
  * Group: TrailFeathers
- * Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+ * Authors: Kim, Smith, Domst, and Snider
  * Last updated: 3/13/26
  *
  * Loads trip by ?id=; fetches /api/trips/<id>/dashboard. Renders trip info, weather, map, notes, team, gear pool.

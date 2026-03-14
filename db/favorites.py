@@ -1,7 +1,7 @@
 """
 TrailFeathers - User favorite hikes (up to 4 per user): list, add, remove; used by friends routes.
 Group: TrailFeathers
-Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Authors: Kim, Smith, Domst, and Snider
 Last updated: 3/13/26
 """
 from .connection import get_cursor

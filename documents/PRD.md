@@ -2,7 +2,7 @@
 
 **Purpose:** Product requirements, vision, and feature scope for the TrailFeathers backpacking trip planner.  
 **Group:** TrailFeathers  
-**Authors (alphabetically by last name):** Kim, Smith, Domst, and Snider  
+**Authors:** Kim, Smith, Domst, and Snider  
 **Last updated:** 3/13/26
 
 ---

@@ -1,7 +1,7 @@
 /**
  * TrailFeathers - Friends page: requests, friends list, add friend form, favorites section.
  * Group: TrailFeathers
- * Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+ * Authors: Kim, Smith, Domst, and Snider
  * Last updated: 3/13/26
  *
  * Runs on friends page (e.g. social_center/friends.html if using main.js).

@@ -1,7 +1,7 @@
 /**
  * TrailFeathers - Social Center friends page (friends.html): profile, search, top four, friend requests, trip reports, wishlist.
  * Group: TrailFeathers
- * Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+ * Authors: Kim, Smith, Domst, and Snider
  * Last updated: 3/13/26
  */
 const API_BASE = "https://trailfeathers-github-io-real.onrender.com";

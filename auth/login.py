@@ -1,7 +1,7 @@
 """
 TrailFeathers - Flask auth blueprint: signup, login, logout, and current-user (session-based).
 Group: TrailFeathers
-Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Authors: Kim, Smith, Domst, and Snider
 Last updated: 3/13/26
 
 Uses db for users (get_user_by_username, create_user, user_exists_by_username),

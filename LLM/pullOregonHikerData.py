@@ -2,7 +2,7 @@
 """
 TrailFeathers - Scrape Oregon Hikers Field Guide to oregonHikerData.csv for LLMProcessing.
 Group: TrailFeathers
-Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Authors: Kim, Smith, Domst, and Snider
 Last updated: 3/13/26
 
 Scrapes hike data from oregonhikers.org; writes oregonHikerData.csv.

@@ -1,7 +1,7 @@
 """
 TrailFeathers - Trip gear assignment: gear pool, assigned gear, assign, unassign; used by trip dashboard routes.
 Group: TrailFeathers
-Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Authors: Kim, Smith, Domst, and Snider
 Last updated: 3/13/26
 """
 from .connection import get_cursor

@@ -1,7 +1,7 @@
 /**
  * TrailFeathers - Main JS entry; imports all feature modules for index, login, register, dashboard, etc.
  * Group: TrailFeathers
- * Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+ * Authors: Kim, Smith, Domst, and Snider
  * Last updated: 3/13/26
  *
  * Use as single script (type="module" src="js/main.js") on pages that use the refactored

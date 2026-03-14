@@ -1,7 +1,7 @@
 /**
  * TrailFeathers - Profile view page (profile_view.html?username=...): public profile, relationship actions.
  * Group: TrailFeathers
- * Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+ * Authors: Kim, Smith, Domst, and Snider
  * Last updated: 3/13/26
  */
 const API_BASE = "https://trailfeathers-github-io-real.onrender.com";

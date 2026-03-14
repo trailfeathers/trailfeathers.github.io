@@ -1,7 +1,7 @@
 """
 TrailFeathers - User profiles: display_name, bio, avatar_path, optional avatar upload; used by profile routes.
 Group: TrailFeathers
-Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Authors: Kim, Smith, Domst, and Snider
 Last updated: 3/13/26
 """
 from .connection import get_cursor

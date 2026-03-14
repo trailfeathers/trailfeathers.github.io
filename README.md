@@ -2,7 +2,7 @@
 
 **Purpose:** Project README—overview, core features, code structure, and live site link for the TrailFeathers backpacking trip planner.
 **Group:** TrailFeathers
-**Authors (alphabetically by last name):** Kim, Smith, Domst, and Snider
+**Authors:** Kim, Smith, Domst, and Snider
 **Last updated:** 3/13/26
 
 ---

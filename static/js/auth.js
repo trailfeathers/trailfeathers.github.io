@@ -1,7 +1,7 @@
 /**
  * TrailFeathers - Login, register, and logout handlers for login.html and register.html.
  * Group: TrailFeathers
- * Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+ * Authors: Kim, Smith, Domst, and Snider
  * Last updated: 3/13/26
  *
  * Handles: login form (POST /api/login, redirect to dashboard),

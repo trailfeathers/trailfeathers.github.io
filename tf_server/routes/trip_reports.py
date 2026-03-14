@@ -1,7 +1,7 @@
 """
 TrailFeathers - Trip reports API: current user's trip reports CRUD and image upload; public read/image by id.
 Group: TrailFeathers
-Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Authors: Kim, Smith, Domst, and Snider
 Last updated: 3/13/26
 
 Endpoints: GET/POST /api/me/trip-reports, GET/PUT/DELETE /api/me/trip-reports/<id>, POST image,

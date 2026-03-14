@@ -1,7 +1,7 @@
 """
 TrailFeathers - Trips API: CRUD, dashboard, weather, checklist, collaborators, invites, trip gear.
 Group: TrailFeathers
-Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Authors: Kim, Smith, Domst, and Snider
 Last updated: 3/13/26
 
 Session cache used for trips list and dashboard; login.refresh_session_cache / invalidate_trip_dashboard_cache.

@@ -1,7 +1,7 @@
 """
 TrailFeathers - Friends: friend requests, accept/decline, list_friends; used by friends and profile routes.
 Group: TrailFeathers
-Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Authors: Kim, Smith, Domst, and Snider
 Last updated: 3/13/26
 """
 from .connection import get_cursor

@@ -1,6 +1,6 @@
 -- TrailFeathers - Migration 009: avatar_path column (preset avatars from static, e.g. profile_ducks).
 -- Group: TrailFeathers
--- Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+-- Authors: Kim, Smith, Domst, and Snider
 -- Last updated: 3/13/26
 
 DO $$

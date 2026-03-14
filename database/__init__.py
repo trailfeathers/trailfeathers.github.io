@@ -1,7 +1,7 @@
 """
 TrailFeathers - Database package; single import surface (from database import ...).
 Group: TrailFeathers
-Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Authors: Kim, Smith, Domst, and Snider
 Last updated: 3/13/26
 
 Re-exports from database.database; submodules: connection, users, trip_report_info, requirements,

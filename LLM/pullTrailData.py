@@ -1,7 +1,7 @@
 """
 TrailFeathers - Scrape WTA hike listing and pages to build trail CSV; writes test.csv for LLMProcessing.
 Group: TrailFeathers
-Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Authors: Kim, Smith, Domst, and Snider
 Last updated: 3/13/26
 """
 import requests

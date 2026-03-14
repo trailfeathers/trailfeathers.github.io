@@ -1,7 +1,7 @@
 """
 TrailFeathers - User wishlist: list, add, remove by trip_report_info_id; used by wishlist routes.
 Group: TrailFeathers
-Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Authors: Kim, Smith, Domst, and Snider
 Last updated: 3/13/26
 """
 from .connection import get_cursor

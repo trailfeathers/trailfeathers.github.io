@@ -1,7 +1,7 @@
 """
 TrailFeathers - Trip management: CRUD, collaborators, leave_trip, user_has_trip_access; ACTIVITY_TYPES.
 Group: TrailFeathers
-Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Authors: Kim, Smith, Domst, and Snider
 Last updated: 3/13/26
 """
 from .connection import get_cursor

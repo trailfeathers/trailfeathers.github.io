@@ -1,7 +1,7 @@
 """
 TrailFeathers - Trip report catalog (trip_report_info): insert, list, get by id or trip; used by routes and LLM.
 Group: TrailFeathers
-Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Authors: Kim, Smith, Domst, and Snider
 Last updated: 3/13/26
 """
 from .connection import get_cursor

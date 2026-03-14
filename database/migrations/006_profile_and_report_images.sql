@@ -1,6 +1,6 @@
 -- TrailFeathers - Migration 006: BYTEA columns for profile avatar and trip report images.
 -- Group: TrailFeathers
--- Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+-- Authors: Kim, Smith, Domst, and Snider
 -- Last updated: 3/13/26
 
 -- Profile avatar (optional): small image (e.g. JPEG/PNG) for user profile.

@@ -1,7 +1,7 @@
 """
 TrailFeathers - Gear (inventory) management: CRUD, _parse_gear_payload; used by gear and trip_gear routes.
 Group: TrailFeathers
-Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Authors: Kim, Smith, Domst, and Snider
 Last updated: 3/13/26
 """
 from .connection import get_cursor

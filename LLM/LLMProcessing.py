@@ -1,7 +1,7 @@
 """
 TrailFeathers - Process trailData.csv with OpenAI; insert summarized descriptions and trip reports into trip_report_info.
 Group: TrailFeathers
-Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Authors: Kim, Smith, Domst, and Snider
 Last updated: 3/13/26
 
 Uses OPENAI_API_KEY, DATABASE_URL; TRIP_REPORT_START_TRIP_ID or MAX(trip_id)+1. Output JSON per row.

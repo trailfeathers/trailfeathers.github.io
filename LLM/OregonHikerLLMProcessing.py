@@ -1,7 +1,7 @@
 """
 TrailFeathers - Process oregonHikerData.csv with OpenAI; insert into trip_report_info (resumable by source_url).
 Group: TrailFeathers
-Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Authors: Kim, Smith, Domst, and Snider
 Last updated: 3/13/26
 """
 from dotenv import load_dotenv

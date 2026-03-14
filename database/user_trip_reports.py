@@ -1,7 +1,7 @@
 """
 TrailFeathers - User-created trip reports: list, get, create, update, delete, set/get image; used by trip_reports and top_four.
 Group: TrailFeathers
-Authors (alphabetically by last name): Kim, Smith, Domst, and Snider
+Authors: Kim, Smith, Domst, and Snider
 Last updated: 3/13/26
 """
 from .connection import get_cursor
