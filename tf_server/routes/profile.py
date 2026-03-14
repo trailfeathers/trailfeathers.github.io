@@ -1,3 +1,15 @@
+"""
+Profile API routes for TrailFeathers: current-user profile and avatar, public profile by username.
+
+Endpoints: GET/PUT /api/me/profile (display_name, bio, avatar_path); GET /api/profile-avatars
+(preset duck filenames under static); POST /api/me/profile/avatar (upload image); GET /api/me/avatar
+and GET /api/users/<username>/avatar (serve avatar bytes); GET /api/users/<username>/profile
+(public profile with top four and trip reports); GET /api/users/<username>/relationship (friend
+status). Uses db: get_user_profile, upsert_user_profile, set_profile_avatar_upload,
+get_profile_avatar_payload, list_top_four_hikes, list_user_trip_reports, get_relationship,
+get_user_by_id, get_user_by_username; PROFILE_AVATAR_DIR_PREFIX. Avatar path validation
+restricts to profile_ducks and blocks path traversal. register(app, login) registers all routes.
+"""
 import os
 import urllib.parse
 

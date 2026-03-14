@@ -1,5 +1,12 @@
 /**
- * Trip dashboard page (trip_dashboard.html?id=...): summary, weather, map, team, gear pool, checklist.
+ * Trip dashboard page (trip_dashboard.html?id=...).
+ *
+ * Loads trip by ?id=; fetches /api/trips/<id>/dashboard for trip, location summary, pending invite.
+ * Renders: trip info, weather (via /api/locations/weather), map (Google embed if coords), trail report
+ * summary (AI summary / report 1 / report 2), notes (editable), team (members + invite), gear pool
+ * and assigned gear, requirement checklist. View toggle: "Trip" vs "Pack" (shows gear block, hides
+ * summary/notes/team). Uses API_BASE (config.js), escapeHtml and getWeatherIcon (utils.js).
+ * Edit/delete/leave trip buttons call window.openEditTripModal, window.tripsDeleteTrip, window.tripsLeaveTrip.
  */
 import { API_BASE } from "./config.js";
 import { escapeHtml, getWeatherIcon } from "./utils.js";

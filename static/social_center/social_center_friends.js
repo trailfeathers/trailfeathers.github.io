@@ -1,3 +1,11 @@
+/**
+ * Social Center friends page (friends.html): profile, search user, top four, friend requests,
+ * friends list, trip reports, wishlist. Uses API_BASE and credentials: "include" for session.
+ * Profile: load/update /api/me/profile, avatar grid from /api/profile-avatars (fallback
+ * PROFILE_AVATAR_PATHS_FALLBACK when server has no static avatars). Top four: /api/me/top-four
+ * and /api/me/top-four-eligible; slots limited to hikes with a trip report. All API calls
+ * redirect to login on 401. Runs in an IIFE; no exports.
+ */
 const API_BASE = "https://trailfeathers-github-io-real.onrender.com";
 
 function escapeHtml(text) {
