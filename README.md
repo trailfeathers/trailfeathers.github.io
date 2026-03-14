@@ -2,6 +2,8 @@
 
 TrailFeathers is a web-based backpacking trip planner designed to help outdoor recreationists organize gear and plan collaborative trips.
 
+**Live site:** [https://trailfeathers.github.io]
+
 ## Overview
 
 TrailFeathers allows users to:
