@@ -1,4 +1,10 @@
-/* Gear library dashboard – layout, categories, edit, inventory sections */
+/*
+ * Gear library (inventory) page – layout, category sections, edit panel, add form.
+ * .gear-dashboard-*: page wrapper, nav, and grid (two sidebars + main on large screens).
+ * .gear-category-section: white card per category (e.g. Sleep Systems). .gear-category-item:
+ * each gear row; in edit mode .gear-item-editable is clickable, .btn-delete-gear appears.
+ * .inventory-add / .inventory-list: legacy section wrappers; #add-item-form and table styles.
+ */
 .gear-dashboard.content {
   align-items: stretch;
   margin-top: 1.5rem;
@@ -35,6 +41,7 @@
   background-color: #f0f5eb;
 }
 
+/* Large screens: three-column grid (left sidebar | main | right sidebar). */
 @media (min-width: 1024px) {
   .gear-dashboard-layout {
     display: grid;
@@ -129,6 +136,7 @@
   min-width: 0;
 }
 
+/* Delete button shown on each item in edit mode. */
 .btn-delete-gear {
   background: #dc3545;
   color: white;
@@ -151,6 +159,7 @@
   background: #c82333;
 }
 
+/* In edit mode, list items are clickable to open the edit panel. */
 .gear-item-editable {
   cursor: pointer;
 }
@@ -186,7 +195,7 @@
   margin-top: 0;
 }
 
-/* Inventory sections */
+/* Legacy inventory add/list section cards (if used). */
 .inventory-add,
 .inventory-list {
   background: white;

@@ -1,4 +1,10 @@
-/* Trip report view page: load/save via API */
+/**
+ * Trip report view page (trip_report_view.html?id=...). Loads a single trip report via
+ * GET /api/trip-reports/<id>, and locations for the edit trail dropdown. Displays title,
+ * trail, date, body, and optional image. Owner sees "Edit report"; edit form allows
+ * updating title, trail, date, body, and uploading a photo (POST image then PUT report).
+ * Uses social_styles.css for layout. Does not use main.js.
+ */
 (function () {
   var API_BASE = "https://trailfeathers-github-io-real.onrender.com";
   var reportId = null;
@@ -19,6 +25,7 @@
     window.location.href = "../login.html";
   }
 
+  /** Fetches /api/locations for the trail dropdown in edit form. */
   function loadLocations() {
     return apiFetch("/api/locations").then(function (res) {
       if (res.status === 401) { redirectToLogin(); return []; }
@@ -29,6 +36,7 @@
     });
   }
 
+  /** Fetches report by id, fills title/trail/date/body/image and trail select; shows Edit button only if is_owner. */
   function loadReport() {
     if (!reportId) {
       document.getElementById("report-title").textContent = "No report specified";
@@ -80,6 +88,7 @@
     });
   }
 
+  /** Wires display vs edit form (showDisplay/showEdit), save (PUT report, optional image POST), logout; loads locations then report. */
   function initTripReportView() {
     reportId = getReportIdFromQuery();
     var display = document.getElementById("report-display");
@@ -116,6 +125,7 @@
       if (btnEdit) btnEdit.textContent = "Cancel edit";
     }
 
+    /** PUT report (and POST image if file selected); then refresh display and show display view. */
     function saveReport() {
       var tripReportInfoId = editTrail && editTrail.value ? parseInt(editTrail.value, 10) : null;
       var title = editTitle && editTitle.value ? editTitle.value.trim() : "";

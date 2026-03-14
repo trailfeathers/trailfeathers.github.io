@@ -1,5 +1,10 @@
 /**
  * Friends page: requests, friends list, add friend form, and favorites section.
+ *
+ * Runs on the friends page loaded from dashboard (e.g. social_center/friends.html if using main.js).
+ * Loads incoming friend requests (/api/friends/requests), friends list (/api/friends), and
+ * favorites; supports accept/decline, add-friend search, and favorite-hike display. Note: the
+ * Social Center friends.html may use social_center_friends.js instead of this module.
  */
 import { API_BASE } from "./config.js";
 import { escapeHtml } from "./utils.js";
@@ -9,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const friendRequestsList = document.querySelector("#friend-requests-list");
   const myFriendsList = document.querySelector("#my-friends-list");
 
+  /** Fetches pending requests and renders Accept/Decline buttons with handlers. */
   async function loadFriendRequests() {
     if (!friendRequestsList) return;
     try {
@@ -70,6 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  /** Fetches friends list and renders. */
   async function loadMyFriends() {
     if (!myFriendsList) return;
     try {

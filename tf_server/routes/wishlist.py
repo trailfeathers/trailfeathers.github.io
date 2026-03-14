@@ -1,12 +1,15 @@
+"""
+Wishlist API. User's "hikes I want to try" (trip_report_info ids). Endpoints:
+GET /api/me/wishlist, POST /api/me/wishlist (trip_report_info_id), DELETE /api/me/wishlist/<id>.
+"""
 from flask import jsonify, request
 
 from db import add_wishlist_item, list_wishlist, remove_wishlist_item
 
 
 def register(app, login):
-    # ----------------------
-    # Wishlist API
-    # ----------------------
+    """Register wishlist routes; login for require_auth()."""
+
     @app.get("/api/me/wishlist")
     def get_my_wishlist():
         user = login.require_auth()

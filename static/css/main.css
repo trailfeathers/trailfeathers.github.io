@@ -1,4 +1,10 @@
-/* Main CSS – imports all modules (Part 3 refactor) */
+/*
+ * Main CSS – single entry for TrailFeathers styles.
+ * Import this as css/main.css from HTML. It pulls in all modules in order:
+ * global (resets, body), banner, forms, dashboard, inventory, trips, friends,
+ * trip-dashboard, utilities (error/success). Page-specific classes live in the
+ * module that owns that page (e.g. .trip-dashboard-* in trip-dashboard.css).
+ */
 @import url('global.css');
 @import url('banner.css');
 @import url('forms.css');

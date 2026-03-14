@@ -1,4 +1,10 @@
-"""Top four hikes."""
+"""
+Top four hikes (user_top_four_hikes). Each user has up to 4 slots (positions 1–4)
+pointing to catalog hikes they have written a trip report for. list_top_four_hikes
+includes latest_report_id and image_report_id for thumbnails; replace_top_four
+replaces all slots; list_top_four_eligible_hikes returns hikes eligible to pick.
+Used by top_four and profile routes.
+"""
 from .connection import get_cursor
 from .trip_report_info import get_trip_report_info_by_id
 

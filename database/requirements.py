@@ -1,4 +1,10 @@
-"""Requirement types and activity requirements."""
+"""
+Activity requirements and gear requirement types. requirement_types table drives
+gear type dropdowns; activity_requirements define per-activity rules (per_person,
+per_group, etc.). get_trip_requirement_summary builds the trip dashboard checklist
+(required vs covered, status met/short). Imports get_trip and list_trip_collaborators
+from .trips for head count and assigned gear.
+"""
 import math
 
 from .connection import get_cursor

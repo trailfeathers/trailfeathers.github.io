@@ -1,4 +1,10 @@
-/* Banner styles – shared and page-specific */
+/*
+ * Banner styles – shared header used across authenticated and auth pages.
+ * Base .banner: green gradient, padding, centered text. .banner-logout-btn and
+ * .banner-logo-link are positioned (top-right, top-left). Modifiers .banner--*
+ * overlay a photo per page (login, friends, inventory, dashboard, trip); image
+ * paths are relative to the CSS file (../images_for_site/banners/).
+ */
 .banner {
   position: relative;
   background: linear-gradient(135deg, #2c5f2d, #97bc62);
@@ -61,7 +67,7 @@
   margin-top: 0.25rem;
 }
 
-/* page-specific banner photos */
+/* Page-specific banner photos (overlay on base gradient). */
 .banner--login {
   background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
     url('../images_for_site/banners/crystal.jpg');
@@ -70,7 +76,7 @@
   min-height: 200px;
 }
 
-/* Login/index: show Trail Feathers name only, no logo image */
+/* Login/index: text-only logo link, no image. */
 .banner--login .banner-logo-link {
   background: none;
   text-indent: 0;

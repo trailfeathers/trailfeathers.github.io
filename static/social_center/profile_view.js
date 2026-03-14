@@ -1,3 +1,9 @@
+/**
+ * Profile view page (profile_view.html?username=...). Displays another user's public profile:
+ * display name, bio, avatar, Top Four hikes, and trip reports. Fetches /api/users/<username>/profile
+ * and /api/users/<username>/relationship. Renders relationship badge and actions (Add friend,
+ * Accept/Decline, Cancel request, Remove friend). Does not use main.js; loads this script only.
+ */
 const API_BASE = "https://trailfeathers-github-io-real.onrender.com";
 
 function escapeHtml(text) {
@@ -37,6 +43,7 @@ function escapeHtml(text) {
   var profileUserId = null;
   var relationship = { status: "none", request_id: null };
 
+  /** Fetches profile by username, fills display name/bio/avatar, Top Four cards, and trip reports list; then loadRelationship(). */
   function loadProfile() {
     var username = getUsernameFromQuery();
     if (!username) {
@@ -118,6 +125,7 @@ function escapeHtml(text) {
     });
   }
 
+  /** Fetches /api/users/<username>/relationship and updates relationship state; then renderRelationship(). */
   function loadRelationship() {
     if (!profileUsername) return;
     return apiFetch("/api/users/" + encodeURIComponent(profileUsername) + "/relationship").then(function (res) {
@@ -130,6 +138,7 @@ function escapeHtml(text) {
     });
   }
 
+  /** Copy for each relationship status: badge text, CSS class, description, primary/secondary button labels. */
   var RELATIONSHIP_STATES = {
     self: { badge: "This is you", badgeClass: "", text: "This is your profile.", btnText: null, btnSecondary: null },
     none: { badge: "Not friends", badgeClass: "", text: "You are not friends with this user.", btnText: "Add friend", btnSecondary: null },
@@ -138,6 +147,7 @@ function escapeHtml(text) {
     friend: { badge: "Friend", badgeClass: "friend", text: "You are friends with this user.", btnText: "Remove friend", btnSecondary: null }
   };
 
+  /** Updates Relationship section UI from current relationship state; hides section when status is "self". */
   function renderRelationship() {
     var s = RELATIONSHIP_STATES[relationship.status] || RELATIONSHIP_STATES.none;
     var badge = document.getElementById("relationship-badge");
@@ -162,6 +172,7 @@ function escapeHtml(text) {
     }
   }
 
+  /** Wires Add friend / Accept / Decline / Cancel request / Remove friend to the correct API calls. */
   function setupRelationshipActions() {
     var btn = document.getElementById("btn-manage-friend");
     var btn2 = document.getElementById("btn-manage-friend-2");
@@ -202,12 +213,14 @@ function escapeHtml(text) {
     }
   }
 
+  /** Home, Inventory, Plan Trip bottom nav links. */
   function initNav() {
     document.getElementById("home").addEventListener("click", function () { window.location.href = "../dashboard.html"; });
     document.getElementById("inventory").addEventListener("click", function () { window.location.href = "../inventory.html"; });
     document.getElementById("plan-trip").addEventListener("click", function () { window.location.href = "../trip.html"; });
   }
 
+  /** Entry: logout, relationship buttons, nav, then load profile (which triggers loadRelationship). */
   function init() {
     initLogout();
     setupRelationshipActions();

@@ -1,4 +1,8 @@
-/* Global styles and resets */
+/*
+ * Global styles and resets. Applied to every page that loads main.css.
+ * Universal box-sizing and zero margin/padding reset; body gets font stack,
+ * background, and text color. No layout or component styles here.
+ */
 * {
   box-sizing: border-box;
   margin: 0;

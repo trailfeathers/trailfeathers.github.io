@@ -1,4 +1,10 @@
-/* Social center – trip report view */
+/*
+ * Social center – trip report view (trip_report_view.html). Used only on this page.
+ * .report-view-nav: back link and Edit report button. .report-view-body: two-column grid
+ * (image | text); stacks on small screens. .report-image: photo or placeholder.
+ * .report-edit-form: edit fields and Save/Cancel. .report-view-display / .report-view-edit:
+ * toggled via .hidden for view vs edit mode.
+ */
 
 .report-view-nav {
   margin-bottom: 1.5rem;
@@ -35,6 +41,7 @@
   background-color: #f0f5eb;
 }
 
+/* Two-column layout: image left, title/trail/date/body (or edit form) right. */
 .report-view-body {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -52,6 +59,7 @@
   }
 }
 
+/* Photo container; placeholder shown when no image. */
 .report-image {
   aspect-ratio: 1;
   background: #e0e0e0;
@@ -96,7 +104,7 @@
   white-space: pre-wrap;
 }
 
-/* Edit mode toggle */
+/* Toggle display vs edit form. */
 .report-view-display.hidden {
   display: none;
 }
@@ -105,7 +113,7 @@
   display: none;
 }
 
-/* Report edit form */
+/* Edit form: labels, inputs, textarea, primary/secondary buttons. */
 .report-edit-form label {
   display: block;
   font-size: 0.9rem;

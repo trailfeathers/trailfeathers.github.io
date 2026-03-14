@@ -1,3 +1,8 @@
+"""
+Friends and favorites API. Friend requests: send, list incoming, accept, decline,
+cancel; friends list (from session cache); remove friend. Favorites: list, add,
+remove (by trip_report_info_id). Endpoints under /api/friends and /api/me/favorites.
+"""
 from flask import jsonify, request, session
 
 from db import (
@@ -15,9 +20,8 @@ from db import (
 
 
 def register(app, login):
-    # ----------------------
-    # Friends API
-    # ----------------------
+    """Register friends and favorites routes; login for require_auth() and refresh_session_cache()."""
+
     @app.post("/api/friends/request")
     def send_friend_request():
         user = login.require_auth()
@@ -82,9 +86,6 @@ def register(app, login):
             login.refresh_session_cache(user["id"])
         return jsonify(session["friends"])
 
-    # ----------------------
-    # Favorites (favorite hikes from catalog)
-    # ----------------------
     @app.get("/api/me/favorites")
     def get_my_favorites():
         user = login.require_auth()
@@ -132,9 +133,6 @@ def register(app, login):
         remove_favorite_hike(user["id"], trip_report_info_id)
         return "", 204
 
-    # ----------------------
-    # Unfriend / Cancel friend request
-    # ----------------------
     @app.delete("/api/friends/<int:friend_user_id>")
     def delete_friend(friend_user_id):
         user = login.require_auth()

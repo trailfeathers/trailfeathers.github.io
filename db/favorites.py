@@ -1,5 +1,10 @@
-"""Module docstring."""
-from .connection import get_cursor, get_db_connection
+"""
+User favorite hikes (user_favorite_hikes). Up to 4 catalog hikes per user. list returns
+joined trip_report_info; add validates catalog id and limit; remove is idempotent.
+Used by friends routes (favorites API). Depends on trip_reports for get_trip_report_info_by_id.
+"""
+from .connection import get_cursor
+from .trip_reports import get_trip_report_info_by_id
 
 
 def list_favorite_hikes(user_id):

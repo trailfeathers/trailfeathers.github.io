@@ -1,4 +1,9 @@
-/* Dashboard page – dash options and buttons */
+/*
+ * Dashboard page (dashboard.html) – main hub with three large action buttons.
+ * #dash-options: flex row of .dash-btn cards. Each button’s background image
+ * is set via inline --dash-btn-bg (e.g. url('...')) in the HTML; this file
+ * provides the overlay and layout. .dash-btn-label is the text inside the button.
+ */
 #dash-options {
   display: flex;
   justify-content: center;

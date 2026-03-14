@@ -1,7 +1,8 @@
 /**
  * TrailFeathers main entry. Imports all feature modules so their DOMContentLoaded handlers run.
- * Use this as the single script on pages that use the refactored script (index, login, register,
- * dashboard, inventory, trip, trip_dashboard). Friends page uses its own script (social_center_friends.js).
+ * Use this as the single script (type="module" src="js/main.js") on pages that use the refactored
+ * script: index, login, register, dashboard, inventory, trip, trip_dashboard. The Social Center
+ * friends page uses its own script (social_center_friends.js) and does not load this file.
  */
 import "./config.js";
 import "./utils.js";

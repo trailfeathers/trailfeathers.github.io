@@ -2,6 +2,11 @@
  * Shared utility functions for TrailFeathers.
  */
 
+/**
+ * Escapes a string for safe insertion into HTML (avoids XSS when setting innerHTML).
+ * @param {string} text - Raw string (e.g. user input or API data)
+ * @returns {string} HTML-escaped string
+ */
 export function escapeHtml(text) {
   const div = document.createElement("div");
   div.textContent = text;
@@ -9,7 +14,10 @@ export function escapeHtml(text) {
 }
 
 /**
- * Map NWS shortForecast string to icon name (for weather display).
+ * Maps NWS shortForecast string to a weather icon filename (no extension).
+ * Used on the trip dashboard to pick an image from images_for_site/weather_icons/.
+ * @param {string} shortForecast - e.g. "Partly Sunny" or "Rain"
+ * @returns {string} Icon name: sunny, partly_cloudy, rain, snow, windy, fog, etc.
  */
 export function getWeatherIcon(shortForecast) {
   if (!shortForecast || typeof shortForecast !== "string") return "partly_cloudy";

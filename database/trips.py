@@ -1,7 +1,14 @@
-"""Trips and trip collaborators."""
+"""
+Trip management (trips, trip_collaborators). create_trip creates trip and adds
+creator; get_trip / list_trips_for_user for dashboard; update_trip (creator: all
+fields, collaborator: notes only); delete_trip (creator only); leave_trip (member
+only); user_has_trip_access for auth; list_trip_collaborators, add_trip_collaborator.
+ACTIVITY_TYPES constrains activity_type. Depends on trip_report_info for catalog lookup.
+"""
 from .connection import get_cursor
 from .trip_report_info import get_trip_report_info_by_id
 
+# Allowed activity_type values for trips (validated on create/update).
 ACTIVITY_TYPES = frozenset({
     "Backpacking",
     "Hiking",

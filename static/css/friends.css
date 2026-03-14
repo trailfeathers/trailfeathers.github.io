@@ -1,4 +1,11 @@
-/* Friends / Social Center dashboard */
+/*
+ * Friends / Social Center (friends.html and related). Layout, sections, and form styles.
+ * .friends-dashboard-*: page wrapper, layout, nav back link. .friends-dashboard-section:
+ * white card for each block (Friend Requests, My Friends, Trip Reports, etc.).
+ * .trip-report-form-row: Date Hiked + date input + Save/Cancel on one line. .favorites-add:
+ * wishlist "Add from catalog" row. .friend-item .view-profile-btn: small profile link button.
+ * .favorite-hike-*: wishlist/favorites list items.
+ */
 .friends-dashboard.content {
   align-items: stretch;
   margin-top: 1.5rem;
@@ -89,6 +96,7 @@
   color: #555;
 }
 
+/* My Trip Reports: spacing and the Date Hiked + buttons row (same line, aligned height). */
 .trip-reports-section .trip-report-form-wrap {
   margin-bottom: 1.5rem;
 }
@@ -128,6 +136,7 @@
   box-sizing: border-box;
 }
 
+/* Wraps Save Report and Cancel so they stay on one line. */
 .trip-report-form-actions {
   display: inline-flex;
   align-items: center;
@@ -143,6 +152,7 @@
 }
 
 
+/* Small "View Profile" link next to each friend in My Friends list. */
 .friend-item .view-profile-btn {
   display: inline-block;
   padding: 0.35rem 0.65rem;
@@ -159,6 +169,7 @@
   background: #f0f5eb;
 }
 
+/* "Add from catalog" row: label + select + Add button (label same height as select). */
 .favorites-add {
   margin-bottom: 1.25rem;
 }

@@ -1,3 +1,9 @@
+"""
+Trip reports API. Registers routes for the current user's trip reports and for
+viewing/serving a single report (including image). Endpoints: GET/POST /api/me/trip-reports,
+GET/PUT/DELETE /api/me/trip-reports/<id>, POST /api/me/trip-reports/<id>/image,
+GET /api/trip-reports/<id> (read), GET /api/trip-reports/<id>/image (no auth, for img src).
+"""
 from flask import Response, jsonify, request
 
 from db import (
@@ -12,9 +18,8 @@ from db import (
 
 
 def register(app, login):
-    # ----------------------
-    # Trip reports API
-    # ----------------------
+    """Register trip report routes; login used for require_auth()."""
+
     @app.get("/api/me/trip-reports")
     def get_my_trip_reports():
         user = login.require_auth()

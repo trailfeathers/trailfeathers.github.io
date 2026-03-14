@@ -1,4 +1,9 @@
-"""User trip reports."""
+"""
+User-created trip reports (user_trip_reports). Each report links to a catalog hike
+(trip_report_info_id) and has title, body, date_hiked, optional image. list/get for
+current user or public view; create/update/delete for owner; set/get image for owner.
+Used by trip_reports routes and top_four eligibility.
+"""
 from .connection import get_cursor
 from .trip_reports import get_trip_report_info_by_id
 

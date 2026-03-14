@@ -1,5 +1,10 @@
 /**
  * Trip planner page: trip list, create trip, edit modal, trip invites, location catalog.
+ *
+ * Runs on trip.html. Loads /api/trips and /api/me (for current user). Renders trip cards;
+ * in edit mode, creator sees Edit/Delete, non-creator sees Disband (leave). Clicking a card
+ * goes to trip_dashboard.html?id=<id>. Create form and edit modal call API; openEditTripModal
+ * and loadTripDashboard are exposed for the trip dashboard. Location combobox uses catalog API.
  */
 import { API_BASE } from "./config.js";
 import { escapeHtml } from "./utils.js";
@@ -12,6 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let tripEditMode = false;
   let lastTrips = [];
 
+  /** Renders trip cards; in edit mode adds Edit/Delete (creator) or Disband (member) and wires click handlers. */
   function renderTripList(trips) {
     if (!tripList || !trips.length) return;
     const isCreator = (t) => currentUserId != null && t.creator_id === currentUserId;
@@ -76,6 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  /** Fetches /api/me (for currentUserId) and /api/trips, then renders list or empty/error message. */
   async function loadTrips() {
     if (!tripList) return;
     try {

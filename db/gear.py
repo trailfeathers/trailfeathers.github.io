@@ -1,4 +1,8 @@
-"""Gear/inventory management functions."""
+"""
+Gear (inventory) management. Per-user gear items with optional requirement_type_id
+and capacity_persons for trip checklist coverage. add_gear_item / update_gear_item
+use _parse_gear_payload for validation. Used by gear routes and trip_gear (pool/assign).
+"""
 from .connection import get_cursor
 
 

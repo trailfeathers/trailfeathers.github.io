@@ -1,4 +1,8 @@
-"""Trip report info (catalog) operations."""
+"""
+Trip report catalog (trip_report_info). Hike/location records used for the location
+dropdown, trip creation, user trip reports, top four, and wishlist. insert_trip_report_info
+adds a row (e.g. from LLM pipeline); list/get functions used by routes and other database modules.
+"""
 from .connection import get_cursor
 
 

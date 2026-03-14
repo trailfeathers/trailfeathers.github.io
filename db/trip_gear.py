@@ -1,4 +1,9 @@
-"""Trip equipment assignment."""
+"""
+Trip gear assignment (trip_gear). get_trip_gear_pool returns all gear from trip
+collaborators with is_assigned flag; get_trip_assigned_gear returns only assigned
+items. assign_gear_to_trip requires gear owner to be a collaborator; unassign
+removes the link. Used by trip dashboard routes.
+"""
 from .connection import get_cursor
 
 

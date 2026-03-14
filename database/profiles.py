@@ -1,4 +1,10 @@
-"""User profiles."""
+"""
+User profiles (user_profiles): display_name, bio, avatar_path (preset under
+PROFILE_AVATAR_DIR_PREFIX), and optional BYTEA avatar upload. get_user_profile returns
+row with avatar_uploaded flag; upsert_user_profile handles display/bio and preset vs
+upload; set_profile_avatar_upload / get_profile_avatar_payload for uploaded image.
+Used by profile routes and avatar serving.
+"""
 from .connection import get_cursor
 
 # Allowed prefix for avatar_path (under static/) — profile duck presets

@@ -1,4 +1,10 @@
-"""Trip invitation management."""
+"""
+Trip invitations (trip_invites). create_trip_invite by invitee_id; invite_user_to_trip
+by username (validates friend, creator, not already member/invited). accept adds
+to trip_collaborators; decline/cancel update or delete invite. list_trip_invites_pending
+(for trip), list_incoming_trip_invites (for user), has_pending_invite_to_trip, list_trip_collaborators.
+Uses local imports from trips, users, friends to avoid circular dependency.
+"""
 from .connection import get_cursor
 
 

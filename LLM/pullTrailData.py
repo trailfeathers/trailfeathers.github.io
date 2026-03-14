@@ -1,3 +1,10 @@
+"""
+Scrape WTA (Washington Trails Association) hike listing and individual hike pages
+to build a CSV of trail data. Uses requests + BeautifulSoup for the search listing
+(paginated by offset); uses Selenium (Chrome headless) per hike URL to get full
+description and lazy-loaded trip reports. Writes all_hikes to test.csv. Intended
+as a one-off or manual run; column names match what LLMProcessing.py expects.
+"""
 import requests
 import time
 import csv
@@ -26,9 +33,9 @@ params = {
 }
 
 offset = 0
-
 links = []
 
+# Paginate WTA search results and collect hike page URLs.
 while offset <= 120:
 
     # Add pagination offset
@@ -73,9 +80,9 @@ print(links)
 
 all_hikes = []
 
-# --- Selenium setup ---
+# Selenium: one Chrome headless session; each hike page is loaded and parsed.
 options = Options()
-options.headless = True  # run browser in background
+options.headless = True
 driver = webdriver.Chrome(options=options)
 
 for url in links:
@@ -181,7 +188,7 @@ for url in links:
 
 driver.quit()
 
-# --- Write to CSV ---
+# Write collected hikes to test.csv (fieldnames derived from all keys).
 if all_hikes:
     fieldnames = set()
     for hike in all_hikes:

@@ -1,4 +1,10 @@
-/* Trip planner – layout, create form, location combobox, trip cards, edit modal, base buttons */
+/*
+ * Trip planner page (trip.html) – layout, create-trip form, trip cards, edit modal.
+ * .trip-planner: page wrapper. .trip-planner-layout: flex row for .trip-setup (create form)
+ * and .trip-overview (trip list). .location-combobox / .location-listbox: catalog search
+ * dropdown. .trip-card: each trip in the list; .trip-card-clickable for navigation.
+ * .edit-trip-modal: overlay and content for the edit-trip dialog. Base button styles at bottom.
+ */
 .trip-planner {
   max-width: 1200px;
   margin: 0 auto;
@@ -43,6 +49,7 @@
   background-color: #f0f5eb;
 }
 
+/* Create-trip form area and trip list area (white cards). */
 .trip-setup,
 .trip-overview {
   background: white;
@@ -141,6 +148,7 @@
   width: auto;
 }
 
+/* Location catalog combobox: input + dropdown list (shown when aria-expanded="true"). */
 .location-combobox {
   position: relative;
   width: 100%;
@@ -208,6 +216,7 @@
   min-height: 80px;
 }
 
+/* Single trip in the list; .trip-card-clickable adds hover and cursor. */
 .trip-card {
   background: white;
   padding: 1rem;
@@ -236,6 +245,7 @@
   margin-right: 0.5rem;
 }
 
+/* Edit-trip dialog: full-screen overlay, dark backdrop, centered white content box. */
 .edit-trip-modal {
   position: fixed;
   inset: 0;
@@ -288,6 +298,7 @@
   max-height: 200px;
 }
 
+/* Default and variant button styles (used on trip and other pages). */
 button {
   padding: 0.5rem 1rem;
   border-radius: 6px;

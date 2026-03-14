@@ -1,12 +1,18 @@
+"""
+Locations (hike catalog) API. Single endpoint: GET /api/locations returns
+trip_report_info rows for dropdowns (trip creation, trip reports, wishlist).
+"""
 from flask import jsonify
 
 from db import list_trip_report_info_for_selection
 
 
 def register(app, login):
+    """Register locations route; login for require_auth()."""
+
     @app.get("/api/locations")
     def get_locations():
-        """Return location catalog (trip_report_info) for trip creation dropdown/search."""
+        """Return location catalog (trip_report_info) for dropdowns."""
         user = login.require_auth()
         if not user:
             return jsonify(error="Not logged in"), 401

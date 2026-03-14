@@ -453,6 +453,7 @@ def _append_hike(csv_path: Path, hike: dict[str, str]) -> None:
 # ---------------------------------------------------------------------------
 
 def main() -> None:
+    """Run scraper: fetch hike URLs (with optional limit), scrape each page with resume, append to OUTPUT_CSV."""
     test_mode = "--test" in sys.argv or os.environ.get("TEST_ONLY") == "1"
     limit = 1 if test_mode else HIKE_LIMIT
 

@@ -1,4 +1,10 @@
-"""Friend requests and relationship helpers."""
+"""
+Friends: friend_requests (pending/accepted/declined). create_friend_request sends a
+request; accept/decline by receiver; list_incoming_requests for current user;
+list_friends returns accepted pairs. get_relationship returns status (self|none|friend|
+pending_out|pending_in) and request_id; remove_friend and cancel_friend_request for
+unfriend and cancel sent request. Used by friends and profile routes.
+"""
 from .connection import get_cursor
 
 

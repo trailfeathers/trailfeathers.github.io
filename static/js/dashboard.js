@@ -1,10 +1,13 @@
 /**
  * First page and dashboard navigation (buttons, banner welcome).
+ *
+ * Runs on index.html (first page) and dashboard.html. Wires: first-page Login/Register buttons,
+ * dashboard buttons (inventory, plan trip, add friend, home), and banner "Welcome, {username}"
+ * on the dashboard only (via /api/me).
  */
 import { API_BASE } from "./config.js";
 
 document.addEventListener("DOMContentLoaded", () => {
-  // First Page buttons
   const loginButton = document.querySelector("#login");
   const registerButton = document.querySelector("#register");
 
@@ -30,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const home = document.querySelector("#home");
   if (home) home.addEventListener("click", () => (window.location.href = "dashboard.html"));
 
-  // Banner: show "Welcome, {username}" only on dashboard (not inventory/trip/friends)
+  /* Banner: show "Welcome, {username}" only on dashboard (path ends with dashboard.html and not trip_dashboard). */
   const bannerTitleEl = document.querySelector("#banner-title");
   const path = (window.location.pathname || "").toLowerCase();
   const isDashboard = path.endsWith("dashboard.html") && !path.includes("trip_dashboard");

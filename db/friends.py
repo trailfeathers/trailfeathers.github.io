@@ -1,4 +1,8 @@
-"""Friends and social features."""
+"""
+Friends: friend_requests (pending/accepted/declined). create_friend_request sends a
+request; accept/decline by receiver; list_incoming_requests for current user;
+list_friends returns accepted pairs. Used by friends routes and profile relationship.
+"""
 from .connection import get_cursor
 
 

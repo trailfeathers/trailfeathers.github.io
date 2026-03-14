@@ -1,4 +1,7 @@
-"""User wishlist."""
+"""
+User wishlist (user_wishlist). Catalog hikes the user wants to try. list returns
+joined trip_report_info; add/remove by trip_report_info_id. Used by wishlist routes.
+"""
 from .connection import get_cursor
 from .trip_report_info import get_trip_report_info_by_id
 

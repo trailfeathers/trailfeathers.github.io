@@ -1,4 +1,10 @@
-"""Trip invites."""
+"""
+Trip invitations (trip_invites). create_trip_invite by invitee_id. accept adds
+to trip_collaborators; decline/cancel update or delete invite. list_trip_invites_pending
+(for trip), list_incoming_trip_invites (for user), has_pending_invite_to_trip,
+get_trip_id_for_invite, cancel_trip_invite. list_trip_collaborators and remove_trip_collaborator
+live in trips.py. Used by trip routes.
+"""
 from .connection import get_cursor
 
 

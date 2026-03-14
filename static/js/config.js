@@ -1,10 +1,14 @@
 /**
  * API and client-side config for TrailFeathers.
+ *
+ * API_BASE is the backend root (e.g. for fetch(API_BASE + "/api/gear")).
+ * REQUIREMENT_KEY_TO_CATEGORY and GEAR_CATEGORY_ORDER are used only on the client
+ * to group gear items into sections (Sleep Systems, Food & Water, etc.) on the inventory page.
  */
 
 export const API_BASE = "https://trailfeathers-github-io-real.onrender.com";
 
-// Gear library: map requirement_type key → category for dashboard grouping (client-side only)
+/** Map requirement_type key → display category for inventory grouping (client-side only). */
 export const REQUIREMENT_KEY_TO_CATEGORY = {
   shelter: "Sleep Systems",
   sleeping_bag: "Sleep Systems",
@@ -36,6 +40,7 @@ export const REQUIREMENT_KEY_TO_CATEGORY = {
   other: "Other"
 };
 
+/** Order in which category sections appear on the inventory page. */
 export const GEAR_CATEGORY_ORDER = [
   "Sleep Systems",
   "Food & Water",

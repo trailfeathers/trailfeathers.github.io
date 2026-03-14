@@ -1,6 +1,9 @@
 """
-Database connection for TrailFeathers.
-Uses DATABASE_URL (e.g. Neon PostgreSQL). Falls back to in-memory if not set.
+Database connection for TrailFeathers. Uses DATABASE_URL (e.g. Neon PostgreSQL);
+raises RuntimeError if unset. get_db_connection() returns a raw connection (caller
+must close). get_cursor() is the preferred context manager: yields a cursor that
+returns dict-like rows and commits on exit. Uses psycopg2 with RealDictCursor when
+available, otherwise psycopg (v3) with dict_row.
 """
 import os
 from contextlib import contextmanager

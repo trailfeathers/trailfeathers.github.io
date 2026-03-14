@@ -1,3 +1,10 @@
+"""
+Process oregonHikerData.csv with OpenAI (same prompt as LLMProcessing) and insert
+into trip_report_info. Skips rows whose source_url is already in the DB so the run
+can be resumed. Uses MAX(trip_id)+1 so Oregon hikes append after existing data.
+Expects columns matching find_csv_column (Hike Name, URL, Length, Elevation Gain, etc.);
+latitude/longitude from dedicated columns.
+"""
 from dotenv import load_dotenv
 load_dotenv()  # ← THIS MUST COME FIRST
 
@@ -156,6 +163,7 @@ csv_file_path = script_dir / "oregonHikerData.csv"
 already_inserted = get_already_inserted_urls()
 next_trip_id = get_starting_trip_id()
 
+# For each row: skip if URL already in DB; else call LLM, parse response, insert and add URL to already_inserted.
 with open(csv_file_path, newline="", encoding="utf-8") as csvfile:
     reader = csv.reader(csvfile)
     headers = next(reader)

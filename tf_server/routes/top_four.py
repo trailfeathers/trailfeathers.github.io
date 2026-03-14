@@ -1,3 +1,9 @@
+"""
+Top Four hikes API. User chooses up to four favorite hikes (from those they have
+a trip report for). Endpoints: GET /api/me/top-four (slots 1–4 with hike info),
+PUT /api/me/top-four (replace slots from payload), GET /api/me/top-four-eligible
+(hikes that can be chosen).
+"""
 from flask import jsonify, request
 
 from db import (
@@ -8,9 +14,8 @@ from db import (
 
 
 def register(app, login):
-    # ----------------------
-    # Top four API
-    # ----------------------
+    """Register Top Four routes; login for require_auth()."""
+
     @app.get("/api/me/top-four")
     def get_my_top_four():
         user = login.require_auth()

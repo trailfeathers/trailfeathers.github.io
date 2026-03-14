@@ -1,5 +1,9 @@
 /**
  * Gear library (inventory) page: load gear by category, add form, edit panel.
+ *
+ * Runs on inventory.html. Fetches gear from /api/gear, groups items by requirement type
+ * into categories (Sleep Systems, Food & Water, etc.), and renders them. Supports add-item
+ * form, edit mode (click item to open edit panel), and delete. Requires config.js and utils.js.
  */
 import { API_BASE, REQUIREMENT_KEY_TO_CATEGORY, GEAR_CATEGORY_ORDER } from "./config.js";
 import { escapeHtml } from "./utils.js";
@@ -11,11 +15,16 @@ document.addEventListener("DOMContentLoaded", () => {
   let gearEditMode = false;
   let lastGearItems = [];
 
+  /** Maps API requirement_type key to display category (from config); falls back to "Other". */
   function getCategoryForKey(key) {
     if (!key) return "Other";
     return REQUIREMENT_KEY_TO_CATEGORY[key] || "Other";
   }
 
+  /**
+   * Renders the gear list grouped by category. In edit mode, items are clickable (open edit panel)
+   * and show a delete button; delete handlers are attached after innerHTML is set.
+   */
   function renderGearList(items) {
     if (!gearCategoriesEl || items.length === 0) return;
     const byCategory = {};
@@ -46,6 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (gearEditMode) {
       gearCategoriesEl.querySelectorAll(".btn-delete-gear").forEach((btn) => {
+        /* Prevent click from bubbling to the list item (which would open edit panel). */
         btn.addEventListener("click", async (e) => {
           e.stopPropagation();
           const id = btn.getAttribute("data-gear-id");
@@ -67,6 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (gearEditMode) {
       gearCategoriesEl.querySelectorAll(".gear-item-editable").forEach((el) => {
         el.addEventListener("click", () => {
+          /* Open edit panel for this gear item. */
           const id = el.getAttribute("data-gear-id");
           if (id) openEditGearPanel(id);
         });
@@ -74,6 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  /** Fetches all gear for the current user and renders the list; redirects to login if unauthenticated. */
   async function loadGear() {
     if (!gearCategoriesEl) return;
     try {
@@ -102,6 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // --- Edit gear panel: DOM refs and helpers ---
   const editGearSection = document.querySelector("#edit-gear-section");
   const editGearForm = document.querySelector("#edit-gear-form");
   const editGearIdEl = document.querySelector("#edit-gear-id");
@@ -116,6 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const editGearErrorEl = document.querySelector("#edit-gear-error");
   const editGearCancelBtn = document.querySelector("#edit-gear-cancel");
 
+  /** Populates the edit-panel type dropdown from /api/requirement-types. */
   async function loadEditGearTypes() {
     if (!editGearTypeSelect) return;
     try {
@@ -128,11 +142,13 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (_) {}
   }
 
+  /** Hides the edit panel and clears any error message. */
   function closeEditGearPanel() {
     if (editGearSection) editGearSection.style.display = "none";
     if (editGearErrorEl) editGearErrorEl.textContent = "";
   }
 
+  /** Fetches gear by id, fills the edit form, and shows the edit panel. */
   async function openEditGearPanel(gearId) {
     if (!editGearSection || !editGearForm) return;
     if (editGearErrorEl) editGearErrorEl.textContent = "";
@@ -165,6 +181,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const id = editGearIdEl && editGearIdEl.value;
       if (!id || !editGearNameEl) return;
       if (editGearErrorEl) editGearErrorEl.textContent = "";
+      /* Build payload from form; only include capacity_persons and weight_oz when valid numbers. */
       const typeOption = editGearTypeSelect && editGearTypeSelect.options[editGearTypeSelect.selectedIndex];
       const requirement_type_id = typeOption && typeOption.value ? parseInt(typeOption.value, 10) : undefined;
       const typeDisplay = typeOption && typeOption.textContent ? typeOption.textContent.trim() : "Other";
@@ -206,6 +223,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   if (editGearCancelBtn) editGearCancelBtn.addEventListener("click", closeEditGearPanel);
 
+  /** Toggle edit mode: when on, list items become clickable and show delete buttons; when off, panel closes. */
   const editGearBtn = document.querySelector("#edit-gear-btn");
   if (editGearBtn) {
     editGearBtn.addEventListener("click", () => {
@@ -216,6 +234,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  /** Fills the add-item form's type dropdown from /api/requirement-types. */
   async function loadRequirementTypes() {
     const selectEl = document.querySelector("#gear-type");
     if (!selectEl) return;
@@ -242,6 +261,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (gearCategoriesEl) loadGear();
   if (document.querySelector("#gear-type")) loadRequirementTypes();
 
+  /* Add-item form: validate name, build payload (type from dropdown, optional capacity_persons/weight), POST to /api/gear. */
   if (addItemForm) {
     addItemForm.addEventListener("submit", async (e) => {
       e.preventDefault();

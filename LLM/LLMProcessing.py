@@ -1,3 +1,11 @@
+"""
+Process trailData.csv with OpenAI to produce summarized descriptions and cleaned
+trip reports, then insert rows into trip_report_info. Reads CSV from script directory;
+uses OPENAI_API_KEY and DATABASE_URL. TRIP_REPORT_START_TRIP_ID can set starting
+trip_id; otherwise continues from MAX(trip_id)+1. Each row is sent to the LLM once;
+output is JSON (summarized_description, trip_report_1, trip_report_2). Latitude/longitude
+are derived from the row (including malformed CSVs where coords appear in headers).
+"""
 from dotenv import load_dotenv
 load_dotenv()  # ← THIS MUST COME FIRST
 
@@ -223,6 +231,7 @@ script_dir = Path(__file__).parent
 csv_file_path = script_dir / "trailData.csv"
 next_trip_id = get_starting_trip_id()
 
+# Process each CSV row: build prompt from row, call LLM, parse JSON, insert trip_report_info.
 with open(csv_file_path, newline="", encoding="utf-8") as csvfile:
     reader = csv.reader(csvfile)
     headers = next(reader)

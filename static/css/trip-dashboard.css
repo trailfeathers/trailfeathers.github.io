@@ -1,4 +1,11 @@
-/* Trip dashboard – layout, view toggle, summary, weather, map, gear pool, team */
+/*
+ * Trip dashboard (trip_dashboard.html?id=...). Layout, Trip/Pack view toggle, and all
+ * dashboard blocks. Summary card, notes panel, weather, map, trail summary, members,
+ * gear pool (Equipment Pool / Assigned / What to Bring), invite section. Checklist
+ * items use .checklist-icon--met (green) and .checklist-icon--short (red). Gear pool
+ * has .gear-owner-section ("X's Gear"), .gear-owner-edit-link ("Edit My Gear"), and
+ * .btn-add-gear / .btn-remove-gear. Media query: gear and team blocks become 2-column grid.
+ */
 .trip-dashboard.content {
   align-items: stretch;
   margin-top: 1.5rem;
@@ -36,6 +43,7 @@
   background-color: #f0f5eb;
 }
 
+/* Trip View / Pack View toggle (pill buttons). .is-active = selected. */
 .trip-dashboard-view-toggle {
   display: inline-flex;
   gap: 0;
@@ -77,6 +85,7 @@
   transform: translateY(1px);
 }
 
+/* Notes section: textarea and Save button. */
 .trip-dashboard-notes-panel {
   margin-bottom: 1.5rem;
 }
@@ -107,6 +116,7 @@
   margin-top: 0.75rem;
 }
 
+/* Main trip info card (name, trail, activity, date, created by, edit/delete/leave). */
 .trip-dashboard-summary {
   background: white;
   padding: 1.5rem 1.75rem;
@@ -127,6 +137,7 @@
   font-size: 1rem;
 }
 
+/* Top row: trip info left, weather right; stacks on small screens. */
 .trip-dashboard-top {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -176,6 +187,7 @@
   border-top: 1px solid #e0e0e0;
 }
 
+/* Map iframe and "Open in Google Maps" link. */
 .trip-dashboard-map {
   margin-top: 1.25rem;
   padding-top: 1.25rem;
@@ -310,6 +322,7 @@
   margin-bottom: 1.5rem;
 }
 
+/* Generic white card for each dashboard block (members, gear pool, checklist, etc.). */
 .trip-dashboard-section {
   margin-top: 0;
   margin-bottom: 0;
@@ -340,6 +353,7 @@
   margin-bottom: 0.35rem;
 }
 
+/* "What to Bring" list: each item has icon + text. Icon color = met (green) or short (red). */
 #trip-checklist-list .checklist-item {
   display: flex;
   align-items: flex-start;
@@ -364,6 +378,7 @@
   color: #c62828;
 }
 
+/* "X's Gear" heading row; .gear-owner-edit-link = "Edit My Gear" (current user only). */
 .gear-owner-heading {
   display: flex;
   align-items: center;
@@ -389,6 +404,7 @@
   background: #f0f5eb;
 }
 
+/* Pack view: gear pool and assigned gear side-by-side; checklist full width below. Team: members | pending/invite. */
 @media (min-width: 768px) {
   .trip-dashboard-block.trip-dashboard-gear {
     display: grid;
@@ -428,6 +444,7 @@
   }
 }
 
+/* Member role label (e.g. "creator") next to username. */
 .role-badge {
   font-size: 0.85rem;
   color: #555;
@@ -459,6 +476,7 @@
   margin-right: 0.75rem;
 }
 
+/* One owner's block in Equipment Pool (heading + list of gear items). */
 .gear-owner-section {
   margin-bottom: 1.5rem;
   padding: 0.75rem;
@@ -489,6 +507,7 @@
   border-radius: 4px;
 }
 
+/* Gear item already assigned to the trip (green tint). */
 .gear-pool-item.assigned {
   background: #e8f5e9;
   border-color: #4caf50;
@@ -499,6 +518,7 @@
   font-size: 0.9rem;
 }
 
+/* Small action buttons in gear pool: Add to Trip (green), Remove (red). */
 .btn-small {
   padding: 0.3rem 0.75rem;
   font-size: 0.85rem;
@@ -526,6 +546,7 @@
   background: #b71c1c;
 }
 
+/* "Assigned Equipment" list (green left border). */
 .assigned-gear-list {
   list-style: none;
   padding: 0;

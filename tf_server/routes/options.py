@@ -1,5 +1,10 @@
+"""
+CORS preflight OPTIONS handlers. Registers OPTIONS for all API routes so
+browser preflight requests get 200; no auth. Called from factory after other
+route modules.
+"""
 def register(app):
-    # Preflight OPTIONS must return 2xx for CORS
+    """Register OPTIONS handlers for CORS preflight (return 200)."""
     @app.route("/api/signup", methods=["OPTIONS"])
     @app.route("/api/login", methods=["OPTIONS"])
     @app.route("/api/gear", methods=["OPTIONS"])
@@ -56,6 +61,5 @@ def register(app):
         username=None,
         friend_user_id=None,
     ):
-        # gear_id used by OPTIONS /api/gear/<int:gear_id>; user_id for DELETE collaborators
         return "", 200
 

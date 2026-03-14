@@ -1,3 +1,9 @@
+"""
+Trips API. CRUD for trips; dashboard (trip + collaborators + gear pool + checklist + pending invite);
+weather (NWS); checklist; requirement types; collaborators; invites (create, list, accept, decline,
+cancel); trip gear (pool, assigned, assign, unassign). Session cache used for trips list and
+dashboard; login.refresh_session_cache / invalidate_trip_dashboard_cache keep it in sync.
+"""
 import json
 import urllib.error
 import urllib.request
@@ -35,10 +41,10 @@ from db import (
 
 
 def register(app, login):
-    # ----------------------
-    # Trips API
-    # ----------------------
+    """Register trip routes; login for auth and session/dashboard cache."""
+
     def _trip_to_json(t):
+        """Serialize trip row to JSON for API responses."""
         out = {
             "id": t["id"],
             "trip_name": t["trip_name"],

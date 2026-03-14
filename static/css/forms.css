@@ -1,4 +1,9 @@
-/* Form and button styles – shared page content, first page, auth, gear form */
+/*
+ * Form and button styles – shared across multiple pages.
+ * .content: main content wrapper (flex, centered). #welcome / #welcome-message: dashboard
+ * intro text. #first-options: index.html Login/Register buttons. .authorization: login
+ * and register form container and inputs. .gear-form: inventory add-item form layout.
+ */
 .content {
   display: flex;
   justify-content: center;
@@ -17,7 +22,7 @@
   margin-bottom: 1.5rem;
 }
 
-/* First Page – login options */
+/* First page (index): Login and Register buttons. */
 #first-options {
   display: flex;
   justify-content: center;
@@ -57,7 +62,7 @@
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
 }
 
-/* Login Page – back button, authorization form */
+/* Login/register: secondary (back) button and auth form container + inputs. */
 .authorization .secondary {
   width: 100%;
   padding: 0.75rem;
@@ -125,7 +130,7 @@
   margin-top: 0.2rem;
 }
 
-/* Gear add form (inventory page) */
+/* Gear add form (inventory page): card layout, labels, inputs, submit. */
 .gear-form {
   background: white;
   padding: 2rem 2.5rem;

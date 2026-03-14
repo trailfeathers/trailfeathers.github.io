@@ -1,3 +1,8 @@
+"""
+Gear (inventory) API. CRUD for the current user's gear items. Endpoints:
+POST /api/gear, GET /api/gear (from session cache), GET/PUT/DELETE /api/gear/<id>.
+Session gear cache refreshed on create/update/delete.
+"""
 from flask import jsonify, request, session
 
 from db import (
@@ -9,9 +14,8 @@ from db import (
 
 
 def register(app, login):
-    # ----------------------
-    # Inventory API
-    # ----------------------
+    """Register gear routes; login for require_auth() and refresh_session_cache()."""
+
     @app.post("/api/gear")
     def create_gear():
         user = login.require_auth()

@@ -1,14 +1,19 @@
-"""User management functions."""
+"""
+User management: lookup by id or username, create user, check existence, get first user.
+Used by auth (login, signup), profile routes (user lookup), and trip_invites (invitee lookup).
+"""
 from .connection import get_cursor
 
 
 def get_user_by_id(user_id):
+    """Return user row (id, username) or None."""
     with get_cursor() as cur:
         cur.execute("SELECT id, username FROM users WHERE id = %s", (user_id,))
         return cur.fetchone()
 
 
 def get_user_by_username(username):
+    """Return user row including password_hash, or None."""
     with get_cursor() as cur:
         cur.execute(
             "SELECT id, username, password_hash FROM users WHERE username = %s",
@@ -18,6 +23,7 @@ def get_user_by_username(username):
 
 
 def create_user(username, password_hash):
+    """Insert user; returns row with id, username."""
     with get_cursor() as cur:
         cur.execute(
             "INSERT INTO users (username, password_hash) VALUES (%s, %s) RETURNING id, username",
@@ -27,6 +33,7 @@ def create_user(username, password_hash):
 
 
 def user_exists_by_username(username):
+    """True if a user with this username exists."""
     with get_cursor() as cur:
         cur.execute("SELECT id FROM users WHERE username = %s", (username,))
         return cur.fetchone() is not None

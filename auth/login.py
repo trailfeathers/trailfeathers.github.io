@@ -1,3 +1,13 @@
+"""
+Flask auth blueprint: signup, login, logout, and current-user (session-based).
+
+Uses db for users (get_user_by_username, create_user, user_exists_by_username),
+list_gear, list_friends, list_trips_for_user. Session stores user_id and caches
+user, gear, friends, trips (and optionally trip_dashboard). SECRET_KEY from env;
+SESSION_PERMANENT with 1-day lifetime; cookie HttpOnly, SameSite=Lax, Secure on RENDER.
+Helpers: require_auth() (session or DB), refresh_session_cache(), invalidate_trip_dashboard_cache().
+Routes: POST /api/signup, POST /api/login, POST /api/logout, GET /api/me.
+"""
 import os
 from flask import Flask, request, jsonify, session
 from flask_bcrypt import Bcrypt
@@ -16,7 +26,7 @@ from db import (
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 
-# --- Secret Key ---
+# --- App config: secret key and session ---
 app.config["SECRET_KEY"] = os.getenv(
     "SECRET_KEY", "dev-insecure-secret-key-change-me"
 )
@@ -29,6 +39,7 @@ app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 app.config["SESSION_COOKIE_SECURE"] = bool(os.getenv("RENDER"))
 
 
+# --- Session serialization and cache ---
 def _serialize_gear(items):
     """Convert gear list to JSON-serializable dicts for session."""
     out = []
@@ -90,7 +101,7 @@ def invalidate_trip_dashboard_cache(trip_id=None):
 
 
 def require_auth():
-    """Return current user dict (id, username) from session cache or DB, or None."""
+    """Return current user dict (id, username) from session cache or DB, or None. Used by protected routes."""
     cached = session.get("user")
     if cached and "id" in cached and "username" in cached:
         return cached
@@ -108,6 +119,7 @@ def require_auth():
 # ----------------------
 @app.post("/api/signup")
 def signup():
+    """Create user with bcrypt hash, set session, populate cache; 400 if missing/invalid, 409 if username taken."""
     data = request.get_json(silent=True) or {}
 
     username = (data.get("username") or "").strip()
@@ -137,6 +149,7 @@ def signup():
 # ----------------------
 @app.post("/api/login")
 def login_route():
+    """Validate username/password, set session and cache; 401 on invalid credentials."""
     data = request.get_json(silent=True) or {}
 
     username = (data.get("username") or "").strip()
@@ -164,6 +177,7 @@ def login_route():
 # ----------------------
 @app.post("/api/logout")
 def logout_route():
+    """Clear session and return ok."""
     session.clear()
     return jsonify(ok=True)
 
@@ -173,6 +187,7 @@ def logout_route():
 # ----------------------
 @app.get("/api/me")
 def me():
+    """Return current user id and username; 401 if not logged in."""
     user = require_auth()
     if not user:
         return jsonify(error="Not logged in"), 401

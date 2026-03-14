@@ -1,6 +1,11 @@
 """
-TrailFeathers database module.
-Refactored from single database.py into logical submodules.
+TrailFeathers database module. Single import surface for all DB access.
+
+Submodules: connection (get_cursor, get_db_connection), users, trip_reports (catalog),
+requirements (activity/gear types, trip checklist), gear, friends, favorites, profiles,
+top_four, user_trip_reports, wishlist, relationships, trips, trip_invites, trip_gear.
+Import from db in routes, auth, and LLM scripts; avoid importing db submodules from
+each other except via local imports where needed to break cycles (e.g. requirements→trips).
 """
 
 # Connection utilities

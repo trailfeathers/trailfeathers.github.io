@@ -1,10 +1,13 @@
 /**
  * Login, register, and logout handlers.
+ *
+ * Runs on login.html and register.html. Handles: login form (POST /api/login, redirect to dashboard),
+ * register form (confirm password, POST /api/signup, 409 → "Username already exists"), back buttons,
+ * and logout button (POST /api/logout, then redirect to login) on any page that includes it.
  */
 import { API_BASE } from "./config.js";
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Back button (Login Page)
   const backButtonLogin = document.querySelector("#back-button-login");
   if (backButtonLogin) {
     backButtonLogin.addEventListener("click", () => {
@@ -12,7 +15,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Login Form – call API, then redirect or show error
   const loginForm = document.querySelector("#login-form");
   if (loginForm) {
     loginForm.addEventListener("submit", async (e) => {
@@ -46,7 +48,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Registration Form – validate confirm password, call API, then redirect or show error
   const registerForm = document.querySelector("#register-form");
   if (registerForm) {
     registerForm.addEventListener("submit", async (e) => {
@@ -89,7 +90,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Back button (Registration Page)
   const backButtonRegister = document.querySelector("#back-button-register");
   if (backButtonRegister) {
     backButtonRegister.addEventListener("click", () => {
@@ -97,7 +97,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Logout button (appears on all authenticated pages)
   const logoutBtn = document.querySelector("#logout-btn");
   if (logoutBtn) {
     logoutBtn.addEventListener("click", async () => {
